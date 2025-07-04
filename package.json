@@ -1,0 +1,53 @@
+{
+    "name": "claude-appsscript-pro",
+    "version": "2.0.1",
+    "description": "🚀 Enterprise級 Google Apps Script開発支援MCPサーバー - 75-99%出力削減システム",
+    "main": "server.js",
+    "type": "module",
+    "engines": {
+        "node": ">=18.0.0"
+    },
+    "scripts": {
+        "start": "node server.js",
+        "dev": "node server.js",
+        "test": "echo \"No tests yet\" && exit 0",
+        "install-deps": "npm install --no-optional --no-fund"
+    },
+    "dependencies": {
+        "@modelcontextprotocol/sdk": "^1.13.1",
+        "dotenv": "^16.5.0",
+        "googleapis": "^150.0.1",
+        "zod": "^3.23.0"
+    },
+    "devDependencies": {
+        "@types/node": "^20.11.0"
+    },
+    "keywords": [
+        "mcp",
+        "claude",
+        "google-apps-script",
+        "automation",
+        "productivity",
+        "output-reduction",
+        "token-optimization"
+    ],
+    "author": "Claude Apps Script Pro Team",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/overdozer1124/claude-appsscript-pro.git"
+    },
+    "homepage": "https://github.com/overdozer1124/claude-appsscript-pro#readme",
+    "bugs": {
+        "url": "https://github.com/overdozer1124/claude-appsscript-pro/issues"
+    },
+    "os": [
+        "win32",
+        "darwin",
+        "linux"
+    ],
+    "cpu": [
+        "x64",
+        "arm64"
+    ]
+}
