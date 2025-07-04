@@ -1,0 +1,97 @@
+# Environment variables (CRITICAL - Never commit credentials!)
+.env
+.env.local
+.env.production
+.env.staging
+credentials.json
+
+# Node.js dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Logs
+logs/
+*.log
+debug.log
+error.log
+output.log
+startup.log
+test_*.log
+live_*.log
+debug_*.log
+
+# Backup files
+*.backup
+*.bak
+*.backup-*
+server.js.backup-*
+server.js.WORKING-*
+server.js.auto-fix-*
+server.js.broken-*
+server.js.phase*-*
+
+# Cache and temporary files
+cache/
+tmp/
+.cache/
+.temp/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Test files
+test_*.txt
+test_*.json
+timestamp-test-*
+stderr*.txt
+stdout*.log
+
+# PowerShell scripts (may contain sensitive paths)
+*.ps1
+
+# Development files
+server-simple.js
+test-server.js
+test.js
+fix-invisible-chars.js
+
+# Documentation work files
+*.md~
+*.tmp
+
+# === Claude-AppsScript-Pro 固有 ===
+# 実験的・一時的ファイル
+sheets-functions-test/
+*-corrupted-*
+*-enhanced-*
+simple_*.js
+temp-*.js
+
+# デバッグ・開発スクリプト
+oauth-helper.js
+fix-*.js
+integration_*.js
+error_patterns.js
+enhanced_handlers.js
+simple_learning_*.js
+
+# 設定ファイルのコピー
+*- コピー.*
+
+# Claude Desktop configuration (contains sensitive paths)
+claude_desktop_config.json
