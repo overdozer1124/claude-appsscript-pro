@@ -1,17 +1,28 @@
-# Environment variables (CRITICAL - Never commit credentials!)
-.env
-.env.local
-.env.production
-.env.staging
-credentials.json
+# ========================================
+# 🚀 Claude-AppsScript-Pro .gitignore v2.1.0
+# Complete exclusion rules for all system components
+# ========================================
 
-# Node.js dependencies
+# === CRITICAL SECURITY (Never commit!) ===
+.env
+.env.*
+credentials.json
+*.key
+*.pem
+*-credentials.json
+oauth-token.json
+refresh-token.json
+
+# === Node.js Dependencies ===
 node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+package-lock.json
+.npm/
+.yarn/
 
-# Logs
+# === Logging System ===
 logs/
 *.log
 debug.log
@@ -21,8 +32,11 @@ startup.log
 test_*.log
 live_*.log
 debug_*.log
+console_*.log
+browser_*.log
+mcp_*.log
 
-# Backup files
+# === Backup & Recovery Files ===
 *.backup
 *.bak
 *.backup-*
@@ -31,21 +45,27 @@ server.js.WORKING-*
 server.js.auto-fix-*
 server.js.broken-*
 server.js.phase*-*
+lib/**/*.backup
+lib/**/*.bak
 
-# Cache and temporary files
+# === Cache & Temporary Files ===
 cache/
 tmp/
 .cache/
 .temp/
+.download/
+*.tmp
+*.temp
 
-# IDE and editor files
+# === IDE & Editor Files ===
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
+*.sublime-*
 
-# OS generated files
+# === OS Generated Files ===
 .DS_Store
 .DS_Store?
 ._*
@@ -53,36 +73,27 @@ tmp/
 .Trashes
 ehthumbs.db
 Thumbs.db
+desktop.ini
 
-# Test files
+# === Test & Development Files ===
 test_*.txt
 test_*.json
+test_*.js
 timestamp-test-*
 stderr*.txt
 stdout*.log
+dev-test-*
+integration-test-*
 
-# PowerShell scripts (may contain sensitive paths)
+# === PowerShell Scripts (may contain sensitive paths) ===
 *.ps1
+powershell-scripts/
 
-# Development files
+# === Development Files ===
 server-simple.js
 test-server.js
 test.js
 fix-invisible-chars.js
-
-# Documentation work files
-*.md~
-*.tmp
-
-# === Claude-AppsScript-Pro 固有 ===
-# 実験的・一時的ファイル
-sheets-functions-test/
-*-corrupted-*
-*-enhanced-*
-simple_*.js
-temp-*.js
-
-# デバッグ・開発スクリプト
 oauth-helper.js
 fix-*.js
 integration_*.js
@@ -90,8 +101,125 @@ error_patterns.js
 enhanced_handlers.js
 simple_learning_*.js
 
-# 設定ファイルのコピー
+# === Documentation Work Files ===
+*.md~
+*.tmp
 *- コピー.*
 
-# Claude Desktop configuration (contains sensitive paths)
+# ========================================
+# 🆕 v2.1.0 NEW EXCLUSIONS
+# ========================================
+
+# === Browser Debug System (Playwright-Core) ===
+# ブラウザデバッグ機能関連
+.playwright/
+playwright-downloads/
+browser-cache/
+screenshots/
+*.png
+*.jpg
+*.jpeg
+browser-debug-*
+browser-logs-*
+console-capture-*
+network-logs-*
+
+# === Process Management ===
+# プロセス管理システム関連
+mcp-process-info.txt
+process-*.txt
+process-*.log
+pid-*.txt
+server-status-*
+
+# === 514 Functions Database ===
+# 関数データベース関連
+sheets-functions-test/
+functions-database-cache/
+function-index-*
+db-backup-*
+function-search-cache/
+
+# === WebApp Deployment ===
+# WebAppデプロイメント関連
+deployment-logs/
+webapp-*.json
+deploy-history-*
+deployment-status-*
+
+# === Performance & Monitoring ===
+# パフォーマンス監視関連
+performance-*.json
+memory-usage-*
+benchmark-results/
+profiling-data/
+
+# === Patch System ===
+# パッチシステム関連
+patches/
+patch-*.diff
+patch-backup-*
+unified-diff-*
+
+# === CLI & Portability ===
+# CLI・可搬性関連
+cli-config-*
+portable-config-*
+path-resolution-*
+
+# ========================================
+# 🔧 CLAUDE-APPSSCRIPT-PRO SPECIFIC
+# ========================================
+
+# === Experimental Files ===
+*-corrupted-*
+*-enhanced-*
+*-experimental-*
+simple_*.js
+temp-*.js
+draft-*.js
+
+# === Configuration Copies ===
 claude_desktop_config.json
+mcp-config-backup-*
+config-*.json
+
+# === Handler Development ===
+handlers-backup/
+handlers-test/
+new-handler-*
+handler-*.js.bak
+
+# === Google APIs Testing ===
+api-test-*
+sheets-test-*
+script-test-*
+oauth-test-*
+
+# === Legacy & Deprecated ===
+legacy/
+deprecated/
+old-version-*
+archive/
+
+# ========================================
+# 🎯 PRODUCTION SAFETY
+# ========================================
+
+# === Never commit sensitive data ===
+# Google Cloud credentials
+# OAuth tokens and secrets
+# User-specific configuration
+# Development databases
+# Test scripts with real data
+# Debugging outputs with sensitive info
+
+# === Always review before commit ===
+# New handler files
+# Configuration changes
+# Package.json modifications
+# Environment templates
+
+# ========================================
+# End of .gitignore v2.1.0
+# ========================================
