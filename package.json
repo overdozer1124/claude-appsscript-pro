@@ -1,7 +1,7 @@
 {
     "name": "claude-appsscript-pro",
-    "version": "2.0.1",
-    "description": "Claude Apps Script Pro - MCP Server for solving Claude's output limitations",
+    "version": "2.1.0",
+    "description": "Claude Apps Script Pro v2.1.0 Portable - Revolutionary 75-99% Output Reduction System with 51 Integrated Tools",
     "main": "server.js",
     "type": "module",
     "engines": {
@@ -11,13 +11,17 @@
         "start": "node server.js",
         "dev": "node server.js",
         "test": "echo \"No tests yet\" && exit 0",
-        "install-deps": "npm install --no-optional --no-fund"
+        "install-deps": "npm install --no-optional --no-fund",
+        "setup": "npm install && echo \"Setup complete! Run 'npm start' to begin.\"",
+        "check": "node --check server.js"
     },
     "dependencies": {
         "@modelcontextprotocol/sdk": "^1.13.1",
         "dotenv": "^16.5.0",
         "googleapis": "^150.0.1",
-        "zod": "^3.23.0"
+        "zod": "^3.23.0",
+        "yargs": "^17.7.2",
+        "playwright-core": "^1.54.1"
     },
     "devDependencies": {
         "@types/node": "^20.11.0"
@@ -27,14 +31,22 @@
         "claude",
         "google-apps-script",
         "automation",
-        "productivity"
+        "productivity",
+        "browser-debugging",
+        "webapp-deployment",
+        "sheets-functions",
+        "output-reduction"
     ],
     "author": "Claude Apps Script Pro Team",
     "license": "MIT",
     "repository": {
         "type": "git",
-        "url": "local"
+        "url": "https://github.com/overdozer1124/claude-appsscript-pro.git"
     },
+    "bugs": {
+        "url": "https://github.com/overdozer1124/claude-appsscript-pro/issues"
+    },
+    "homepage": "https://github.com/overdozer1124/claude-appsscript-pro#readme",
     "os": [
         "win32",
         "darwin",
