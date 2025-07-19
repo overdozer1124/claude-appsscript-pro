@@ -70,18 +70,36 @@ export class FunctionsDatabaseManager {
 
     for (const category of coreCategories) {
       try {
-        // 動的import使用で遅延読み込み
-        const modulePath = `./${category.name}-functions.js`;
         console.error(`[DB-MANAGER] Loading ${category.displayName}...`);
         
-        // 基本モジュール構造をシミュレーション（実際のファイルが無い場合）
+        // 実際のモジュールをロード（logical-functions.jsは存在）
+        if (category.name === 'logical') {
+          try {
+            const logicalModule = await import('./logical-functions.js');
+            const moduleInstance = {
+              categoryName: category.name,
+              displayName: category.displayName,
+              functions: logicalModule.getAllFunctions(),
+              buildDatabase: logicalModule.buildDatabase,
+              getFunctionInfo: logicalModule.getFunctionInfo,
+              searchFunctions: logicalModule.searchFunctions,
+              getAllFunctions: logicalModule.getAllFunctions
+            };
+            this.modules.set(category.name, moduleInstance);
+            console.error(`[DB-MANAGER] ✅ ${category.displayName} loaded from file`);
+            continue;
+          } catch (error) {
+            console.error(`[DB-MANAGER] ⚠️ Failed to load ${category.displayName} from file, using mock:`, error.message);
+          }
+        }
+        
+        // フォールバック: モックモジュール
         const mockModule = this.createMockModule(category);
         this.modules.set(category.name, mockModule);
+        console.error(`[DB-MANAGER] ✅ ${category.displayName} loaded (mock)`);
         
-        console.error(`[DB-MANAGER] ✅ ${category.displayName} loaded`);
       } catch (error) {
         console.error(`[DB-MANAGER] ⚠️ ${category.displayName} failed to load:`, error.message);
-        // 失敗してもコア機能は継続
       }
     }
   }
@@ -488,6 +506,112 @@ export class FunctionsDatabaseManager {
       3: ['配列の概念', '複数関数の組み合わせ']
     };
     return prerequisites[complexity] || prerequisites[3];
+  }
+}
+
+// 🔧 既存コード互換性のための直接export関数（重要！）
+// lib/handlers/sheets-functions-tools.js が期待する関数群
+
+// グローバルマネージャーインスタンス（シングルトン）
+let globalManager = null;
+
+/**
+ * グローバルマネージャー取得（遅延初期化）
+ */
+async function getGlobalManager() {
+  if (!globalManager) {
+    globalManager = new FunctionsDatabaseManager();
+    await globalManager.initialize();
+  }
+  return globalManager;
+}
+
+/**
+ * 既存コード互換: 関数情報取得（直接関数として）
+ */
+export async function getFunctionInfo(functionName, options = {}) {
+  try {
+    const manager = await getGlobalManager();
+    return await manager.getFunctionInfo(functionName, options);
+  } catch (error) {
+    console.error('[COMPAT] getFunctionInfo error:', error);
+    return {
+      success: false,
+      error: `Function info retrieval failed: ${error.message}`
+    };
+  }
+}
+
+/**
+ * 既存コード互換: 関数検索（直接関数として）
+ */
+export async function searchFunctions(query, maxResults = 10, categoryFilter = null) {
+  try {
+    const manager = await getGlobalManager();
+    const options = { max_results: maxResults };
+    if (categoryFilter) {
+      options.category_filter = categoryFilter;
+    }
+    return await manager.searchFunctions(query, options);
+  } catch (error) {
+    console.error('[COMPAT] searchFunctions error:', error);
+    return {
+      success: false,
+      results: [],
+      total_matches: 0,
+      error: `Function search failed: ${error.message}`
+    };
+  }
+}
+
+/**
+ * 既存コード互換: 数式検証（直接関数として）
+ */
+export async function validateFormula(formula, options = {}) {
+  try {
+    const manager = await getGlobalManager();
+    return await manager.validateFormula(formula, options);
+  } catch (error) {
+    console.error('[COMPAT] validateFormula error:', error);
+    return {
+      success: false,
+      is_valid: false,
+      error: `Formula validation failed: ${error.message}`
+    };
+  }
+}
+
+/**
+ * 既存コード互換: 代替案提案（直接関数として）
+ */
+export async function suggestAlternatives(functionName, options = {}) {
+  try {
+    const manager = await getGlobalManager();
+    return await manager.suggestAlternatives(functionName, options);
+  } catch (error) {
+    console.error('[COMPAT] suggestAlternatives error:', error);
+    return {
+      success: false,
+      alternatives: [],
+      error: `Alternative suggestions failed: ${error.message}`
+    };
+  }
+}
+
+/**
+ * 既存コード互換: 複雑度分析（直接関数として）
+ */
+export async function analyzeComplexity(functionName, options = {}) {
+  try {
+    const manager = await getGlobalManager();
+    return await manager.analyzeComplexity(functionName, options);
+  } catch (error) {
+    console.error('[COMPAT] analyzeComplexity error:', error);
+    return {
+      success: false,
+      complexity_score: 0,
+      error: `Complexity analysis failed: ${error.message}`
+    };
   }
 }
 
