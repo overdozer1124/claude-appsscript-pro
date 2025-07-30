@@ -1,7 +1,7 @@
 {
     "name": "claude-appsscript-pro",
-    "version": "2.1.0",
-    "description": "Claude Apps Script Pro v2.1.0 Portable - Revolutionary 75-99% Output Reduction System with 54 Integrated Tools + AI Autonomous System + Real Browser Debugging",
+    "version": "3.0.0",
+    "description": "Claude Apps Script Pro v3.0.0 All-in-One Suite - Google Apps Script and Sheets Specialized 55-Tool Integrated All-in-One Development Suite",
     "main": "server.js",
     "type": "module",
     "engines": {
@@ -13,9 +13,7 @@
         "test": "echo \"No tests yet\" && exit 0",
         "install-deps": "npm install --no-optional --no-fund",
         "setup": "npm install && echo \"Setup complete! Run 'npm start' to begin.\"",
-        "check": "node --check server.js",
-        "clean": "rm -rf node_modules package-lock.json && npm install",
-        "lint": "echo \"Linting not configured yet\" && exit 0"
+        "check": "node --check server.js"
     },
     "dependencies": {
         "@modelcontextprotocol/sdk": "^1.13.1",
@@ -39,11 +37,8 @@
         "webapp-deployment",
         "sheets-functions",
         "output-reduction",
-        "ai-autonomous",
-        "real-browser-control",
-        "playwright",
-        "cost-efficient",
-        "portable"
+        "all-in-one-suite",
+        "55-tools-integrated"
     ],
     "author": "Claude Apps Script Pro Team",
     "license": "MIT",
@@ -63,18 +58,5 @@
     "cpu": [
         "x64",
         "arm64"
-    ],
-    "mcp": {
-        "version": "1.13.1",
-        "tools": 54,
-        "features": [
-            "google-apps-script-integration",
-            "google-sheets-direct-api",
-            "webapp-deployment",
-            "real-browser-debugging",
-            "ai-autonomous-development",
-            "output-reduction-75-99-percent",
-            "cost-efficiency-optimized"
-        ]
-    }
+    ]
 }
