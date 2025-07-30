@@ -1,14 +1,14 @@
 #!/usr/bin/env node
 
 /**
- * 🚀 Claude-AppsScript-Pro MCP Server v2.1.0 Portable Complete
- * 46ツール統合・費用効率最適化システム
+ * 🚀 Claude-AppsScript-Pro MCP Server v2.1.0 Local Enhanced
+ * 55ツール統合・ローカル強化版（2025年7月30日版）
  * 
- * v2.1.0 Portable特徴:
- * - 関数データベース除去による軽量化・費用効率最適化
- * - 46核心ツール統合（WebApp・ブラウザデバッグ・Sheet操作・パッチシステム）
+ * v2.1.0 Local Enhanced特徴:
+ * - Enhanced Patch Tools完全統合（ローカル独自機能）
+ * - 55核心ツール統合（動作確認済み機能フル装備）
  * - 75-99%出力削減効果維持
- * - 完全可搬化システム
+ * - 完全可搬化システム + 強化パッチシステム
  */
 
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
@@ -26,11 +26,12 @@ import { config } from 'dotenv';
 import { GoogleAPIsManager } from './lib/core/google-apis-manager.js';
 import { DiagnosticLogger } from './lib/core/diagnostic-logger.js';
 
-// Handler Modules (v2.1.0 Portable - 46ツール構成)
+// Handler Modules - Local Enhanced (55ツール構成)
 import { BasicToolsHandler } from './lib/handlers/basic-tools.js';
 import { SystemToolsHandler } from './lib/handlers/system-tools.js';
 import { DevelopmentToolsHandler } from './lib/handlers/development-tools.js';
 import { PatchToolsHandler } from './lib/handlers/patch-tools.js';
+import { EnhancedPatchToolsHandler } from './lib/handlers/enhanced-patch-tools.js';
 import { FunctionToolsHandler } from './lib/handlers/function-tools.js';
 import { FormulaToolsHandler } from './lib/handlers/formula-tools.js';
 import { WebAppDeploymentToolsHandler } from './lib/handlers/webapp-deployment-tools.js';
@@ -39,20 +40,19 @@ import { SheetToolsHandler } from './lib/handlers/sheet-tools.js';
 import { SheetManagementHandler } from './lib/handlers/sheet-management-tools.js';
 import { ExecutionToolsHandler } from './lib/handlers/execution-tools.js';
 import { IntelligentWorkflowHandler } from './lib/handlers/intelligent-workflow-tools.js';
-// 🔥 SheetsFunctionsTools除去 - v2.1.0 Portable軽量化
 
 // Load environment variables
 config();
 
 /**
- * MCP Server Class - v2.1.0 Portable（46ツール・軽量版）
+ * MCP Server Class - v2.1.0 Local Enhanced（55ツール・強化版）
  */
 class MCPServer {
   constructor() {
     this.server = new Server(
       {
         name: 'claude-appsscript-pro',
-        version: '2.1.0-portable'
+        version: '2.1.0-local-enhanced'
       },
       {
         capabilities: {
@@ -61,15 +61,16 @@ class MCPServer {
       }
     );
 
-    // Initialize all components (軽量版)
+    // Initialize all components (強化版)
     this.googleManager = new GoogleAPIsManager();
     this.logger = new DiagnosticLogger();
     
-    // Initialize handlers (46ツール構成)
+    // Initialize handlers - Local Enhanced (55ツール構成)
     this.basicTools = new BasicToolsHandler(this.googleManager, this.logger, this);
     this.systemTools = new SystemToolsHandler(this.googleManager, this.logger);
     this.developmentTools = new DevelopmentToolsHandler(this.googleManager, this.logger);
     this.patchTools = new PatchToolsHandler(this.googleManager, this.logger);
+    this.enhancedPatchTools = new EnhancedPatchToolsHandler(this.googleManager, this.logger);
     this.functionTools = new FunctionToolsHandler(this.googleManager, this.logger);
     this.formulaTools = new FormulaToolsHandler(this.googleManager, this.logger);
     this.webappDeploymentTools = new WebAppDeploymentToolsHandler(this.googleManager, this.logger);
@@ -78,7 +79,6 @@ class MCPServer {
     this.sheetManagement = new SheetManagementHandler(this.googleManager, this.logger);
     this.executionTools = new ExecutionToolsHandler(this.googleManager, this.logger);
     this.intelligentWorkflow = new IntelligentWorkflowHandler(this.googleManager, this.logger, this);
-    // 🔥 sheetsFunctions除去 - v2.1.0 Portable軽量化
 
     // Initialize Google APIs
     this.initializeAPIs();
@@ -135,10 +135,11 @@ class MCPServer {
         }
       ];
 
-      // Get other handler tools (46個)
+      // Get all handler tools - Local Enhanced (55個)
       const systemTools = this.systemTools.getToolDefinitions();
       const developmentTools = this.developmentTools.getToolDefinitions();
       const patchTools = this.patchTools.getToolDefinitions();
+      const enhancedPatchTools = this.enhancedPatchTools.getToolDefinitions();
       const functionTools = this.functionTools.getToolDefinitions();
       const formulaTools = this.formulaTools.getToolDefinitions();
       const webappDeploymentTools = this.webappDeploymentTools.getToolDefinitions();
@@ -147,13 +148,13 @@ class MCPServer {
       const sheetManagementTools = this.sheetManagement.getToolDefinitions();
       const executionTools = this.executionTools.getTools();
       const intelligentWorkflowTools = this.intelligentWorkflow.getToolDefinitions();
-      // 🔥 sheetsFunctionsTools除去 - v2.1.0 Portable軽量化
 
       const allTools = [
         ...basicTools, 
         ...systemTools, 
         ...developmentTools, 
-        ...patchTools, 
+        ...patchTools,
+        ...enhancedPatchTools,
         ...functionTools, 
         ...formulaTools,
         ...webappDeploymentTools,
@@ -188,9 +189,14 @@ class MCPServer {
           return await this.developmentTools.handleTool(name, args || {});
         }
         
-        // Patch tools (🚀 革命的パッチシステム統合)
+        // Patch tools
         if (this.patchTools.canHandle(name)) {
           return await this.patchTools.handleTool(name, args || {});
+        }
+        
+        // Enhanced Patch tools (🚀 革命的パッチシステム)
+        if (this.enhancedPatchTools.canHandle(name)) {
+          return await this.enhancedPatchTools.handleTool(name, args || {});
         }
         
         // Function tools
@@ -223,17 +229,15 @@ class MCPServer {
           return await this.sheetManagement.handleTool(name, args || {});
         }
 
-        // Execution tools (🎯 革新的Apps Script関数実行機能)
+        // Execution tools
         if (this.executionTools.canHandle(name)) {
           return await this.executionTools.handleTool(name, args || {});
         }
 
-        // Intelligent Workflow tools (🤖 Claude自律サブエージェント機能)
+        // Intelligent Workflow tools
         if (this.intelligentWorkflow.canHandle(name)) {
           return await this.intelligentWorkflow.handleToolCall(name, args || {});
         }
-
-        // 🔥 SheetsFunctions除去 - v2.1.0 Portable軽量化
         
         throw new Error(`Unknown tool: ${name}`);
         
@@ -281,13 +285,13 @@ class MCPServer {
       nodeVersion: process.version,
       platform: process.platform,
       architecture: process.arch,
-      phase: 'v2.1.0 Portable (46 tools - lightweight)',
+      phase: 'v2.1.0 Local Enhanced (55 tools - enhanced features)',
       memoryUsage: Math.round(process.memoryUsage().heapUsed / 1024 / 1024 * 100) / 100
     };
     
     // Log to STDERR to avoid STDOUT pollution
     console.error('====================================================');
-    console.error('[MCP-PROCESS] Claude-AppsScript-Pro Server v2.1.0 Portable');
+    console.error('[MCP-PROCESS] Claude-AppsScript-Pro Server v2.1.0 Local Enhanced');
     console.error('[MCP-PROCESS] PID:', processInfo.pid);
     console.error('[MCP-PROCESS] Start Time:', processInfo.startTime);
     console.error('[MCP-PROCESS] Phase:', processInfo.phase);
@@ -304,7 +308,7 @@ class MCPServer {
    */
   async saveProcessInfoToFile(processInfo) {
     try {
-      const content = `Claude-AppsScript-Pro MCP Server v2.1.0 Portable
+      const content = `Claude-AppsScript-Pro MCP Server v2.1.0 Local Enhanced
 ${processInfo.phase}
 PID: ${processInfo.pid}
 Start Time: ${processInfo.startTime}
@@ -327,14 +331,18 @@ Kill Process Command (if needed):
 PowerShell: Stop-Process -Id ${processInfo.pid}
 Claude Code: kill ${processInfo.pid}
 
-🎯 v2.1.0 Portable Features:
-- 46 core tools (functions database removed for cost efficiency)
+🎯 v2.1.0 Local Enhanced Features:
+- 55 integrated tools (enhanced local feature set)
+- Enhanced Patch Tools (revolutionary anchor-based system) - LOCAL EXCLUSIVE
 - WebApp deployment system (6 tools)
-- Browser debugging with Playwright-Core (4 tools)
-- Revolutionary patch system with anchor-based positioning (5 tools)
+- Browser debugging with Playwright-Core (10 tools)
 - Complete Sheet operations (18 tools)
+- Intelligent Workflow tools (4 tools)
+- Execution tools (2 tools)
 - 75-99% output reduction system
-- Fully portable architecture
+- Fully portable + enhanced architecture
+- ChatGPT-optimized algorithms
+- Anchor-based patching system
 `;
       
       await fs.writeFile('mcp-process-info.txt', content, 'utf8');
@@ -351,9 +359,9 @@ Claude Code: kill ${processInfo.pid}
     const transport = new StdioServerTransport();
     await this.server.connect(transport);
     
-    this.logger.info('🚀 Claude-AppsScript-Pro MCP Server v2.1.0 Portable started successfully');
-    this.logger.info('📊 Features: 46 tools, cost-optimized, revolutionary patch system');
-    this.logger.info('💡 Ready for enterprise-grade Google Apps Script development!');
+    this.logger.info('🚀 Claude-AppsScript-Pro MCP Server v2.1.0 Local Enhanced started successfully');
+    this.logger.info('📊 Features: 55 tools, enhanced integration, revolutionary patch system');
+    this.logger.info('💡 Ready for enterprise-grade Google Apps Script development with enhanced features!');
   }
 }
 
