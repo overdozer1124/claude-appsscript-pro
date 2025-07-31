@@ -27,7 +27,7 @@ import { config } from 'dotenv';
 import { GoogleAPIsManager } from './lib/core/google-apis-manager.js';
 import { DiagnosticLogger } from './lib/core/diagnostic-logger.js';
 
-// Handler Modules - All-in-One Suite (61ツール構成)
+// Handler Modules - Local Enhanced (61ツール構成)
 import { BasicToolsHandler } from './lib/handlers/basic-tools.js';
 import { SystemToolsHandler } from './lib/handlers/system-tools.js';
 import { DevelopmentToolsHandler } from './lib/handlers/development-tools.js';
@@ -53,7 +53,7 @@ class MCPServer {
     this.server = new Server(
       {
         name: 'claude-appsscript-pro',
-        version: '3.0.0-all-in-one-suite'
+        version: '3.0.0'
       },
       {
         capabilities: {
@@ -62,314 +62,179 @@ class MCPServer {
       }
     );
 
-    // Initialize all components (オールインワン版)
-    this.googleManager = new GoogleAPIsManager();
+    // Initialize Core Services
     this.logger = new DiagnosticLogger();
+    this.googleManager = new GoogleAPIsManager();
     
-    // Initialize handlers - All-in-One Suite (61ツール構成)
-    this.basicTools = new BasicToolsHandler(this.googleManager, this.logger, this);
+    // Initialize All Handler Modules（61ツール完全統合）
+    this.basicTools = new BasicToolsHandler(this.googleManager, this.logger);
     this.systemTools = new SystemToolsHandler(this.googleManager, this.logger);
     this.developmentTools = new DevelopmentToolsHandler(this.googleManager, this.logger);
     this.patchTools = new PatchToolsHandler(this.googleManager, this.logger);
     this.enhancedPatchTools = new EnhancedPatchToolsHandler(this.googleManager, this.logger);
     this.functionTools = new FunctionToolsHandler(this.googleManager, this.logger);
     this.formulaTools = new FormulaToolsHandler(this.googleManager, this.logger);
-    this.webappDeploymentTools = new WebAppDeploymentToolsHandler(this.googleManager, this.logger);
+    this.webAppDeploymentTools = new WebAppDeploymentToolsHandler(this.googleManager, this.logger);
     this.browserDebugTools = new BrowserDebugTools(this.googleManager, this.logger);
     this.sheetTools = new SheetToolsHandler(this.googleManager, this.logger);
     this.sheetManagement = new SheetManagementHandler(this.googleManager, this.logger);
     this.executionTools = new ExecutionToolsHandler(this.googleManager, this.logger);
-    this.intelligentWorkflow = new IntelligentWorkflowHandler(this.googleManager, this.logger, this);
+    this.intelligentWorkflow = new IntelligentWorkflowHandler(this.googleManager, this.logger);
 
-    // Initialize Google APIs
-    this.initializeAPIs();
+    // Collect all handlers（61ツール統合配列）
+    this.handlers = [
+      this.basicTools,
+      this.systemTools, 
+      this.developmentTools,
+      this.patchTools,
+      this.enhancedPatchTools,
+      this.functionTools,
+      this.formulaTools,
+      this.webAppDeploymentTools,
+      this.browserDebugTools,
+      this.sheetTools,
+      this.sheetManagement,
+      this.executionTools,
+      this.intelligentWorkflow
+    ];
 
-    // Log process info
-    this.logProcessInfo();
-    
-    // Setup handlers
     this.setupHandlers();
+    this.logProcessInfo();
   }
 
   /**
-   * Setup MCP request handlers
+   * プロセス情報出力（MCPサーバー情報）
    */
+  logProcessInfo() {
+    const startTime = new Date().toISOString();
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = dirname(__filename);
+
+    // 出力：詳細プロセス情報（STDERR使用でSTDOUT汚染回避）
+    console.error('====================================================');
+    console.error('[MCP-PROCESS] Claude-AppsScript-Pro Server v3.0.0');
+    console.error('====================================================');
+    console.error('[MCP-PROCESS] PID:', process.pid);
+    console.error('[MCP-PROCESS] Start Time:', startTime);
+    console.error('[MCP-PROCESS] Command:', process.argv[0], __filename);
+    console.error('[MCP-PROCESS] Working Dir:', process.cwd());
+    console.error('[MCP-PROCESS] Script Path:', __filename);
+    console.error('[MCP-PROCESS] Node Version:', process.version);
+    console.error('[MCP-PROCESS] Platform:', process.platform);
+    console.error('[MCP-PROCESS] Architecture:', process.arch);
+    console.error('[MCP-PROCESS] Phase: All-in-One Suite (61 tools implemented)');
+    console.error('====================================================');
+
+    // mcp-process-info.txtファイル生成
+    this.saveProcessInfoToFile(startTime);
+  }
+
+  /**
+   * プロセス情報をファイルに保存
+   */
+  async saveProcessInfoToFile(startTime) {
+    try {
+      const processInfo = `Claude-AppsScript-Pro MCP Server v3.0.0
+Phase: All-in-One Suite (61 tools implemented)
+PID: ${process.pid}
+Start Time: ${startTime}
+Command: ${process.argv[0]} ${fileURLToPath(import.meta.url)}
+Working Dir: ${process.cwd()}
+Script Path: ${fileURLToPath(import.meta.url)}
+Server Dir: ${dirname(fileURLToPath(import.meta.url))}
+Node Version: ${process.version}
+Platform: ${process.platform}
+Architecture: ${process.arch}
+
+PowerShell Process Check Command:
+Get-Process -Id ${process.pid}
+
+Claude Code Process Check Command:
+ps -p ${process.pid}
+
+Kill Process Command (if needed):
+PowerShell: Stop-Process -Id ${process.pid}
+Claude Code: kill ${process.pid}
+`;
+
+      await fs.writeFile('mcp-process-info.txt', processInfo, 'utf8');
+      console.error('[MCP-PROCESS] Process info saved to mcp-process-info.txt');
+    } catch (error) {
+      console.error('[MCP-PROCESS] Failed to save process info:', error.message);
+    }
+  }
+
   setupHandlers() {
+    // List Tools Handler（61ツール定義）
     this.server.setRequestHandler(ListToolsRequestSchema, async () => {
-      // Get basic tools (4個)
-      const basicTools = [
-        {
-          name: 'test_connection',
-          description: 'Test MCP connection and OAuth status',
-          inputSchema: {
-            type: 'object',
-            properties: {},
-            required: []
-          }
-        },
-        {
-          name: 'diagnostic_info',
-          description: 'Get detailed OAuth authentication diagnostic information',
-          inputSchema: {
-            type: 'object',
-            properties: {},
-            required: []
-          }
-        },
-        {
-          name: 'test_apis',
-          description: 'Test individual Google API connections and functionality',
-          inputSchema: {
-            type: 'object',
-            properties: {},
-            required: []
-          }
-        },
-        {
-          name: 'get_process_info',
-          description: '🔧 MCPサーバープロセス情報取得・トラブルシューティング支援',
-          inputSchema: {
-            type: 'object',
-            properties: {},
-            required: []
-          }
+      const allTools = [];
+      
+      // 全ハンドラーからツール定義を収集
+      for (const handler of this.handlers) {
+        if (handler.getToolDefinitions) {
+          const tools = handler.getToolDefinitions();
+          allTools.push(...tools);
         }
-      ];
-
-      // Get all handler tools - All-in-One Suite (61個)
-      const systemTools = this.systemTools.getToolDefinitions();
-      const developmentTools = this.developmentTools.getToolDefinitions();
-      const patchTools = this.patchTools.getToolDefinitions();
-      const enhancedPatchTools = this.enhancedPatchTools.getToolDefinitions();
-      const functionTools = this.functionTools.getToolDefinitions();
-      const formulaTools = this.formulaTools.getToolDefinitions();
-      const webappDeploymentTools = this.webappDeploymentTools.getToolDefinitions();
-      const browserDebugTools = this.browserDebugTools.getToolDefinitions();
-      const sheetTools = this.sheetTools.getToolDefinitions();
-      const sheetManagementTools = this.sheetManagement.getToolDefinitions();
-      const executionTools = this.executionTools.getToolDefinitions();
-      const intelligentWorkflowTools = this.intelligentWorkflow.getToolDefinitions();
-
-      const allTools = [
-        ...basicTools, 
-        ...systemTools, 
-        ...developmentTools, 
-        ...patchTools,
-        ...enhancedPatchTools,
-        ...functionTools, 
-        ...formulaTools,
-        ...webappDeploymentTools,
-        ...browserDebugTools,
-        ...sheetTools,
-        ...sheetManagementTools,
-        ...executionTools,
-        ...intelligentWorkflowTools
-      ];
+      }
 
       return {
         tools: allTools
       };
     });
 
+    // Call Tool Handler（61ツール実行ルーティング）
     this.server.setRequestHandler(CallToolRequestSchema, async (request) => {
-      const { name, arguments: args } = request.params;
+      const { name: toolName, arguments: args } = request.params;
       
       try {
-        // Basic tools
-        if (['test_connection', 'diagnostic_info', 'test_apis', 'get_process_info'].includes(name)) {
-          return await this.basicTools.handleTool(name, args || {});
-        }
-        
-        // System tools
-        if (this.systemTools.canHandle(name)) {
-          return await this.systemTools.handleTool(name, args || {});
-        }
-        
-        // Development tools
-        if (this.developmentTools.canHandle(name)) {
-          return await this.developmentTools.handleTool(name, args || {});
-        }
-        
-        // Patch tools
-        if (this.patchTools.canHandle(name)) {
-          return await this.patchTools.handleTool(name, args || {});
-        }
-        
-        // Enhanced Patch tools (🚀 革命的パッチシステム)
-        if (this.enhancedPatchTools.canHandle(name)) {
-          return await this.enhancedPatchTools.handleTool(name, args || {});
-        }
-        
-        // Function tools
-        if (this.functionTools.canHandle(name)) {
-          return await this.functionTools.handleTool(name, args || {});
-        }
-        
-        // Formula tools
-        if (this.formulaTools.canHandle(name)) {
-          return await this.formulaTools.handleTool(name, args || {});
+        // ツール名に基づいてハンドラーを特定し実行
+        for (const handler of this.handlers) {
+          if (handler.canHandle && handler.canHandle(toolName)) {
+            this.logger.info(`Executing tool: ${toolName}`);
+            const result = await handler.handle(toolName, args || {});
+            this.logger.info(`Tool execution completed: ${toolName}`);
+            return {
+              content: [
+                {
+                  type: "text",
+                  text: typeof result === 'string' ? result : JSON.stringify(result, null, 2)
+                }
+              ],
+              isError: false
+            };
+          }
         }
 
-        // WebApp deployment tools
-        if (this.webappDeploymentTools.canHandle(name)) {
-          return await this.webappDeploymentTools.handleTool(name, args || {});
-        }
-
-        // Browser debug tools
-        if (this.browserDebugTools.canHandle(name)) {
-          return await this.browserDebugTools.handleTool(name, args || {});
-        }
-
-        // Sheet tools
-        if (this.sheetTools.canHandle(name)) {
-          return await this.sheetTools.handleTool(name, args || {});
-        }
-
-        // Sheet management tools
-        if (this.sheetManagement.canHandle(name)) {
-          return await this.sheetManagement.handleTool(name, args || {});
-        }
-
-        // Execution tools
-        if (this.executionTools.canHandle(name)) {
-          return await this.executionTools.handleTool(name, args || {});
-        }
-
-        // Intelligent Workflow tools
-        if (this.intelligentWorkflow.canHandle(name)) {
-          return await this.intelligentWorkflow.handleToolCall(name, args || {});
-        }
-        
-        throw new Error(`Unknown tool: ${name}`);
+        // ハンドラーが見つからない場合
+        throw new Error(`Unknown tool: ${toolName}`);
         
       } catch (error) {
-        this.logger.error(`Tool execution error for ${name}:`, error);
+        this.logger.error(`Tool execution failed: ${toolName}`, error);
         return {
           content: [
             {
-              type: 'text',
-              text: `❌ Error executing ${name}: ${error.message}`
+              type: "text", 
+              text: `Error executing ${toolName}: ${error.message}`
             }
-          ]
+          ],
+          isError: true
         };
       }
     });
   }
 
-  /**
-   * Initialize Google APIs
-   */
-  async initializeAPIs() {
-    try {
-      await this.googleManager.initialize();
-      this.logger.info('Google APIs initialized successfully');
-    } catch (error) {
-      this.logger.error('Failed to initialize Google APIs:', error);
-    }
-  }
-
-  /**
-   * Log process information for debugging and monitoring
-   */
-  logProcessInfo() {
-    const startTime = new Date().toISOString();
-    const __filename = fileURLToPath(import.meta.url);
-    const __dirname = dirname(__filename);
-    
-    const processInfo = {
-      pid: process.pid,
-      startTime: startTime,
-      command: process.argv.join(' '),
-      workingDir: process.cwd(),
-      scriptPath: __filename,
-      serverDir: __dirname,
-      nodeVersion: process.version,
-      platform: process.platform,
-      architecture: process.arch,
-      phase: 'v3.0.0 All-in-One Suite (61 tools - all-in-one features)',
-      memoryUsage: Math.round(process.memoryUsage().heapUsed / 1024 / 1024 * 100) / 100
-    };
-    
-    // Log to STDERR to avoid STDOUT pollution
-    console.error('====================================================');
-    console.error('[MCP-PROCESS] Claude-AppsScript-Pro Server v3.0.0 All-in-One Suite');
-    console.error('[MCP-PROCESS] PID:', processInfo.pid);
-    console.error('[MCP-PROCESS] Start Time:', processInfo.startTime);
-    console.error('[MCP-PROCESS] Phase:', processInfo.phase);
-    console.error('[MCP-PROCESS] Memory Usage:', processInfo.memoryUsage, 'MB');
-    console.error('[MCP-PROCESS] Architecture:', processInfo.architecture);
-    console.error('====================================================');
-    
-    // Save process info to file for troubleshooting
-    this.saveProcessInfoToFile(processInfo);
-  }
-
-  /**
-   * Save process information to file
-   */
-  async saveProcessInfoToFile(processInfo) {
-    try {
-      const content = `Claude-AppsScript-Pro MCP Server v3.0.0 All-in-One Suite
-${processInfo.phase}
-PID: ${processInfo.pid}
-Start Time: ${processInfo.startTime}
-Command: ${processInfo.command}
-Working Dir: ${processInfo.workingDir}
-Script Path: ${processInfo.scriptPath}
-Server Dir: ${processInfo.serverDir}
-Node Version: ${processInfo.nodeVersion}
-Platform: ${processInfo.platform}
-Architecture: ${processInfo.architecture}
-Memory Usage: ${processInfo.memoryUsage} MB
-
-PowerShell Process Check Command:
-Get-Process -Id ${processInfo.pid}
-
-Claude Code Process Check Command:
-ps -p ${processInfo.pid}
-
-Kill Process Command (if needed):
-PowerShell: Stop-Process -Id ${processInfo.pid}
-Claude Code: kill ${processInfo.pid}
-
-🎯 v3.0.0 All-in-One Suite Features:
-- 61 integrated tools (all-in-one feature set)
-- Enhanced Patch Tools (revolutionary anchor-based system)
-- WebApp deployment system (6 tools)
-- Browser debugging with Playwright-Core (8 tools)
-- Complete Sheet operations (18 tools)
-- Intelligent Workflow tools (4 tools)
-- Execution tools (2 tools)
-- Formula analysis tools (3 tools)
-- Function validation tools (3 tools)
-- 99% output reduction system
-- AI autonomous development system
-- Google Workspace完全対応オールインワンプラットフォーム
-`;
-      
-      await fs.writeFile('mcp-process-info.txt', content, 'utf8');
-      this.logger.info('Process info saved to mcp-process-info.txt');
-    } catch (error) {
-      this.logger.error('Failed to save process info:', error.message);
-    }
-  }
-
-  /**
-   * Start the MCP server
-   */
-  async start() {
+  async run() {
     const transport = new StdioServerTransport();
+    this.logger.info('🚀 Claude-AppsScript-Pro MCP Server v3.0.0 All-in-One Suite starting...');
+    this.logger.info('📊 61 tools integrated for Google Apps Script & Sheets development');
     await this.server.connect(transport);
-    
-    this.logger.info('🚀 Claude-AppsScript-Pro MCP Server v3.0.0 All-in-One Suite started successfully');
-    this.logger.info('📊 Features: 61 tools, all-in-one integration, revolutionary patch system');
-    this.logger.info('💡 Ready for enterprise-grade Google Apps Script development with All-in-One Suite!');
+    this.logger.info('✅ MCP Server running successfully');
   }
 }
 
-// Start the server
+// Initialize and run server
 const server = new MCPServer();
-server.start().catch((error) => {
+server.run().catch((error) => {
   console.error('Failed to start MCP server:', error);
   process.exit(1);
 });
