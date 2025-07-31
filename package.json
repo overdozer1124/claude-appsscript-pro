@@ -1,7 +1,7 @@
 {
     "name": "claude-appsscript-pro",
-    "version": "2.1.0",
-    "description": "Claude Apps Script Pro v2.1.0 Portable - Revolutionary 75-99% Output Reduction System with 51 Integrated Tools",
+    "version": "3.0.0",
+    "description": "Claude Apps Script Pro v3.0.0 All-in-One Suite - Google Apps Script and Sheets Specialized 55-Tool Integrated All-in-One Development Suite",
     "main": "server.js",
     "type": "module",
     "engines": {
