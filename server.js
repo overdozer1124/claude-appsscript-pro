@@ -309,7 +309,7 @@ class MCPServer {
    */
   async saveProcessInfoToFile(processInfo) {
     try {
-      const content = `Claude-AppsScript-Pro MCP Server v3.0.0 All-in-One Suite
+      const content = `Claude-AppsScript-Pro MCP Server v2.1.0 Local Enhanced
 ${processInfo.phase}
 PID: ${processInfo.pid}
 Start Time: ${processInfo.startTime}
@@ -332,19 +332,17 @@ Kill Process Command (if needed):
 PowerShell: Stop-Process -Id ${processInfo.pid}
 Claude Code: kill ${processInfo.pid}
 
-🎯 v3.0.0 All-in-One Suite Features:
-- 61 integrated tools (complete feature set)
-- Enhanced Patch Tools (revolutionary anchor-based system)
+🎯 v2.1.0 Local Enhanced Features:
+- 61 integrated tools (enhanced local feature set)
+- Enhanced Patch Tools (revolutionary anchor-based system) - LOCAL EXCLUSIVE
 - WebApp deployment system (6 tools)
 - Browser debugging with Playwright-Core (10 tools)
 - Complete Sheet operations (18 tools)
 - Intelligent Workflow tools (4 tools)
 - Execution tools (2 tools)
-- AI autonomous development system
-- Real-time browser control
-- 99% output reduction system
+- 75-99% output reduction system
 - Fully portable + enhanced architecture
-- All-in-One development platform
+- ChatGPT-optimized algorithms
 - Anchor-based patching system
 `;
       
@@ -362,9 +360,9 @@ Claude Code: kill ${processInfo.pid}
     const transport = new StdioServerTransport();
     await this.server.connect(transport);
     
-    this.logger.info('🚀 Claude-AppsScript-Pro MCP Server v3.0.0 All-in-One Suite started successfully');
-    this.logger.info('📊 Features: 61 tools, complete integration, AI autonomous development');
-    this.logger.info('💡 Ready for enterprise-grade Google Apps Script development with all-in-one features!');
+    this.logger.info('🚀 Claude-AppsScript-Pro MCP Server v2.1.0 Local Enhanced started successfully');
+    this.logger.info('📊 Features: 61 tools, enhanced integration, revolutionary patch system');
+    this.logger.info('💡 Ready for enterprise-grade Google Apps Script development with enhanced features!');
   }
 }
 
