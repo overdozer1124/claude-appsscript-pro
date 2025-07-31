@@ -1,14 +1,15 @@
 #!/usr/bin/env node
 
 /**
- * 🚀 Claude-AppsScript-Pro MCP Server v2.1.0 Local Enhanced
- * 55ツール統合・ローカル強化版（2025年7月30日版）
+ * 🚀 Claude-AppsScript-Pro MCP Server v3.0.0 All-in-One Suite
+ * Google Apps Script & Sheets専門の61ツール統合型オールインワン開発スイート
  * 
- * v2.1.0 Local Enhanced特徴:
- * - Enhanced Patch Tools完全統合（ローカル独自機能）
- * - 55核心ツール統合（動作確認済み機能フル装備）
- * - 75-99%出力削減効果維持
- * - 完全可搬化システム + 強化パッチシステム
+ * v3.0.0 All-in-One Suite 特徴:
+ * - 61核心ツール完全統合（WebApp開発・デプロイメント・ブラウザデバッグ）
+ * - AI自律開発システム（intelligent workflow analyzer）
+ * - リアルタイムブラウザ制御（Playwright-Core統合）
+ * - 99%出力削減効果・Enhanced Patch Tools
+ * - Google Workspace完全対応オールインワンプラットフォーム
  */
 
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
@@ -26,7 +27,7 @@ import { config } from 'dotenv';
 import { GoogleAPIsManager } from './lib/core/google-apis-manager.js';
 import { DiagnosticLogger } from './lib/core/diagnostic-logger.js';
 
-// Handler Modules - Local Enhanced (55ツール構成)
+// Handler Modules - Local Enhanced (61ツール構成)
 import { BasicToolsHandler } from './lib/handlers/basic-tools.js';
 import { SystemToolsHandler } from './lib/handlers/system-tools.js';
 import { DevelopmentToolsHandler } from './lib/handlers/development-tools.js';
@@ -45,14 +46,14 @@ import { IntelligentWorkflowHandler } from './lib/handlers/intelligent-workflow-
 config();
 
 /**
- * MCP Server Class - v2.1.0 Local Enhanced（55ツール・強化版）
+ * MCP Server Class - v3.0.0 All-in-One Suite（61ツール・オールインワン版）
  */
 class MCPServer {
   constructor() {
     this.server = new Server(
       {
         name: 'claude-appsscript-pro',
-        version: '2.1.0-local-enhanced'
+        version: '3.0.0-all-in-one-suite'
       },
       {
         capabilities: {
@@ -61,11 +62,11 @@ class MCPServer {
       }
     );
 
-    // Initialize all components (強化版)
+    // Initialize all components (オールインワン版)
     this.googleManager = new GoogleAPIsManager();
     this.logger = new DiagnosticLogger();
     
-    // Initialize handlers - Local Enhanced (55ツール構成)
+    // Initialize handlers - All-in-One Suite (61ツール構成)
     this.basicTools = new BasicToolsHandler(this.googleManager, this.logger, this);
     this.systemTools = new SystemToolsHandler(this.googleManager, this.logger);
     this.developmentTools = new DevelopmentToolsHandler(this.googleManager, this.logger);
@@ -135,7 +136,7 @@ class MCPServer {
         }
       ];
 
-      // Get all handler tools - Local Enhanced (55個)
+      // Get all handler tools - All-in-One Suite (61個)
       const systemTools = this.systemTools.getToolDefinitions();
       const developmentTools = this.developmentTools.getToolDefinitions();
       const patchTools = this.patchTools.getToolDefinitions();
@@ -146,7 +147,7 @@ class MCPServer {
       const browserDebugTools = this.browserDebugTools.getToolDefinitions();
       const sheetTools = this.sheetTools.getToolDefinitions();
       const sheetManagementTools = this.sheetManagement.getToolDefinitions();
-      const executionTools = this.executionTools.getTools();
+      const executionTools = this.executionTools.getToolDefinitions();
       const intelligentWorkflowTools = this.intelligentWorkflow.getToolDefinitions();
 
       const allTools = [
@@ -285,13 +286,13 @@ class MCPServer {
       nodeVersion: process.version,
       platform: process.platform,
       architecture: process.arch,
-      phase: 'v2.1.0 Local Enhanced (55 tools - enhanced features)',
+      phase: 'v3.0.0 All-in-One Suite (61 tools - all-in-one features)',
       memoryUsage: Math.round(process.memoryUsage().heapUsed / 1024 / 1024 * 100) / 100
     };
     
     // Log to STDERR to avoid STDOUT pollution
     console.error('====================================================');
-    console.error('[MCP-PROCESS] Claude-AppsScript-Pro Server v2.1.0 Local Enhanced');
+    console.error('[MCP-PROCESS] Claude-AppsScript-Pro Server v3.0.0 All-in-One Suite');
     console.error('[MCP-PROCESS] PID:', processInfo.pid);
     console.error('[MCP-PROCESS] Start Time:', processInfo.startTime);
     console.error('[MCP-PROCESS] Phase:', processInfo.phase);
@@ -308,7 +309,7 @@ class MCPServer {
    */
   async saveProcessInfoToFile(processInfo) {
     try {
-      const content = `Claude-AppsScript-Pro MCP Server v2.1.0 Local Enhanced
+      const content = `Claude-AppsScript-Pro MCP Server v3.0.0 All-in-One Suite
 ${processInfo.phase}
 PID: ${processInfo.pid}
 Start Time: ${processInfo.startTime}
@@ -331,17 +332,19 @@ Kill Process Command (if needed):
 PowerShell: Stop-Process -Id ${processInfo.pid}
 Claude Code: kill ${processInfo.pid}
 
-🎯 v2.1.0 Local Enhanced Features:
-- 55 integrated tools (enhanced local feature set)
-- Enhanced Patch Tools (revolutionary anchor-based system) - LOCAL EXCLUSIVE
+🎯 v3.0.0 All-in-One Suite Features:
+- 61 integrated tools (complete feature set)
+- Enhanced Patch Tools (revolutionary anchor-based system)
 - WebApp deployment system (6 tools)
 - Browser debugging with Playwright-Core (10 tools)
 - Complete Sheet operations (18 tools)
 - Intelligent Workflow tools (4 tools)
 - Execution tools (2 tools)
-- 75-99% output reduction system
+- AI autonomous development system
+- Real-time browser control
+- 99% output reduction system
 - Fully portable + enhanced architecture
-- ChatGPT-optimized algorithms
+- All-in-One development platform
 - Anchor-based patching system
 `;
       
@@ -359,9 +362,9 @@ Claude Code: kill ${processInfo.pid}
     const transport = new StdioServerTransport();
     await this.server.connect(transport);
     
-    this.logger.info('🚀 Claude-AppsScript-Pro MCP Server v2.1.0 Local Enhanced started successfully');
-    this.logger.info('📊 Features: 55 tools, enhanced integration, revolutionary patch system');
-    this.logger.info('💡 Ready for enterprise-grade Google Apps Script development with enhanced features!');
+    this.logger.info('🚀 Claude-AppsScript-Pro MCP Server v3.0.0 All-in-One Suite started successfully');
+    this.logger.info('📊 Features: 61 tools, complete integration, AI autonomous development');
+    this.logger.info('💡 Ready for enterprise-grade Google Apps Script development with all-in-one features!');
   }
 }
 
