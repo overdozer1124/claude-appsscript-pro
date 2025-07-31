@@ -27,7 +27,7 @@ import { config } from 'dotenv';
 import { GoogleAPIsManager } from './lib/core/google-apis-manager.js';
 import { DiagnosticLogger } from './lib/core/diagnostic-logger.js';
 
-// Handler Modules - Local Enhanced (61ツール構成)
+// Handler Modules - All-in-One Suite (61ツール構成)
 import { BasicToolsHandler } from './lib/handlers/basic-tools.js';
 import { SystemToolsHandler } from './lib/handlers/system-tools.js';
 import { DevelopmentToolsHandler } from './lib/handlers/development-tools.js';
@@ -309,7 +309,7 @@ class MCPServer {
    */
   async saveProcessInfoToFile(processInfo) {
     try {
-      const content = `Claude-AppsScript-Pro MCP Server v2.1.0 Local Enhanced
+      const content = `Claude-AppsScript-Pro MCP Server v3.0.0 All-in-One Suite
 ${processInfo.phase}
 PID: ${processInfo.pid}
 Start Time: ${processInfo.startTime}
@@ -332,18 +332,19 @@ Kill Process Command (if needed):
 PowerShell: Stop-Process -Id ${processInfo.pid}
 Claude Code: kill ${processInfo.pid}
 
-🎯 v2.1.0 Local Enhanced Features:
-- 61 integrated tools (enhanced local feature set)
-- Enhanced Patch Tools (revolutionary anchor-based system) - LOCAL EXCLUSIVE
+🎯 v3.0.0 All-in-One Suite Features:
+- 61 integrated tools (all-in-one feature set)
+- Enhanced Patch Tools (revolutionary anchor-based system)
 - WebApp deployment system (6 tools)
-- Browser debugging with Playwright-Core (10 tools)
+- Browser debugging with Playwright-Core (8 tools)
 - Complete Sheet operations (18 tools)
 - Intelligent Workflow tools (4 tools)
 - Execution tools (2 tools)
-- 75-99% output reduction system
-- Fully portable + enhanced architecture
-- ChatGPT-optimized algorithms
-- Anchor-based patching system
+- Formula analysis tools (3 tools)
+- Function validation tools (3 tools)
+- 99% output reduction system
+- AI autonomous development system
+- Google Workspace完全対応オールインワンプラットフォーム
 `;
       
       await fs.writeFile('mcp-process-info.txt', content, 'utf8');
@@ -360,9 +361,9 @@ Claude Code: kill ${processInfo.pid}
     const transport = new StdioServerTransport();
     await this.server.connect(transport);
     
-    this.logger.info('🚀 Claude-AppsScript-Pro MCP Server v2.1.0 Local Enhanced started successfully');
-    this.logger.info('📊 Features: 61 tools, enhanced integration, revolutionary patch system');
-    this.logger.info('💡 Ready for enterprise-grade Google Apps Script development with enhanced features!');
+    this.logger.info('🚀 Claude-AppsScript-Pro MCP Server v3.0.0 All-in-One Suite started successfully');
+    this.logger.info('📊 Features: 61 tools, all-in-one integration, revolutionary patch system');
+    this.logger.info('💡 Ready for enterprise-grade Google Apps Script development with All-in-One Suite!');
   }
 }
 
