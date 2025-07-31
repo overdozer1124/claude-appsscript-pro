@@ -1,7 +1,7 @@
 {
     "name": "claude-appsscript-pro",
     "version": "3.0.0",
-    "description": "Claude Apps Script Pro v3.0.0 All-in-One Suite - Google Apps Script and Sheets Specialized 55-Tool Integrated All-in-One Development Suite",
+    "description": "Claude Apps Script Pro v3.0.0 All-in-One Suite - Google Apps Script and Sheets Specialized 61-Tool Integrated All-in-One Development Suite",
     "main": "server.js",
     "type": "module",
     "engines": {
@@ -38,7 +38,7 @@
         "sheets-functions",
         "output-reduction",
         "all-in-one-suite",
-        "55-tools-integrated"
+        "61-tools-integrated"
     ],
     "author": "Claude Apps Script Pro Team",
     "license": "MIT",
