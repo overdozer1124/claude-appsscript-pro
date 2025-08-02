@@ -53,7 +53,7 @@ class MCPServer {
     this.server = new Server(
       {
         name: 'claude-appsscript-pro',
-        version: '3.0.0'
+        version: '3.0.0-all-in-one-suite'
       },
       {
         capabilities: {
@@ -62,44 +62,214 @@ class MCPServer {
       }
     );
 
-    // Initialize Core Services
-    this.logger = new DiagnosticLogger();
+    // Initialize all components (オールインワン版)
     this.googleManager = new GoogleAPIsManager();
+    this.logger = new DiagnosticLogger();
     
-    // Initialize All Handler Modules（61ツール完全統合）
-    this.basicTools = new BasicToolsHandler(this.googleManager, this.logger);
+    // Initialize handlers - All-in-One Suite (61ツール構成)
+    this.basicTools = new BasicToolsHandler(this.googleManager, this.logger, this);
     this.systemTools = new SystemToolsHandler(this.googleManager, this.logger);
     this.developmentTools = new DevelopmentToolsHandler(this.googleManager, this.logger);
     this.patchTools = new PatchToolsHandler(this.googleManager, this.logger);
     this.enhancedPatchTools = new EnhancedPatchToolsHandler(this.googleManager, this.logger);
     this.functionTools = new FunctionToolsHandler(this.googleManager, this.logger);
     this.formulaTools = new FormulaToolsHandler(this.googleManager, this.logger);
-    this.webAppDeploymentTools = new WebAppDeploymentToolsHandler(this.googleManager, this.logger);
+    this.webappDeploymentTools = new WebAppDeploymentToolsHandler(this.googleManager, this.logger);
     this.browserDebugTools = new BrowserDebugTools(this.googleManager, this.logger);
     this.sheetTools = new SheetToolsHandler(this.googleManager, this.logger);
     this.sheetManagement = new SheetManagementHandler(this.googleManager, this.logger);
     this.executionTools = new ExecutionToolsHandler(this.googleManager, this.logger);
-    this.intelligentWorkflow = new IntelligentWorkflowHandler(this.googleManager, this.logger);
+    this.intelligentWorkflow = new IntelligentWorkflowHandler(this.googleManager, this.logger, this);
 
-    // Collect all handlers（61ツール統合配列）
-    this.handlers = [
-      this.basicTools,
-      this.systemTools, 
-      this.developmentTools,
-      this.patchTools,
-      this.enhancedPatchTools,
-      this.functionTools,
-      this.formulaTools,
-      this.webAppDeploymentTools,
-      this.browserDebugTools,
-      this.sheetTools,
-      this.sheetManagement,
-      this.executionTools,
-      this.intelligentWorkflow
-    ];
+    // Initialize Google APIs
+    this.initializeAPIs();
 
-    this.setupHandlers();
+    // Log process info
     this.logProcessInfo();
+    
+    // Setup handlers
+    this.setupHandlers();
+  }
+
+  /**
+   * Setup MCP request handlers
+   */
+  setupHandlers() {
+    this.server.setRequestHandler(ListToolsRequestSchema, async () => {
+      // Get basic tools (4個)
+      const basicTools = [
+        {
+          name: 'test_connection',
+          description: 'Test MCP connection and OAuth status',
+          inputSchema: {
+            type: 'object',
+            properties: {},
+            required: []
+          }
+        },
+        {
+          name: 'diagnostic_info',
+          description: 'Get detailed OAuth authentication diagnostic information',
+          inputSchema: {
+            type: 'object',
+            properties: {},
+            required: []
+          }
+        },
+        {
+          name: 'test_apis',
+          description: 'Test individual Google API connections and functionality',
+          inputSchema: {
+            type: 'object',
+            properties: {},
+            required: []
+          }
+        },
+        {
+          name: 'get_process_info',
+          description: '🔧 MCPサーバープロセス情報取得・トラブルシューティング支援',
+          inputSchema: {
+            type: 'object',
+            properties: {},
+            required: []
+          }
+        }
+      ];
+
+      // Get all handler tools - All-in-One Suite (61個)
+      const systemTools = this.systemTools.getToolDefinitions();
+      const developmentTools = this.developmentTools.getToolDefinitions();
+      const patchTools = this.patchTools.getToolDefinitions();
+      const enhancedPatchTools = this.enhancedPatchTools.getToolDefinitions();
+      const functionTools = this.functionTools.getToolDefinitions();
+      const formulaTools = this.formulaTools.getToolDefinitions();
+      const webappDeploymentTools = this.webappDeploymentTools.getToolDefinitions();
+      const browserDebugTools = this.browserDebugTools.getToolDefinitions();
+      const sheetTools = this.sheetTools.getToolDefinitions();
+      const sheetManagementTools = this.sheetManagement.getToolDefinitions();
+      const executionTools = this.executionTools.getToolDefinitions();
+      const intelligentWorkflowTools = this.intelligentWorkflow.getToolDefinitions();
+
+      const allTools = [
+        ...basicTools, 
+        ...systemTools, 
+        ...developmentTools, 
+        ...patchTools,
+        ...enhancedPatchTools,
+        ...functionTools, 
+        ...formulaTools,
+        ...webappDeploymentTools,
+        ...browserDebugTools,
+        ...sheetTools,
+        ...sheetManagementTools,
+        ...executionTools,
+        ...intelligentWorkflowTools
+      ];
+
+      return {
+        tools: allTools
+      };
+    });
+
+    this.server.setRequestHandler(CallToolRequestSchema, async (request) => {
+      const { name, arguments: args } = request.params;
+      
+      try {
+        // Basic tools
+        if (['test_connection', 'diagnostic_info', 'test_apis', 'get_process_info'].includes(name)) {
+          return await this.basicTools.handleTool(name, args || {});
+        }
+        
+        // System tools
+        if (this.systemTools.canHandle(name)) {
+          return await this.systemTools.handleTool(name, args || {});
+        }
+        
+        // Development tools
+        if (this.developmentTools.canHandle(name)) {
+          return await this.developmentTools.handleTool(name, args || {});
+        }
+        
+        // Patch tools
+        if (this.patchTools.canHandle(name)) {
+          return await this.patchTools.handleTool(name, args || {});
+        }
+        
+        // Enhanced Patch tools (🚀 革命的パッチシステム)
+        if (this.enhancedPatchTools.canHandle(name)) {
+          return await this.enhancedPatchTools.handleTool(name, args || {});
+        }
+        
+        // Function tools
+        if (this.functionTools.canHandle(name)) {
+          return await this.functionTools.handleTool(name, args || {});
+        }
+        
+        // Formula tools
+        if (this.formulaTools.canHandle(name)) {
+          return await this.formulaTools.handleTool(name, args || {});
+        }
+
+        // WebApp deployment tools
+        if (this.webappDeploymentTools.canHandle(name)) {
+          return await this.webappDeploymentTools.handleTool(name, args || {});
+        }
+
+        // Browser debug tools
+        if (this.browserDebugTools.canHandle(name)) {
+          return await this.browserDebugTools.handleTool(name, args || {});
+        }
+
+        // Sheet tools
+        if (this.sheetTools.canHandle(name)) {
+          return await this.sheetTools.handleTool(name, args || {});
+        }
+
+        // Sheet management tools
+        if (this.sheetManagement.canHandle(name)) {
+          return await this.sheetManagement.handleTool(name, args || {});
+        }
+
+        // Execution tools
+        if (this.executionTools.canHandle(name)) {
+          return await this.executionTools.handleTool(name, args || {});
+        }
+
+        // Intelligent Workflow tools
+        if (this.intelligentWorkflow.canHandle(name)) {
+          return await this.intelligentWorkflow.handleToolCall(name, args || {});
+        }
+        
+        throw new Error(`Unknown tool: ${name}`);
+        
+      } catch (error) {
+        this.logger.error(`Tool execution error for ${name}:`, error);
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify({
+                success: false,
+                error: error.message,
+                tool: name
+              }, null, 2)
+            }
+          ]
+        };
+      }
+    });
+  }
+
+  /**
+   * Initialize Google APIs
+   */
+  async initializeAPIs() {
+    try {
+      await this.googleManager.initializeAPIs();
+      this.logger.info('Google APIs initialized successfully');
+    } catch (error) {
+      this.logger.error('Failed to initialize Google APIs:', error);
+    }
   }
 
   /**
@@ -162,65 +332,6 @@ Claude Code: kill ${process.pid}
     } catch (error) {
       console.error('[MCP-PROCESS] Failed to save process info:', error.message);
     }
-  }
-
-  setupHandlers() {
-    // List Tools Handler（61ツール定義）
-    this.server.setRequestHandler(ListToolsRequestSchema, async () => {
-      const allTools = [];
-      
-      // 全ハンドラーからツール定義を収集
-      for (const handler of this.handlers) {
-        if (handler.getToolDefinitions) {
-          const tools = handler.getToolDefinitions();
-          allTools.push(...tools);
-        }
-      }
-
-      return {
-        tools: allTools
-      };
-    });
-
-    // Call Tool Handler（61ツール実行ルーティング）
-    this.server.setRequestHandler(CallToolRequestSchema, async (request) => {
-      const { name: toolName, arguments: args } = request.params;
-      
-      try {
-        // ツール名に基づいてハンドラーを特定し実行
-        for (const handler of this.handlers) {
-          if (handler.canHandle && handler.canHandle(toolName)) {
-            this.logger.info(`Executing tool: ${toolName}`);
-            const result = await handler.handle(toolName, args || {});
-            this.logger.info(`Tool execution completed: ${toolName}`);
-            return {
-              content: [
-                {
-                  type: "text",
-                  text: typeof result === 'string' ? result : JSON.stringify(result, null, 2)
-                }
-              ],
-              isError: false
-            };
-          }
-        }
-
-        // ハンドラーが見つからない場合
-        throw new Error(`Unknown tool: ${toolName}`);
-        
-      } catch (error) {
-        this.logger.error(`Tool execution failed: ${toolName}`, error);
-        return {
-          content: [
-            {
-              type: "text", 
-              text: `Error executing ${toolName}: ${error.message}`
-            }
-          ],
-          isError: true
-        };
-      }
-    });
   }
 
   async run() {
