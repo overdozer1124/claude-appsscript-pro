@@ -12,14 +12,17 @@
         "dev": "node server.js",
         "test": "echo \"No tests yet\" && exit 0",
         "install-deps": "npm install --no-optional --no-fund",
-        "setup": "npm install && echo \"Setup complete! Run 'npm start' to begin.\"",
-        "check": "node --check server.js"
+        "setup": "npm install && echo \"Setup complete! Run 'npm run oauth-setup' to configure authentication.\"",
+        "check": "node --check server.js",
+        "oauth-setup": "node scripts/oauth-setup.js",
+        "auth": "node scripts/oauth-setup.js"
     },
     "dependencies": {
         "@modelcontextprotocol/sdk": "^1.13.1",
         "diff-match-patch": "^1.0.5",
         "dotenv": "^16.5.0",
         "googleapis": "^150.0.1",
+        "open": "^10.1.0",
         "playwright-core": "^1.54.1",
         "yargs": "^17.7.2",
         "zod": "^3.23.0"
@@ -38,7 +41,8 @@
         "sheets-functions",
         "output-reduction",
         "all-in-one-suite",
-        "61-tools-integrated"
+        "61-tools-integrated",
+        "oauth-automation"
     ],
     "author": "Claude Apps Script Pro Team",
     "license": "MIT",
