@@ -54,45 +54,24 @@ cd claude-appsscript-pro
 npm install
 ```
 
-2. **Google Cloud Console Setup** (2 minutes)
+2. **Google OAuth Setup** (One-time, 3 minutes)
 ```bash
-# Required Google Cloud Console setup:
+# Get your OAuth credentials from Google Cloud Console:
 # 1. Go to https://console.cloud.google.com/
 # 2. Create new project (or select existing)
-# 3. Enable the following APIs:
-#    - Google Apps Script API
-#    - Google Drive API  
-#    - Google Sheets API
-# 4. Create OAuth 2.0 credentials (Desktop Application)
+# 3. Enable Apps Script API + Google Drive API + Google Sheets API
+# 4. Create OAuth 2.0 credentials
 # 5. Add http://localhost:3001/oauth/callback as redirect URI
-# 6. Download credentials or copy Client ID and Client Secret
 ```
 
-3. **Automated OAuth Setup** (1 minute) ⭐ **NEW!**
+3. **Configure Environment**
 ```bash
-# Copy environment template
-cp .env.example .env
-
-# Edit .env with your credentials (just Client ID and Secret needed):
-# GOOGLE_APP_SCRIPT_API_CLIENT_ID=your_client_id_here
-# GOOGLE_APP_SCRIPT_API_CLIENT_SECRET=your_client_secret_here
-
-# Run automated OAuth setup (will open browser automatically)
-npm run oauth-setup
-```
-
-**The automated script will:**
-- Open your browser for Google OAuth consent
-- Start a local callback server
-- Automatically capture the authorization code
-- Exchange it for a refresh token
-- Update your .env file automatically
-- Verify the setup is working
-
-**Alternative: Manual OAuth Setup**
-```bash
-# If automated setup doesn't work, use manual method:
-npm run auth  # or node scripts/oauth-setup.js
+# Create .env file with your credentials:
+GOOGLE_APP_SCRIPT_API_CLIENT_ID=your_client_id
+GOOGLE_APP_SCRIPT_API_CLIENT_SECRET=your_client_secret  
+GOOGLE_APP_SCRIPT_API_REFRESH_TOKEN=your_refresh_token
+GOOGLE_APP_SCRIPT_API_REDIRECT_URI=http://localhost:3001/oauth/callback
+LOG_LEVEL=error
 ```
 
 4. **Add to Claude Desktop**
@@ -115,10 +94,51 @@ Restart Claude Desktop and test:
 claude-appsscript-pro:test_connection
 ```
 
-### **⚡ Quick Setup Script**
+## 🚨 **Troubleshooting: Node.js PATH Issues**
+
+### **❌ Common Error: "node is not recognized" or "npm is not recognized"**
+
+If you encounter this error, Node.js is installed but not in your system PATH. This affects **90% of new users**.
+
+### **🔧 Windows Solution (Choose One)**
+
+#### **Option A: Automatic Fix (Recommended)**
+```powershell
+# Run as Administrator
+cd claude-appsscript-pro
+./scripts/setup-windows.ps1
+```
+
+#### **Option B: Manual PATH Setup**
+```powershell
+# Run as Administrator in PowerShell
+$currentPath = [Environment]::GetEnvironmentVariable("PATH", "Machine")
+$nodePath = "C:\Program Files\nodejs"
+if ($currentPath -notlike "*$nodePath*") {
+    [Environment]::SetEnvironmentVariable("PATH", "$currentPath;$nodePath", "Machine")
+    Write-Host "✅ Node.js PATH added. Please restart your terminal."
+}
+```
+
+#### **Option C: Direct Execution (No PATH Required)**
+```powershell
+# Use full paths instead of 'node' command
+cd claude-appsscript-pro
+& "C:\Program Files\nodejs\npm.exe" install
+& "C:\Program Files\nodejs\node.exe" server.js
+```
+
+### **🔧 macOS/Linux Solution**
 ```bash
-# One-command setup for experienced users:
-git clone https://github.com/overdozer1124/claude-appsscript-pro.git && cd claude-appsscript-pro && npm install && cp .env.example .env && echo "Edit .env with your Google OAuth credentials, then run: npm run oauth-setup"
+# Add to ~/.bashrc or ~/.zshrc
+export PATH="/usr/local/bin/node:$PATH"
+source ~/.bashrc  # or ~/.zshrc
+```
+
+### **✅ Verification**
+```bash
+node --version  # Should show v18.0.0+
+npm --version   # Should show version number
 ```
 
 ## 🛠️ **Complete Tool Reference (61 Tools)**
@@ -328,17 +348,6 @@ claude-appsscript-pro:execute_script_function({
 
 ### **Common Issues & Solutions**
 
-#### **"Cannot find module 'scripts/oauth-setup.js'" Error**
-```bash
-# This error occurs if you have an older version
-# Solution: Update to latest version
-git pull origin main
-npm install
-
-# Then run OAuth setup
-npm run oauth-setup
-```
-
 #### **OAuth Authentication Failed**
 ```javascript
 // Check authentication status
@@ -348,7 +357,6 @@ claude-appsscript-pro:diagnostic_info
 // 1. Verify .env file credentials
 // 2. Check Google Cloud Console API enablement  
 // 3. Confirm redirect URI matches exactly
-// 4. Re-run OAuth setup: npm run oauth-setup
 ```
 
 #### **WebApp Deployment Issues**
@@ -375,31 +383,6 @@ claude-appsscript-pro:capture_browser_console({
   url: "https://google.com",
   duration: 10000
 })
-```
-
-### **OAuth Setup Troubleshooting**
-
-#### **Browser doesn't open automatically**
-```bash
-# Manual browser opening
-# Copy the URL from terminal output and paste into browser
-```
-
-#### **"No refresh token received" error**
-```bash
-# This happens if you've already authorized the app before
-# Solution: Revoke app permissions and try again
-# 1. Go to https://myaccount.google.com/permissions
-# 2. Find your app and revoke access
-# 3. Run: npm run oauth-setup
-```
-
-#### **Port 3001 already in use**
-```bash
-# Change the redirect URI in .env file
-GOOGLE_APP_SCRIPT_API_REDIRECT_URI=http://localhost:3002/oauth/callback
-# Update redirect URI in Google Cloud Console to match
-# Then run: npm run oauth-setup
 ```
 
 ## 📚 **Documentation**

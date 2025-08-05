@@ -9,13 +9,20 @@
     },
     "scripts": {
         "start": "node server.js",
+        "start-win": "C:\\Program Files\\nodejs\\node.exe server.js",
         "dev": "node server.js",
+        "dev-win": "C:\\Program Files\\nodejs\\node.exe server.js",
         "test": "echo \"No tests yet\" && exit 0",
         "install-deps": "npm install --no-optional --no-fund",
+        "install-deps-win": "C:\\Program Files\\nodejs\\npm.exe install --no-optional --no-fund",
         "setup": "npm install && echo \"Setup complete! Run 'npm run oauth-setup' to configure authentication.\"",
+        "setup-win": "C:\\Program Files\\nodejs\\npm.exe install && echo Setup complete! Run 'npm run oauth-setup' to configure authentication.",
         "check": "node --check server.js",
+        "check-win": "C:\\Program Files\\nodejs\\node.exe --check server.js",
         "oauth-setup": "node scripts/oauth-setup.js",
-        "auth": "node scripts/oauth-setup.js"
+        "oauth-setup-win": "C:\\Program Files\\nodejs\\node.exe scripts/oauth-setup.js",
+        "auth": "node scripts/oauth-setup.js",
+        "auth-win": "C:\\Program Files\\nodejs\\node.exe scripts/oauth-setup.js"
     },
     "dependencies": {
         "@modelcontextprotocol/sdk": "^1.13.1",
