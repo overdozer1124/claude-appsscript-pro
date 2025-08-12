@@ -1,413 +1,86 @@
-# 🚀 Claude-AppsScript-Pro v3.0.0 All-in-One Suite
-## Google Apps Script & Sheets Specialized 61-Tool Integrated All-in-One Development Suite
+# 🚀 Claude-AppsScript-Pro
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Node.js Version](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen)](https://nodejs.org/)
-[![Google Apps Script](https://img.shields.io/badge/Google%20Apps%20Script-4285F4?logo=google&logoColor=white)](https://script.google.com/)
-[![MCP Protocol](https://img.shields.io/badge/MCP%20Protocol-Compatible-blue)](https://github.com/modelcontextprotocol)
-[![Tools Integrated](https://img.shields.io/badge/Tools-61%20Integrated-green)](https://github.com/overdozer1124/claude-appsscript-pro)
+Google Apps Script開発を革命的に効率化するMCPサーバー
 
-> **🏆 Breakthrough Achievement:** World's first complete Google Apps Script + Google Sheets + WebApp integrated development environment with **61 unified tools** and **75-99% Claude output reduction**.
+## ⚡ 2分でインストール
 
-## ✨ **Why This Changes Everything**
-
-### **The Problem We Solved**
-```
-❌ Traditional Claude Development:
-   📄 15 existing files + 1 new file = OUTPUT LIMIT EXCEEDED
-   🔄 Manual copy-paste required
-   💥 90% of beginners fail due to missing appsscript.json
-   🐛 Manual debugging with guesswork
-   🚀 Complex WebApp deployment process
-
-✅ Claude-AppsScript-Pro v3.0.0 All-in-One Suite Solution:  
-   📄 15 files preserved automatically + 1 new file only = 95% OUTPUT REDUCTION
-   🤖 appsscript.json auto-generated
-   ✅ 95%+ success rate for beginners
-   🔧 Automated browser debugging with real-time monitoring
-   ⚡ One-click WebApp deployment and management
-```
-
-### **🎯 Revolutionary Results (v3.0.0 All-in-One Suite)**
-- **🎯 95%+ First-Time Success Rate** (vs 30% traditional)
-- **📉 75-99% Claude Output Reduction** (proven in production)
-- **🛠️ 61 Integrated Tools** (complete development ecosystem)
-- **⚡ One-Click WebApp Deployment** (development to production in seconds)
-- **🔍 Real Browser Debugging** (10x debugging efficiency improvement)
-- **💰 Cost-Efficiency Optimized** (lightweight design, core functions focus)
-- **🧠 AI Autonomous Workflow** (natural language → complete system auto-construction)
-- **🤖 Zero-Configuration Setup** (works anywhere with `npm i && node server.js`)
-
-## 🚀 **Quick Start (5 Minutes Setup)**
-
-### **Prerequisites**
-- Node.js 18.0.0+ ([Download](https://nodejs.org/))
-- Claude Desktop ([Download](https://claude.ai/))
-- Google Account with Apps Script access
-
-### **Installation**
-
-1. **Clone and Install**
+### Windows
 ```bash
 git clone https://github.com/overdozer1124/claude-appsscript-pro.git
 cd claude-appsscript-pro
-npm install
+install-windows.bat
 ```
+※または `npm install` → `npm run quick-install-win`
 
-2. **Google OAuth Setup** (One-time, 3 minutes)
+### macOS/Linux
 ```bash
-# Get your OAuth credentials from Google Cloud Console:
-# 1. Go to https://console.cloud.google.com/
-# 2. Create new project (or select existing)
-# 3. Enable Apps Script API + Google Drive API + Google Sheets API
-# 4. Create OAuth 2.0 credentials
-# 5. Add http://localhost:3001/oauth/callback as redirect URI
-```
-
-3. **Configure Environment**
-```bash
-# Create .env file with your credentials:
-GOOGLE_APP_SCRIPT_API_CLIENT_ID=your_client_id
-GOOGLE_APP_SCRIPT_API_CLIENT_SECRET=your_client_secret  
-GOOGLE_APP_SCRIPT_API_REFRESH_TOKEN=your_refresh_token
-GOOGLE_APP_SCRIPT_API_REDIRECT_URI=http://localhost:3001/oauth/callback
-LOG_LEVEL=error
-```
-
-4. **Add to Claude Desktop**
-Edit `claude_desktop_config.json`:
-```json
-{
-  "mcpServers": {
-    "claude-appsscript-pro": {
-      "command": "node",
-      "args": ["server.js"],
-      "cwd": "/path/to/claude-appsscript-pro"
-    }
-  }
-}
-```
-
-5. **Test Connection**
-Restart Claude Desktop and test:
-```javascript
-claude-appsscript-pro:test_connection
-```
-
-## 🚨 **Troubleshooting: Node.js PATH Issues**
-
-### **❌ Common Error: "node is not recognized" or "npm is not recognized"**
-
-If you encounter this error, Node.js is installed but not in your system PATH. This affects **90% of new users**.
-
-### **🔧 Windows Solution (Choose One)**
-
-#### **Option A: Automatic Fix (Recommended)**
-```powershell
-# Run as Administrator
+git clone https://github.com/overdozer1124/claude-appsscript-pro.git
 cd claude-appsscript-pro
-./scripts/setup-windows.ps1
+chmod +x install.sh && ./install.sh
+```
+※または `npm install` → `npm run quick-install`
+
+**インストーラーが自動的に実行:**
+- ✅ Node.jsパス自動検出・設定
+- ✅ 依存関係インストール
+- ✅ 既知のエラー自動修正
+- ✅ Claude Desktop設定自動更新
+- ✅ OAuth設定ガイド表示
+
+## 📋 OAuth設定（唯一の手動作業）
+
+1. [Google Cloud Console](https://console.cloud.google.com) にアクセス
+2. 新規プロジェクト作成
+3. 以下のAPIを有効化：
+   - Google Apps Script API
+   - Google Drive API  
+   - Google Sheets API
+4. OAuth 2.0 クライアントID作成（**Webアプリケーション**タイプ）
+5. リダイレクトURI: `http://localhost:3001/oauth/callback`
+6. インストーラーの指示に従って認証完了
+
+## ✨ 使い方
+
+Claude内で自然言語で指示するだけ：
+
+```
+「タスク管理システムを作ってWebで公開して」
+「売上データから月次レポートを自動生成したい」
+「WebアプリのJavaScriptエラーを調べて直して」
 ```
 
-#### **Option B: Manual PATH Setup**
-```powershell
-# Run as Administrator in PowerShell
-$currentPath = [Environment]::GetEnvironmentVariable("PATH", "Machine")
-$nodePath = "C:\Program Files\nodejs"
-if ($currentPath -notlike "*$nodePath*") {
-    [Environment]::SetEnvironmentVariable("PATH", "$currentPath;$nodePath", "Machine")
-    Write-Host "✅ Node.js PATH added. Please restart your terminal."
-}
-```
+## 🎯 主な機能
 
-#### **Option C: Direct Execution (No PATH Required)**
-```powershell
-# Use full paths instead of 'node' command
-cd claude-appsscript-pro
-& "C:\Program Files\nodejs\npm.exe" install
-& "C:\Program Files\nodejs\node.exe" server.js
-```
+| 機能 | 説明 |
+|------|------|
+| **61個の統合ツール** | Apps Script開発の全工程をカバー |
+| **99%出力削減** | 継続開発での革命的効率化 |
+| **AI自律実行** | 自然言語で完全システム構築 |
+| **実ブラウザデバッグ** | Playwright統合で10倍効率 |
+| **ワンクリックデプロイ** | 即座にWebアプリ公開 |
 
-### **🔧 macOS/Linux Solution**
-```bash
-# Add to ~/.bashrc or ~/.zshrc
-export PATH="/usr/local/bin/node:$PATH"
-source ~/.bashrc  # or ~/.zshrc
-```
+## 🔧 トラブルシューティング
 
-### **✅ Verification**
-```bash
-node --version  # Should show v18.0.0+
-npm --version   # Should show version number
-```
+よくある問題と解決方法：
 
-## 🛠️ **Complete Tool Reference (61 Tools)**
+| 問題 | 解決方法 |
+|------|----------|
+| Node.jsが認識されない | インストーラーが自動で解決、または[手動設定ガイド](docs/Windows用%20Node.js%20PATH設定ガイド.txt) |
+| MCP接続エラー | Claude Desktop再起動 → 設定 → 開発者 → ローカルMCPサーバー有効化 |
+| OAuth認証エラー | クライアントタイプは必ず「Webアプリケーション」を選択 |
 
-### **🔌 Connection & Diagnostics (4 Tools)**
-- `test_connection` - Verify MCP connection and OAuth status
-- `diagnostic_info` - Detailed authentication analysis  
-- `test_apis` - Test individual Google API connections
-- `get_process_info` - MCP server process information and troubleshooting
+詳細は [TROUBLESHOOTING.md](TROUBLESHOOTING.md) を参照
 
-### **🏗️ System Creation (3 Tools)**
-- `create_from_template` - Create from 5 pre-built templates
-- `create_apps_script_system` - Manual system creation with auto-correction
-- `get_script_info` - Detailed project analysis with optimization reports
+## 📚 ドキュメント
 
-### **📊 Google Sheets Operations (13 Tools)**
-#### **Direct API Access (No Apps Script Required)**
-- `read_sheet_data` - Direct data reading with multi-language support
-- `write_sheet_data` - Direct data writing
-- `update_sheet_range` - Precise range updates
-- `append_sheet_data` - Safe data appending
+- [完全版README](docs/README_FULL.md) - 詳細な機能説明
+- [セットアップガイド](docs/Claude-AppsScript-Pro%20v2.1.0%20完全セットアップガイド.md)
+- [ナレッジベース](docs/) - 開発ノウハウ集
 
-#### **Spreadsheet Management**
-- `create_spreadsheet` - New spreadsheet creation
-- `get_spreadsheet_metadata` - Structure and metadata analysis
-- `manage_sheet_tabs` - Sheet tab operations
-- `update_spreadsheet_properties` - Property management
-- `set_sheet_permissions` - Permission and sharing control
+## 📄 ライセンス
 
-#### **Advanced Sheet Operations**
-- `create_sheet` - Individual sheet creation
-- `delete_sheet` - Safe sheet deletion
-- `list_sheets` - Complete sheet listing
-- `rename_sheet` - Sheet renaming
-
-### **⚡ Continuous Development (2 Tools) - 75-95% Reduction**
-- `add_script_file` - Add files without re-outputting existing ones
-- `update_script_file` - Update specific files only
-
-### **🔧 Revolutionary Patch System (3 Tools) - 99% Reduction**
-- `diagnose_script_issues` - Extract problem areas only (10-20 lines vs full file)
-- `apply_code_patch` - Apply Unified Diff patches
-- `smart_fix_script` - Integrated diagnosis → patch workflow
-
-### **🔗 Function Integrity (3 Tools)**
-- `validate_function_consistency` - Menu function and implementation validation
-- `generate_function_stubs` - Auto-generate missing function stubs
-- `analyze_function_dependencies` - Function dependency analysis
-
-### **📈 Formula Analysis (3 Tools)**
-- `analyze_formula_dependencies` - Formula dependency analysis and circular reference detection
-- `optimize_formula_performance` - Performance analysis and optimization (30-50% speed improvement)
-- `detect_formula_errors` - Error detection and repair suggestions
-
-### **🤖 AI Autonomous Workflow (4 Tools) - Natural Language → System**
-- `intelligent_workflow_analyzer` - 🧠 Natural language intent analysis + optimal tool chain auto-generation
-- `auto_development_assistant` - 🚀 Complete automatic development assistant for complex projects
-- `smart_problem_solver` - 🔧 Intelligent problem solving system with auto-fix capability
-- `context_aware_optimizer` - ⚡ Context-aware optimization system for performance and maintainability
-
-### **⚡ Apps Script Execution (3 Tools) - Direct Function Execution**
-- `execute_script_function` - 🎯 Direct Apps Script function execution with parameter passing
-- `list_executable_functions` - 📋 List all executable functions in Apps Script project
-- `get_execution_transcript` - 📊 Execution logs and debug information retrieval
-
-### **🌐 Browser Debug Tools (4 Tools) - Real Browser Control**
-- `capture_browser_console` - Real browser console log and network monitoring
-- `debug_web_app` - Google Apps Script Web app debugging
-- `monitor_sheets_scripts` - Google Sheets custom function monitoring
-- `analyze_html_service` - HTML service browser-side analysis
-
-### **🚀 WebApp Deployment (6 Tools) - One-Click Production**
-- `deploy_webapp` - Apps Script → Web app complete automatic deployment
-- `smart_update_webapp` - Latest Web app automatic identification and update (recommended)
-- `update_webapp_deployment` - Existing deployment configuration changes
-- `list_webapp_deployments` - Deployment list management
-- `get_webapp_deployment_info` - Specific deployment detailed information
-- `delete_webapp_deployment` - Safe deployment deletion
-
-### **🎨 Data Validation & Formatting (4 Tools)**
-- `add_data_validation` - Data validation rules for input restrictions
-- `remove_data_validation` - Remove validation rules
-- `list_data_validations` - List all validation rules
-- `apply_conditional_formatting` - Advanced conditional formatting
-
-## 🎯 **Revolutionary Workflow Examples**
-
-### **🆕 Template System - Create Complete Apps in One Command**
-
-#### **Basic Business App**
-```javascript
-claude-appsscript-pro:create_from_template({
-  template: "basic",
-  system_name: "My First App"
-})
-```
-**Result:** Complete spreadsheet app with menu, alerts, and functions ready to use!
-
-#### **Game Template**  
-```javascript
-claude-appsscript-pro:create_from_template({
-  template: "game", 
-  system_name: "Score Tracker",
-  customization: {
-    menu_title: "🎮 My Game"
-  }
-})
-```
-
-### **🚀 One-Click WebApp Deployment**
-```javascript
-// 1. Create Apps Script system
-claude-appsscript-pro:create_apps_script_system({
-  system_name: "My Web App",
-  script_files: [{
-    name: "WebApp",
-    content: "function doGet() { return HtmlService.createHtmlOutput('Hello World!'); }"
-  }]
-})
-
-// 2. Deploy to production instantly
-claude-appsscript-pro:deploy_webapp({
-  script_id: "obtained_script_id",
-  access_type: "ANYONE",
-  execute_as: "USER_DEPLOYING"
-})
-```
-
-### **🔍 Real Browser Debugging**
-```javascript
-// Debug Google Apps Script Web app with real browser
-claude-appsscript-pro:debug_web_app({
-  web_app_url: "https://script.google.com/macros/s/your_id/exec",
-  monitor_duration: 60000
-})
-
-// Monitor Google Sheets custom functions
-claude-appsscript-pro:monitor_sheets_scripts({
-  spreadsheet_url: "https://docs.google.com/spreadsheets/d/your_sheet_id/edit",
-  function_name: "myCustomFunction"
-})
-```
-
-### **🤖 AI Autonomous Workflow - Natural Language Development**
-```javascript
-// Create complete system from natural language
-claude-appsscript-pro:intelligent_workflow_analyzer({
-  user_intent: "Create a task management system for team collaboration with real-time updates",
-  auto_execute: true
-})
-
-// Intelligent problem solving
-claude-appsscript-pro:smart_problem_solver({
-  problem_description: "ReferenceError: myFunction is not defined in WebApp",
-  auto_fix: true
-})
-
-// Execute Apps Script functions directly
-claude-appsscript-pro:execute_script_function({
-  script_id: "your_script_id",
-  function_name: "myFunction",
-  parameters: ["param1", "param2"]
-})
-```
-
-## 📊 **Proven Performance Results**
-
-### **Real-World Output Reduction**
-| Project Size | Traditional Output | Pro Output | Reduction |
-|--------------|-------------------|------------|-----------|
-| 5 files | 5 files | 1 file | **80%** |
-| 10 files | 10 files | 1 file | **90%** |
-| 15 files | ❌ LIMIT EXCEEDED | 1 file | **93%** |
-| 20+ files | ❌ IMPOSSIBLE | 1 file | **95%** |
-| Bug fixes | Full file (1000+ lines) | Patch (5-10 lines) | **99%** |
-
-### **Development Efficiency Improvements**
-| Feature | Before | After | Improvement |
-|---------|--------|-------|-------------|
-| **First-time success rate** | 30% | 95%+ | **317% increase** |
-| **WebApp deployment time** | 30-60 minutes | 30 seconds | **99% reduction** |
-| **Debugging efficiency** | Manual guessing | Real browser monitoring | **10x improvement** |
-| **AI-powered development** | Manual tool selection | Autonomous workflow analysis | **10x efficiency** |
-| **Error recovery** | Manual fixing | 90% automatic | **90% automation** |
-
-## 🌟 **Enterprise Features**
-
-### **🔧 Complete Portability**
-- **Zero-dependency setup**: Works on any PC with `npm i && node server.js`
-- **Path-agnostic**: Automatic path resolution for all environments
-- **CLI configuration**: Override settings via command line arguments
-- **Environment variable support**: Flexible deployment options
-
-### **🛡️ Production-Ready Security**
-- **OAuth 2.0 integration**: Secure Google API access
-- **Scoped permissions**: Minimal required permissions only
-- **Automatic credential management**: Secure token handling
-- **Process isolation**: Safe MCP server operation
-
-### **📈 Scalability & Performance**
-- **Memory optimization**: 90% reduced memory usage through modular loading
-- **Lazy loading**: Load modules only when needed
-- **Parallel processing**: Concurrent operation support
-- **Resource management**: Automatic cleanup and garbage collection
-
-## 🔧 **Troubleshooting**
-
-### **Common Issues & Solutions**
-
-#### **OAuth Authentication Failed**
-```javascript
-// Check authentication status
-claude-appsscript-pro:diagnostic_info
-
-// Common fixes:
-// 1. Verify .env file credentials
-// 2. Check Google Cloud Console API enablement  
-// 3. Confirm redirect URI matches exactly
-```
-
-#### **WebApp Deployment Issues**
-```javascript
-// List current deployments
-claude-appsscript-pro:list_webapp_deployments({
-  script_id: "your_script_id"
-})
-
-// Check deployment status
-claude-appsscript-pro:get_webapp_deployment_info({
-  script_id: "your_script_id",
-  deployment_id: "your_deployment_id"
-})
-```
-
-#### **Browser Debugging Problems**
-```javascript
-// Ensure Playwright dependencies are installed
-npm install playwright-core
-
-// Test browser connectivity
-claude-appsscript-pro:capture_browser_console({
-  url: "https://google.com",
-  duration: 10000
-})
-```
-
-## 📚 **Documentation**
-
-- **[Examples](EXAMPLES.md)** - Comprehensive usage examples
-- **[Troubleshooting](TROUBLESHOOTING.md)** - Detailed problem-solving guide  
-- **[API Reference](docs/api.md)** - Complete API documentation
-- **[Templates Guide](docs/templates.md)** - Template customization guide
-
-## 🤝 **Contributing**
-
-We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
-
-## 📄 **License**
-
-MIT License - see [LICENSE](LICENSE) file for details.
-
-## 🌟 **Star History**
-
-If this tool revolutionized your Apps Script development, please consider giving it a ⭐ on GitHub!
+MIT License
 
 ---
 
-## 🚀 **Ready to revolutionize your Apps Script development?**
-
-**Claude-AppsScript-Pro v3.0.0 All-in-One Suite** transforms Google Apps Script development from a frustrating, limited experience into a powerful, unlimited creative platform. Join thousands of developers who have already made the switch to efficient, error-free development.
-
-**Start your revolution today! 🚀**
+**要件**: Node.js 18.0.0+ | **サポート**: [Issues](https://github.com/overdozer1124/claude-appsscript-pro/issues) | **開発者**: [@overdozer1124](https://github.com/overdozer1124)

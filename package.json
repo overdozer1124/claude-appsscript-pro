@@ -1,7 +1,7 @@
 {
     "name": "claude-appsscript-pro",
-    "version": "3.0.0",
-    "description": "Claude Apps Script Pro v3.0.0 All-in-One Suite - Google Apps Script and Sheets Specialized 61-Tool Integrated All-in-One Development Suite",
+    "version": "3.0.1",
+    "description": "Claude Apps Script Pro v3.0.1 - Google Apps Script + Sheets + WebApp Integrated Development Suite with 2-Minute Quick Setup",
     "main": "server.js",
     "type": "module",
     "engines": {
@@ -22,7 +22,10 @@
         "oauth-setup": "node scripts/oauth-setup.js",
         "oauth-setup-win": "C:\\Program Files\\nodejs\\node.exe scripts/oauth-setup.js",
         "auth": "node scripts/oauth-setup.js",
-        "auth-win": "C:\\Program Files\\nodejs\\node.exe scripts/oauth-setup.js"
+        "auth-win": "C:\\Program Files\\nodejs\\node.exe scripts/oauth-setup.js",
+        "quick-install": "node install.js",
+        "quick-install-win": "install-windows.bat",
+        "postinstall": "node -e \"console.log('\\n🎉 インストール完了！\\n\\n次のステップ: npm run quick-install\\n')\""
     },
     "dependencies": {
         "@modelcontextprotocol/sdk": "^1.13.1",
