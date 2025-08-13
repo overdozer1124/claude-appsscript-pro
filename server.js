@@ -248,7 +248,11 @@ class MCPServer {
           content: [
             {
               type: 'text',
-              text: `❌ Error executing ${name}: ${error.message}`
+              text: JSON.stringify({
+                success: false,
+                error: error.message,
+                tool: name
+              }, null, 2)
             }
           ]
         };
@@ -269,106 +273,79 @@ class MCPServer {
   }
 
   /**
-   * Log process information for debugging and monitoring
+   * プロセス情報出力（MCPサーバー情報）
    */
   logProcessInfo() {
     const startTime = new Date().toISOString();
     const __filename = fileURLToPath(import.meta.url);
     const __dirname = dirname(__filename);
-    
-    const processInfo = {
-      pid: process.pid,
-      startTime: startTime,
-      command: process.argv.join(' '),
-      workingDir: process.cwd(),
-      scriptPath: __filename,
-      serverDir: __dirname,
-      nodeVersion: process.version,
-      platform: process.platform,
-      architecture: process.arch,
-      phase: 'v3.0.0 All-in-One Suite (61 tools - all-in-one features)',
-      memoryUsage: Math.round(process.memoryUsage().heapUsed / 1024 / 1024 * 100) / 100
-    };
-    
-    // Log to STDERR to avoid STDOUT pollution
+
+    // 出力：詳細プロセス情報（STDERR使用でSTDOUT汚染回避）
     console.error('====================================================');
-    console.error('[MCP-PROCESS] Claude-AppsScript-Pro Server v3.0.0 All-in-One Suite');
-    console.error('[MCP-PROCESS] PID:', processInfo.pid);
-    console.error('[MCP-PROCESS] Start Time:', processInfo.startTime);
-    console.error('[MCP-PROCESS] Phase:', processInfo.phase);
-    console.error('[MCP-PROCESS] Memory Usage:', processInfo.memoryUsage, 'MB');
-    console.error('[MCP-PROCESS] Architecture:', processInfo.architecture);
+    console.error('[MCP-PROCESS] Claude-AppsScript-Pro Server v3.0.0');
     console.error('====================================================');
-    
-    // Save process info to file for troubleshooting
-    this.saveProcessInfoToFile(processInfo);
+    console.error('[MCP-PROCESS] PID:', process.pid);
+    console.error('[MCP-PROCESS] Start Time:', startTime);
+    console.error('[MCP-PROCESS] Command:', process.argv[0], __filename);
+    console.error('[MCP-PROCESS] Working Dir:', process.cwd());
+    console.error('[MCP-PROCESS] Script Path:', __filename);
+    console.error('[MCP-PROCESS] Node Version:', process.version);
+    console.error('[MCP-PROCESS] Platform:', process.platform);
+    console.error('[MCP-PROCESS] Architecture:', process.arch);
+    console.error('[MCP-PROCESS] Phase: All-in-One Suite (61 tools implemented)');
+    console.error('====================================================');
+
+    // mcp-process-info.txtファイル生成
+    this.saveProcessInfoToFile(startTime);
   }
 
   /**
-   * Save process information to file
+   * プロセス情報をファイルに保存
    */
-  async saveProcessInfoToFile(processInfo) {
+  async saveProcessInfoToFile(startTime) {
     try {
-      const content = `Claude-AppsScript-Pro MCP Server v2.1.0 Local Enhanced
-${processInfo.phase}
-PID: ${processInfo.pid}
-Start Time: ${processInfo.startTime}
-Command: ${processInfo.command}
-Working Dir: ${processInfo.workingDir}
-Script Path: ${processInfo.scriptPath}
-Server Dir: ${processInfo.serverDir}
-Node Version: ${processInfo.nodeVersion}
-Platform: ${processInfo.platform}
-Architecture: ${processInfo.architecture}
-Memory Usage: ${processInfo.memoryUsage} MB
+      const processInfo = `Claude-AppsScript-Pro MCP Server v3.0.0
+Phase: All-in-One Suite (61 tools implemented)
+PID: ${process.pid}
+Start Time: ${startTime}
+Command: ${process.argv[0]} ${fileURLToPath(import.meta.url)}
+Working Dir: ${process.cwd()}
+Script Path: ${fileURLToPath(import.meta.url)}
+Server Dir: ${dirname(fileURLToPath(import.meta.url))}
+Node Version: ${process.version}
+Platform: ${process.platform}
+Architecture: ${process.arch}
 
 PowerShell Process Check Command:
-Get-Process -Id ${processInfo.pid}
+Get-Process -Id ${process.pid}
 
 Claude Code Process Check Command:
-ps -p ${processInfo.pid}
+ps -p ${process.pid}
 
 Kill Process Command (if needed):
-PowerShell: Stop-Process -Id ${processInfo.pid}
-Claude Code: kill ${processInfo.pid}
-
-🎯 v2.1.0 Local Enhanced Features:
-- 61 integrated tools (enhanced local feature set)
-- Enhanced Patch Tools (revolutionary anchor-based system) - LOCAL EXCLUSIVE
-- WebApp deployment system (6 tools)
-- Browser debugging with Playwright-Core (10 tools)
-- Complete Sheet operations (18 tools)
-- Intelligent Workflow tools (4 tools)
-- Execution tools (2 tools)
-- 75-99% output reduction system
-- Fully portable + enhanced architecture
-- ChatGPT-optimized algorithms
-- Anchor-based patching system
+PowerShell: Stop-Process -Id ${process.pid}
+Claude Code: kill ${process.pid}
 `;
-      
-      await fs.writeFile('mcp-process-info.txt', content, 'utf8');
-      this.logger.info('Process info saved to mcp-process-info.txt');
+
+      await fs.writeFile('mcp-process-info.txt', processInfo, 'utf8');
+      console.error('[MCP-PROCESS] Process info saved to mcp-process-info.txt');
     } catch (error) {
-      this.logger.error('Failed to save process info:', error.message);
+      console.error('[MCP-PROCESS] Failed to save process info:', error.message);
     }
   }
 
-  /**
-   * Start the MCP server
-   */
-  async start() {
+  async run() {
     const transport = new StdioServerTransport();
+    this.logger.info('🚀 Claude-AppsScript-Pro MCP Server v3.0.0 All-in-One Suite starting...');
+    this.logger.info('📊 61 tools integrated for Google Apps Script & Sheets development');
     await this.server.connect(transport);
-    
-    this.logger.info('🚀 Claude-AppsScript-Pro MCP Server v2.1.0 Local Enhanced started successfully');
-    this.logger.info('📊 Features: 61 tools, enhanced integration, revolutionary patch system');
-    this.logger.info('💡 Ready for enterprise-grade Google Apps Script development with enhanced features!');
+    this.logger.info('✅ MCP Server running successfully');
   }
 }
 
-// Start the server
+// Initialize and run server
 const server = new MCPServer();
-server.start().catch((error) => {
+server.run().catch((error) => {
   console.error('Failed to start MCP server:', error);
   process.exit(1);
 });
