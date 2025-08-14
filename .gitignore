@@ -127,3 +127,4 @@ claude_desktop_config*.json
 client_secret_*.json
 *.bat
 *.backup*
+manual-token-exchange.cjs
