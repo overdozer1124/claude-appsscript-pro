@@ -28,38 +28,52 @@ console.log('🚀 Claude-AppsScript-Pro OAuth設定 (対話版)');
 console.log('==========================================');
 console.log('');
 
-// 対話的入力のためのreadlineインターフェース
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout
-});
+// 共通のreadlineインターフェース（必要時のみ作成）
+let rl = null;
+
+function createReadlineInterface() {
+  if (!rl) {
+    rl = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout
+    });
+  }
+  return rl;
+}
+
+function closeReadlineInterface() {
+  if (rl) {
+    rl.close();
+    rl = null;
+  }
+}
 
 // パスワード入力用（非表示）
 function inputSecret(prompt) {
   return new Promise((resolve) => {
-    const rl = readline.createInterface({
-      input: process.stdin,
-      output: process.stdout
-    });
+    const interface = createReadlineInterface();
     
-    rl.question(prompt, (answer) => {
-      rl.close();
-      resolve(answer);
-    });
-    
-    // カーソルを非表示にして入力を隠す
-    rl._writeToOutput = function _writeToOutput(stringToWrite) {
+    // 入力を非表示にする処理
+    const originalWrite = interface._writeToOutput;
+    interface._writeToOutput = function _writeToOutput(stringToWrite) {
       if (stringToWrite.charCodeAt(0) === 13) { // carriage return
-        rl.output.write('\n');
+        interface.output.write('\n');
       }
     };
+    
+    interface.question(prompt, (answer) => {
+      // 元の出力機能を復元
+      interface._writeToOutput = originalWrite;
+      resolve(answer.trim());
+    });
   });
 }
 
 // 通常の入力
 function inputText(prompt) {
   return new Promise((resolve) => {
-    rl.question(prompt, (answer) => {
+    const interface = createReadlineInterface();
+    interface.question(prompt, (answer) => {
       resolve(answer.trim());
     });
   });
@@ -205,7 +219,7 @@ async function main() {
     console.log('✅ 認証情報を .env ファイルに保存しました\n');
     
     // readlineインターフェースを閉じる
-    rl.close();
+    closeReadlineInterface();
     
     // 認証URL生成
     const state = crypto.randomBytes(16).toString('hex');
@@ -371,7 +385,7 @@ async function main() {
     
   } catch (error) {
     console.error(`❌ 設定エラー: ${error.message}`);
-    rl.close();
+    closeReadlineInterface();
     process.exit(1);
   }
 }
