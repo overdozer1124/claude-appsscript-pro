@@ -141,7 +141,7 @@ if exist install.js (
     echo 4. .envファイルに認証情報を設定
     echo.
     echo 5. 以下のコマンドでリフレッシュトークンを取得：
-    echo    npm run oauth-setup-win
+    echo    node scripts\oauth-setup-cmd.cjs
     echo.
     echo 6. Claude Desktop設定ファイルを更新：
     echo    %APPDATA%\Claude\claude_desktop_config.json
