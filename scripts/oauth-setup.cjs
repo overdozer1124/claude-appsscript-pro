@@ -1,247 +1,383 @@
+#!/usr/bin/env node
+/**
+ * Google OAuth セットアップスクリプト - 対話的設定版
+ * ターミナルでクライアントID/シークレットを入力可能
+ */
+
+'use strict';
+
+const fs = require('fs');
+const path = require('path');
 const http = require('http');
-const { URL } = require('url');
-const { spawn } = require('child_process');
-require('dotenv').config();
+const https = require('https');
+const { URL, URLSearchParams } = require('url');
+const crypto = require('crypto');
+const { exec } = require('child_process');
+const readline = require('readline');
 
-const PORT = 3001;
-const CLIENT_ID = process.env.GOOGLE_APP_SCRIPT_API_CLIENT_ID;
-const CLIENT_SECRET = process.env.GOOGLE_APP_SCRIPT_API_CLIENT_SECRET;
-
-// Check environment variables
-if (!CLIENT_ID || !CLIENT_SECRET) {
-    console.error('❌ .envファイルにCLIENT_IDとCLIENT_SECRETを設定してください');
-    console.log('\n設定例:');
-    console.log('GOOGLE_APP_SCRIPT_API_CLIENT_ID=your_client_id_here');
-    console.log('GOOGLE_APP_SCRIPT_API_CLIENT_SECRET=your_client_secret_here');
-    process.exit(1);
-}
-
-console.log('✅ 環境変数確認完了');
-console.log('CLIENT_ID:', CLIENT_ID.substring(0, 20) + '...');
-
-// OAuth URL construction
-const scopes = [
-    'https://www.googleapis.com/auth/script.projects',
-    'https://www.googleapis.com/auth/script.deployments', 
-    'https://www.googleapis.com/auth/drive',
-    'https://www.googleapis.com/auth/spreadsheets'
+// 定数
+const TOKEN_ENDPOINT = 'https://oauth2.googleapis.com/token';
+const SCOPES = [
+  'https://www.googleapis.com/auth/script.projects',
+  'https://www.googleapis.com/auth/script.deployments',
+  'https://www.googleapis.com/auth/drive',
+  'https://www.googleapis.com/auth/spreadsheets',
 ];
 
-const authUrl = 'https://accounts.google.com/o/oauth2/v2/auth?' +
-    'response_type=code&' +
-    'client_id=' + encodeURIComponent(CLIENT_ID) + '&' +
-    'redirect_uri=' + encodeURIComponent('http://localhost:3001/oauth/callback') + '&' +
-    'scope=' + encodeURIComponent(scopes.join(' ')) + '&' +
-    'access_type=offline&' +
-    'prompt=consent';
+console.log('🚀 Claude-AppsScript-Pro OAuth設定 (対話版)');
+console.log('==========================================');
+console.log('');
 
-console.log('\n🚀 OAuth認証サーバー起動中...');
-console.log('\n以下のURLをブラウザで開いてください:');
-console.log('=====================================');
-console.log(authUrl);
-console.log('=====================================\n');
+// 対話的入力のためのreadlineインターフェース
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout
+});
 
-// Create HTTP server for OAuth callback
-const server = http.createServer(async (req, res) => {
-    const url = new URL(req.url, 'http://localhost:' + PORT);
+// パスワード入力用（非表示）
+function inputSecret(prompt) {
+  return new Promise((resolve) => {
+    const rl = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout
+    });
     
-    if (url.pathname === '/oauth/callback') {
-        const code = url.searchParams.get('code');
-        const error = url.searchParams.get('error');
-        
-        if (error) {
-            console.error('❌ OAuth認証エラー:', error);
-            res.writeHead(400, { 'Content-Type': 'text/html; charset=utf-8' });
-            res.end('<h1>認証エラー</h1><p>認証が拒否されました。</p>');
-            return;
-        }
-        
-        if (code) {
-            console.log('✅ 認証コード取得成功!');
-            
-            // Use https module for Node.js compatibility
-            try {
-                const https = require('https');
-                const querystring = require('querystring');
-                
-                const postData = querystring.stringify({
-                    client_id: CLIENT_ID,
-                    client_secret: CLIENT_SECRET,
-                    code: code,
-                    grant_type: 'authorization_code',
-                    redirect_uri: 'http://localhost:3001/oauth/callback'
-                });
-                
-                const options = {
-                    hostname: 'oauth2.googleapis.com',
-                    port: 443,
-                    path: '/token',
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                        'Content-Length': Buffer.byteLength(postData)
-                    }
-                };
-                
-                const tokenReq = https.request(options, (tokenRes) => {
-                    let data = '';
-                    
-                    tokenRes.on('data', (chunk) => {
-                        data += chunk;
-                    });
-                    
-                    tokenRes.on('end', () => {
-                        try {
-                            const tokens = JSON.parse(data);
-                            
-                            if (tokens.error) {
-                                throw new Error('Token exchange error: ' + (tokens.error_description || tokens.error));
-                            }
-                            
-                            if (tokens.refresh_token) {
-                                console.log('\n========================================');
-                                console.log('✅ REFRESH TOKEN取得成功!');
-                                console.log('========================================');
-                                console.log('\n🔧 .envファイルを自動更新中...');
-                                
-                                // .envファイルの自動更新
-                                try {
-                                    const fs = require('fs');
-                                    const path = require('path');
-                                    
-                                    const envPath = path.join(__dirname, '..', '.env');
-                                    const refreshTokenLine = 'GOOGLE_APP_SCRIPT_API_REFRESH_TOKEN=' + tokens.refresh_token;
-                                    
-                                    // .envファイルを読み込み
-                                    let envContent = '';
-                                    if (fs.existsSync(envPath)) {
-                                        envContent = fs.readFileSync(envPath, 'utf8');
-                                        console.log('📄 既存の.envファイルを発見');
-                                    } else {
-                                        console.log('📄 新規.envファイルを作成');
-                                    }
-                                    
-                                    // REFRESH_TOKENの行を更新または追加
-                                    const lines = envContent.split('\n');
-                                    let tokenLineExists = false;
-                                    
-                                    for (let i = 0; i < lines.length; i++) {
-                                        if (lines[i].startsWith('GOOGLE_APP_SCRIPT_API_REFRESH_TOKEN=')) {
-                                            lines[i] = refreshTokenLine;
-                                            tokenLineExists = true;
-                                            console.log('🔄 既存のREFRESH_TOKEN行を更新');
-                                            break;
-                                        }
-                                    }
-                                    
-                                    if (!tokenLineExists) {
-                                        lines.push(refreshTokenLine);
-                                        console.log('➕ REFRESH_TOKEN行を追加');
-                                    }
-                                    
-                                    // .envファイルに書き戻し
-                                    fs.writeFileSync(envPath, lines.join('\n'));
-                                    console.log('✅ .envファイルの更新完了!');
-                                    console.log('📍 ファイルパス:', envPath);
-                                    
-                                } catch (fileError) {
-                                    console.log('⚠️ .envファイルの自動更新に失敗しました:', fileError.message);
-                                    console.log('📋 手動で以下の行を.envファイルに追加してください:');
-                                    console.log('GOOGLE_APP_SCRIPT_API_REFRESH_TOKEN=' + tokens.refresh_token);
-                                }
-                                
-                                console.log('\n========================================');
-                                console.log('🎉 OAuth設定が完全に完了しました!');
-                                console.log('========================================\n');
-                                
-                                res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-                                res.end('<html><head><title>認証成功</title></head><body style="font-family: Arial, sans-serif; text-align: center; padding: 50px;"><h1 style="color: green;">✅ 認証成功!</h1><p>ターミナルでREFRESH_TOKENを確認してください。</p><p>このウィンドウは閉じて大丈夫です。</p></body></html>');
-                                
-                                setTimeout(() => {
-                                    console.log('OAuth認証サーバーを終了します...');
-                                    process.exit(0);
-                                }, 5000);
-                            } else {
-                                throw new Error('Refresh token not received in response');
-                            }
-                        } catch (parseError) {
-                            console.error('❌ レスポンス解析エラー:', parseError.message);
-                            res.writeHead(500, { 'Content-Type': 'text/html; charset=utf-8' });
-                            res.end('<h1>レスポンス解析エラー</h1><p>' + parseError.message + '</p>');
-                        }
-                    });
-                });
-                
-                tokenReq.on('error', (error) => {
-                    console.error('❌ トークン交換エラー:', error.message);
-                    res.writeHead(500, { 'Content-Type': 'text/html; charset=utf-8' });
-                    res.end('<h1>トークン交換エラー</h1><p>' + error.message + '</p>');
-                });
-                
-                tokenReq.write(postData);
-                tokenReq.end();
-                
-            } catch (error) {
-                console.error('❌ 処理エラー:', error.message);
-                res.writeHead(500, { 'Content-Type': 'text/html; charset=utf-8' });
-                res.end('<h1>処理エラー</h1><p>' + error.message + '</p>');
-            }
-        } else {
-            res.writeHead(400, { 'Content-Type': 'text/html; charset=utf-8' });
-            res.end('<h1>エラー</h1><p>認証コードが見つかりません。</p>');
-        }
+    rl.question(prompt, (answer) => {
+      rl.close();
+      resolve(answer);
+    });
+    
+    // カーソルを非表示にして入力を隠す
+    rl._writeToOutput = function _writeToOutput(stringToWrite) {
+      if (stringToWrite.charCodeAt(0) === 13) { // carriage return
+        rl.output.write('\n');
+      }
+    };
+  });
+}
+
+// 通常の入力
+function inputText(prompt) {
+  return new Promise((resolve) => {
+    rl.question(prompt, (answer) => {
+      resolve(answer.trim());
+    });
+  });
+}
+
+// クライアントID/シークレットの検証
+function validateClientId(clientId) {
+  return clientId && clientId.includes('.apps.googleusercontent.com');
+}
+
+function validateClientSecret(secret) {
+  return secret && secret.length >= 20;
+}
+
+// .envファイルの処理
+function readEnvFile() {
+  const envPath = path.join(__dirname, '..', '.env');
+  
+  if (!fs.existsSync(envPath)) {
+    // .envファイルが存在しない場合は作成
+    console.log('📄 .envファイルを新規作成します...');
+    fs.writeFileSync(envPath, `# Claude-AppsScript-Pro 環境変数設定
+# Google Apps Script API 設定
+GOOGLE_APP_SCRIPT_API_CLIENT_ID=
+GOOGLE_APP_SCRIPT_API_CLIENT_SECRET=
+GOOGLE_APP_SCRIPT_API_REDIRECT_URI=http://localhost:3001/oauth/callback
+GOOGLE_APP_SCRIPT_API_REFRESH_TOKEN=
+
+# オプション設定
+LOG_LEVEL=info
+SCRIPT_API_TIMEOUT_MS=30000
+MAX_CONCURRENT_REQUESTS=5
+DEBUG_MODE=false
+VERBOSE_LOGGING=false
+`);
+  }
+  
+  const envContent = fs.readFileSync(envPath, 'utf8');
+  
+  // 手動で環境変数をパース
+  const envVars = {};
+  envContent.split('\n').forEach(line => {
+    line = line.trim();
+    if (line && !line.startsWith('#') && line.includes('=')) {
+      const [key, ...valueParts] = line.split('=');
+      envVars[key.trim()] = valueParts.join('=').trim();
+    }
+  });
+  
+  return { envPath, envContent, envVars };
+}
+
+function updateEnvFile(envPath, envContent, updates) {
+  let newContent = envContent;
+  
+  Object.entries(updates).forEach(([key, value]) => {
+    const regex = new RegExp(`${key}=.*$`, 'm');
+    if (newContent.match(regex)) {
+      newContent = newContent.replace(regex, `${key}=${value}`);
     } else {
+      newContent += `\n${key}=${value}\n`;
+    }
+  });
+  
+  fs.writeFileSync(envPath, newContent);
+}
+
+// ブラウザを開く関数
+function openUrl(url) {
+  const command = process.platform === 'win32' ? 'start ""' :
+                 process.platform === 'darwin' ? 'open' : 'xdg-open';
+  
+  exec(`${command} "${url}"`, (error) => {
+    if (error) {
+      console.log('\n手動でブラウザを開いて以下のURLにアクセスしてください:');
+      console.log(url);
+    } else {
+      console.log('🌐 ブラウザを起動しました');
+    }
+  });
+}
+
+// メイン処理
+async function main() {
+  try {
+    // .envファイル読み込み
+    const { envPath, envContent, envVars } = readEnvFile();
+    console.log(`📄 .envファイル: ${envPath}\n`);
+    
+    let CLIENT_ID = envVars.GOOGLE_APP_SCRIPT_API_CLIENT_ID;
+    let CLIENT_SECRET = envVars.GOOGLE_APP_SCRIPT_API_CLIENT_SECRET;
+    const REDIRECT_URI = envVars.GOOGLE_APP_SCRIPT_API_REDIRECT_URI || 'http://localhost:3001/oauth/callback';
+    
+    // 既存の認証情報確認
+    console.log('🔑 現在の認証情報:');
+    console.log(`   Client ID: ${CLIENT_ID || '未設定'}`);
+    console.log(`   Client Secret: ${CLIENT_SECRET ? '設定済み' : '未設定'}`);
+    console.log(`   Redirect URI: ${REDIRECT_URI}\n`);
+    
+    // クライアントIDの入力・確認
+    if (!CLIENT_ID || !validateClientId(CLIENT_ID)) {
+      console.log('📋 Google Cloud Console で OAuth クライアント ID を作成してください:');
+      console.log('   1. https://console.cloud.google.com/apis/credentials');
+      console.log('   2. 「認証情報を作成」→「OAuth 2.0 クライアント ID」');
+      console.log('   3. アプリケーションの種類: 「ウェブ アプリケーション」');
+      console.log('   4. 承認済みリダイレクト URI: http://localhost:3001/oauth/callback');
+      console.log('');
+      
+      while (true) {
+        CLIENT_ID = await inputText('🔑 クライアント ID を入力してください: ');
+        if (validateClientId(CLIENT_ID)) {
+          console.log('✅ クライアント ID 形式確認');
+          break;
+        } else {
+          console.log('❌ 無効なクライアント ID です。.apps.googleusercontent.com で終わる形式を入力してください。');
+        }
+      }
+    }
+    
+    // クライアントシークレットの入力・確認
+    if (!CLIENT_SECRET || !validateClientSecret(CLIENT_SECRET)) {
+      while (true) {
+        console.log('🔒 クライアント シークレット を入力してください（入力は非表示になります）:');
+        CLIENT_SECRET = await inputSecret('');
+        console.log(''); // 改行
+        
+        if (validateClientSecret(CLIENT_SECRET)) {
+          console.log('✅ クライアント シークレット 形式確認');
+          break;
+        } else {
+          console.log('❌ 無効なクライアント シークレットです。20文字以上の文字列を入力してください。');
+        }
+      }
+    }
+    
+    // .envファイルに保存
+    updateEnvFile(envPath, envContent, {
+      'GOOGLE_APP_SCRIPT_API_CLIENT_ID': CLIENT_ID,
+      'GOOGLE_APP_SCRIPT_API_CLIENT_SECRET': CLIENT_SECRET,
+      'GOOGLE_APP_SCRIPT_API_REDIRECT_URI': REDIRECT_URI
+    });
+    
+    console.log('✅ 認証情報を .env ファイルに保存しました\n');
+    
+    // readlineインターフェースを閉じる
+    rl.close();
+    
+    // 認証URL生成
+    const state = crypto.randomBytes(16).toString('hex');
+    const authUrl = new URL('https://accounts.google.com/o/oauth2/v2/auth');
+    authUrl.searchParams.set('response_type', 'code');
+    authUrl.searchParams.set('client_id', CLIENT_ID);
+    authUrl.searchParams.set('redirect_uri', REDIRECT_URI);
+    authUrl.searchParams.set('scope', SCOPES.join(' '));
+    authUrl.searchParams.set('access_type', 'offline');
+    authUrl.searchParams.set('prompt', 'consent');
+    authUrl.searchParams.set('state', state);
+
+    console.log('🔗 OAuth認証を開始します...');
+    console.log('=====================================');
+    console.log(authUrl.toString());
+    console.log('=====================================\n');
+
+    // HTTPサーバー起動
+    const redirectURL = new URL(REDIRECT_URI);
+    const PORT = parseInt(redirectURL.port) || 3001;
+
+    const server = http.createServer(async (req, res) => {
+      const url = new URL(req.url, `http://localhost:${PORT}`);
+      
+      if (url.pathname !== redirectURL.pathname) {
         res.writeHead(404);
         res.end('Not Found');
-    }
-});
+        return;
+      }
 
-// Start server
-server.listen(PORT, () => {
-    console.log('📡 コールバックサーバー起動: http://localhost:' + PORT);
-    console.log('\n上記のURLをブラウザで開いてGoogleアカウントでログインしてください。');
-    
-    // Windows-optimized browser launching
-    console.log('🌐 ブラウザを自動起動中...');
-    
-    if (process.platform === 'win32') {
-        try {
-            const { exec } = require('child_process');
-            exec(`powershell -command "Start-Process '${authUrl}'"`, (error) => {
-                if (error) {
-                    console.log('❌ PowerShellでの起動に失敗しました。上記のURLを手動でコピーしてください。');
-                    console.log('エラー詳細:', error.message);
-                } else {
-                    console.log('✅ ブラウザが正常に起動しました（PowerShell経由）');
-                }
-            });
-        } catch (error) {
-            console.log('❌ ブラウザの自動起動に失敗しました。上記のURLを手動でコピーしてください。');
-            console.log('エラー詳細:', error.message);
-        }
-    } else {
-        // Non-Windows platforms
-        try {
-            const { spawn } = require('child_process');
-            if (process.platform === 'darwin') {
-                spawn('open', [authUrl], { stdio: 'ignore' });
-                console.log('✅ ブラウザが正常に起動しました（macOS）');
-            } else {
-                spawn('xdg-open', [authUrl], { stdio: 'ignore' });
-                console.log('✅ ブラウザが正常に起動しました（Linux）');
-            }
-        } catch (error) {
-            console.log('❌ ブラウザの自動起動に失敗しました。上記のURLを手動でコピーしてください。');
-        }
-    }
-});
+      const error = url.searchParams.get('error');
+      if (error) {
+        console.error(`❌ 認証エラー: ${error}`);
+        res.writeHead(400, { 'Content-Type': 'text/html; charset=utf-8' });
+        res.end('<h3>認証に失敗しました</h3>');
+        server.close();
+        process.exit(1);
+      }
 
-// Handle server errors
-server.on('error', (error) => {
-    if (error.code === 'EADDRINUSE') {
-        console.error('❌ ポート' + PORT + 'は既に使用されています。他のプロセスを終了してから再試行してください。');
-    } else {
-        console.error('❌ サーバーエラー:', error.message);
-    }
+      const returnedState = url.searchParams.get('state');
+      if (returnedState !== state) {
+        console.error('❌ State不一致エラー');
+        res.writeHead(400, { 'Content-Type': 'text/html; charset=utf-8' });
+        res.end('<h3>セキュリティエラー</h3>');
+        server.close();
+        process.exit(1);
+      }
+
+      const code = url.searchParams.get('code');
+      if (!code) {
+        console.error('❌ 認証コードが見つかりません');
+        res.writeHead(400, { 'Content-Type': 'text/html; charset=utf-8' });
+        res.end('<h3>認証コードエラー</h3>');
+        server.close();
+        process.exit(1);
+      }
+
+      console.log('✅ 認証コード取得成功');
+      console.log('🔄 トークン交換中...');
+
+      // トークン交換
+      try {
+        const postData = new URLSearchParams({
+          grant_type: 'authorization_code',
+          code: code,
+          redirect_uri: REDIRECT_URI,
+          client_id: CLIENT_ID,
+          client_secret: CLIENT_SECRET,
+        });
+
+        const options = {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Content-Length': Buffer.byteLength(postData.toString()),
+          },
+        };
+
+        const tokenResponse = await new Promise((resolve, reject) => {
+          const req = https.request(TOKEN_ENDPOINT, options, (res) => {
+            let data = '';
+            res.on('data', chunk => data += chunk);
+            res.on('end', () => resolve({ status: res.statusCode, data }));
+          });
+          req.on('error', reject);
+          req.write(postData.toString());
+          req.end();
+        });
+
+        if (tokenResponse.status !== 200) {
+          throw new Error(`HTTP ${tokenResponse.status}: ${tokenResponse.data}`);
+        }
+
+        const tokens = JSON.parse(tokenResponse.data);
+        
+        if (tokens.error) {
+          throw new Error(`Token Error: ${tokens.error_description || tokens.error}`);
+        }
+
+        console.log('\n✅ トークン取得成功!');
+        console.log('=====================================');
+        console.log(`Access Token: ${tokens.access_token.slice(0, 20)}...`);
+        console.log(`Refresh Token: ${tokens.refresh_token ? tokens.refresh_token.slice(0, 20) + '...' : 'なし'}`);
+        console.log(`Expires In: ${tokens.expires_in} seconds`);
+        console.log('=====================================\n');
+
+        if (tokens.refresh_token) {
+          // .envファイルを自動更新
+          const { envContent: currentEnvContent } = readEnvFile();
+          updateEnvFile(envPath, currentEnvContent, {
+            'GOOGLE_APP_SCRIPT_API_REFRESH_TOKEN': tokens.refresh_token
+          });
+          
+          console.log('✅ .env ファイルにリフレッシュトークンを保存しました');
+          console.log(`📝 リフレッシュトークン: ${tokens.refresh_token.slice(0, 20)}...`);
+        } else {
+          console.log('⚠️ リフレッシュトークンが取得できませんでした（再認証が必要な場合があります）');
+        }
+
+        res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+        res.end('<h3>✅ 認証成功！このウィンドウを閉じてください。</h3>');
+
+        setTimeout(() => {
+          console.log('\n🎉 OAuth設定が完了しました！');
+          console.log('Claude-AppsScript-Proが使用可能になりました。');
+          server.close();
+          process.exit(0);
+        }, 1000);
+
+      } catch (error) {
+        console.error(`❌ トークン交換エラー: ${error.message}`);
+        res.writeHead(500, { 'Content-Type': 'text/html; charset=utf-8' });
+        res.end('<h3>トークン交換エラー</h3>');
+        server.close();
+        process.exit(1);
+      }
+    });
+
+    server.listen(PORT, () => {
+      console.log(`📡 コールバックサーバー起動: http://localhost:${PORT}`);
+      console.log('🔗 ブラウザを起動中...\n');
+      
+      // 少し待ってからブラウザを開く
+      setTimeout(() => {
+        openUrl(authUrl.toString());
+      }, 1000);
+    });
+
+    // エラーハンドリング
+    server.on('error', (error) => {
+      console.error(`❌ サーバーエラー: ${error.message}`);
+      if (error.code === 'EADDRINUSE') {
+        console.error(`ポート ${PORT} が使用中です。他のプロセスを終了してください。`);
+      }
+      process.exit(1);
+    });
+
+    process.on('SIGINT', () => {
+      console.log('\n👋 プロセス終了中...');
+      server.close();
+      process.exit(0);
+    });
+    
+  } catch (error) {
+    console.error(`❌ 設定エラー: ${error.message}`);
+    rl.close();
     process.exit(1);
+  }
+}
+
+// プロセス実行
+main().catch(error => {
+  console.error(`❌ 予期しないエラー: ${error.message}`);
+  process.exit(1);
 });
