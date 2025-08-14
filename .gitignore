@@ -121,10 +121,14 @@ minimal-*.js
 
 # Claude Desktop config (contains sensitive paths)
 claude_desktop_config*.json
-!claude_desktop_config.example.jsonclient_secret_*.json
-*.bat
-*.backup*
+# Additional security exclusions
+!claude_desktop_config.example.json
 client_secret_*.json
 *.bat
 *.backup*
 manual-token-exchange.cjs
+
+# Ensure all credential files are excluded
+*.gserviceaccount.json
+*_secret_*.json
+*credentials*.json
