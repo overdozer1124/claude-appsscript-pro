@@ -25,7 +25,10 @@
         "auth-win": "C:\\Program Files\\nodejs\\node.exe scripts/oauth-setup.cjs",
         "quick-install": "node install.js",
         "quick-install-win": "install-windows.bat",
-        "postinstall": "node -e \"console.log('\\n🎉 インストール完了！\\n\\n次のステップ: npm run quick-install\\n')\""
+        "auto-install": "install-auto.bat",
+        "full-auto": "install-auto.bat",
+        "install-auto": "install-auto.bat",
+        "postinstall": "node -e \"console.log('\\n🎉 インストール完了！\\n\\n次のステップ: npm run auto-install (完全自動) または npm run quick-install\\n')\""
     },
     "dependencies": {
         "@modelcontextprotocol/sdk": "^1.13.1",

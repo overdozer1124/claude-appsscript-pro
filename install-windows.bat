@@ -165,4 +165,5 @@ if exist install.js (
 echo.
 echo インストール処理が完了しました。
 echo.
-pause
+echo 次のステップ: npm run oauth-setup
+echo.

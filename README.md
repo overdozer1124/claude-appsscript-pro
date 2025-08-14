@@ -59,7 +59,32 @@ git --version
 
 ## ⚡ インストール手順
 
-### 方法1: Git使用（推奨）
+### 🚀 方法0: 完全自動化（最も簡単・推奨）
+
+**新機能！** 全てのステップが自動で実行され、エンターキーを押す必要がありません。
+
+```bash
+# プロジェクトをダウンロード
+git clone https://github.com/overdozer1124/claude-appsscript-pro.git
+
+# フォルダに移動
+cd claude-appsscript-pro
+
+# 依存関係インストール
+npm install
+
+# 🔥 完全自動インストーラー実行（新機能！）
+.\install-auto.bat
+```
+
+**特徴:**
+- ✅ **完全自動化**: エンターキー不要で最後まで自動実行
+- ✅ **OAuth自動設定**: ブラウザ認証まで自動案内
+- ✅ **Claude Desktop自動設定**: 設定ファイル自動生成
+- ✅ **動作確認**: インストール完了時に自動テスト
+- ✅ **エラーログ**: 問題発生時の詳細ログ保存
+
+### 方法1: 標準インストール（従来版）
 
 ```bash
 # プロジェクトをダウンロード
@@ -80,6 +105,15 @@ npm install
 1. **[ZIPダウンロード](https://github.com/overdozer1124/claude-appsscript-pro/archive/refs/heads/main.zip)** をクリック
 2. ZIPファイルを解凍
 3. PowerShellで解凍したフォルダに移動：
+
+   **🚀 完全自動化（推奨）:**
+   ```bash
+   cd C:\Users\[ユーザー名]\Downloads\claude-appsscript-pro-main
+   npm install
+   .\install-auto.bat
+   ```
+
+   **従来版:**
    ```bash
    cd C:\Users\[ユーザー名]\Downloads\claude-appsscript-pro-main
    npm install
@@ -87,6 +121,31 @@ npm install
    ```
 
 ## 🔧 よくある問題と解決方法
+
+### 🚀 完全自動化関連の問題
+
+#### ❌ `install-auto.bat` でエラーが発生
+```bash
+# エラーログを確認
+type install-auto.log
+
+# 基本インストールに戻る
+.\install-windows.bat
+
+# 手動でOAuth設定
+npm run oauth-setup
+```
+
+#### ❌ Claude Desktop設定が自動更新されない
+```bash
+# 手動で設定ファイル確認
+notepad "%APPDATA%\Claude\claude_desktop_config.json"
+
+# 設定ディレクトリが存在しない場合
+mkdir "%APPDATA%\Claude"
+```
+
+### 🔧 基本的な問題
 
 ### ❌ `npm: ファイル名、ディレクトリ名、またはボリューム ラベルの構文が間違っています`
 
@@ -124,7 +183,49 @@ cd claude-appsscript-pro-main
    "C:\Program Files\nodejs\npm.exe" install
    ```
 
+## 🎯 便利なNPMコマンド
+
+インストール後に使える便利なコマンド：
+
+### 🚀 完全自動化コマンド
+```bash
+npm run auto-install     # 完全自動インストール（推奨）
+npm run full-auto        # 同上（エイリアス）
+npm run install-auto     # 同上（エイリアス）
+```
+
+### 🔧 基本コマンド
+```bash
+npm run oauth-setup      # OAuth認証設定
+npm run auth            # 同上（短縮版）
+npm run start           # MCPサーバー起動
+npm run check           # 構文チェック
+```
+
+### 💡 使用例
+```bash
+# 最も簡単な方法：完全自動セットアップ
+npm install && npm run auto-install
+
+# 手動でOAuth設定のみ
+npm run oauth-setup
+
+# サーバー動作確認
+npm run check && npm run start
+```
+
 ## 📋 OAuth設定
+
+> 💡 **注意**: `npm run auto-install` を使用した場合、以下の設定は自動で案内されます！
+
+### ⚡ 完全自動化を使用した場合
+
+`install-auto.bat` または `npm run auto-install` を実行した場合：
+- OAuth設定の必要性を自動判定
+- 設定が必要な場合は自動でブラウザが起動
+- 手動設定が不要な場合はスキップ
+
+### 🔧 手動設定が必要な場合
 
 ### Step 1: Google Cloud Console
 
@@ -166,9 +267,43 @@ Start-Process $authUrl
 
 ## 🎉 完了確認
 
-1. **Claude Desktop再起動**
-2. **設定 → 開発者 → ローカルMCPサーバー有効化**
-3. **動作確認**:
+### 🚀 完全自動化を使用した場合
+
+`install-auto.bat` を使用した場合、以下が自動で完了しています：
+- ✅ Claude Desktop設定ファイル更新
+- ✅ OAuth認証設定
+- ✅ 基本動作確認
+
+**最終確認手順:**
+1. **Claude Desktop 再起動**（自動案内に従って実行済みの場合はスキップ）
+2. **動作確認**:
+   ```
+   claude-appsscript-pro:test_connection
+   ```
+
+### 🔧 手動インストールの場合
+
+従来の `install-windows.bat` を使用した場合：
+
+1. **Claude Desktop設定**:
+   ```json
+   // %APPDATA%\Claude\claude_desktop_config.json に追加
+   {
+     "mcpServers": {
+       "claude-appsscript-pro": {
+         "command": "C:\\Program Files\\nodejs\\node.exe",
+         "args": ["C:\\path\\to\\claude-appsscript-pro\\server.js"],
+         "cwd": "C:\\path\\to\\claude-appsscript-pro"
+       }
+     }
+   }
+   ```
+
+2. **Claude Desktop再起動**
+
+3. **設定 → 開発者 → ローカルMCPサーバー有効化**
+
+4. **動作確認**:
    ```
    claude-appsscript-pro:test_connection
    ```
