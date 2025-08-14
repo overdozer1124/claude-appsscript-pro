@@ -51,19 +51,19 @@ function closeReadlineInterface() {
 // パスワード入力用（非表示）
 function inputSecret(prompt) {
   return new Promise((resolve) => {
-    const interface = createReadlineInterface();
+    const rlInterface = createReadlineInterface();
     
     // 入力を非表示にする処理
-    const originalWrite = interface._writeToOutput;
-    interface._writeToOutput = function _writeToOutput(stringToWrite) {
+    const originalWrite = rlInterface._writeToOutput;
+    rlInterface._writeToOutput = function _writeToOutput(stringToWrite) {
       if (stringToWrite.charCodeAt(0) === 13) { // carriage return
-        interface.output.write('\n');
+        rlInterface.output.write('\n');
       }
     };
     
-    interface.question(prompt, (answer) => {
+    rlInterface.question(prompt, (answer) => {
       // 元の出力機能を復元
-      interface._writeToOutput = originalWrite;
+      rlInterface._writeToOutput = originalWrite;
       resolve(answer.trim());
     });
   });
@@ -72,8 +72,8 @@ function inputSecret(prompt) {
 // 通常の入力
 function inputText(prompt) {
   return new Promise((resolve) => {
-    const interface = createReadlineInterface();
-    interface.question(prompt, (answer) => {
+    const rlInterface = createReadlineInterface();
+    rlInterface.question(prompt, (answer) => {
       resolve(answer.trim());
     });
   });
