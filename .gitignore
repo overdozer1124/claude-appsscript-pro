@@ -124,3 +124,6 @@ claude_desktop_config*.json
 !claude_desktop_config.example.jsonclient_secret_*.json
 *.bat
 *.backup*
+client_secret_*.json
+*.bat
+*.backup*
