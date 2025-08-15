@@ -29,10 +29,11 @@ call install-windows.bat >> %LOG_FILE% 2>&1
 if %ERRORLEVEL% NEQ 0 (
     echo ❌ 基本インストールでエラーが発生しました
     echo 📄 ログファイル: %LOG_FILE% を確認してください
-    pause
-    exit /b 1
+    echo ⚠️  インストールを続行します...
+    echo [%DATE% %TIME%] 基本インストールエラー（続行） >> %LOG_FILE%
+) else (
+    echo ✅ 基本インストール完了
 )
-echo ✅ 基本インストール完了
 
 :: ステップ2: OAuth設定確認
 echo [2/4] OAuth設定を確認中...
@@ -45,22 +46,9 @@ if exist .env (
 )
 
 echo ⚠️  OAuth設定が必要です
-echo.
-echo 🔗 自動でOAuth設定を開始しますか？ (Y/N)
-set /p OAUTH_CHOICE="選択 (Y/N): "
-if /i "!OAUTH_CHOICE!"=="Y" (
-    echo [%DATE% %TIME%] OAuth自動設定開始 >> %LOG_FILE%
-    npm run oauth-setup >> %LOG_FILE% 2>&1
-    if !ERRORLEVEL! EQU 0 (
-        echo ✅ OAuth設定完了
-    ) else (
-        echo ⚠️  OAuth設定は後で手動で実行してください
-        echo 💡 コマンド: npm run oauth-setup
-    )
-) else (
-    echo ℹ️  OAuth設定をスキップしました
-    echo 💡 後で手動実行: npm run oauth-setup
-)
+echo ℹ️  OAuth設定は対話式のため、自動実行後に手動で実行してください
+echo 💡 次のコマンドを実行: npm run oauth-setup
+echo [%DATE% %TIME%] OAuth設定スキップ（手動設定が必要） >> %LOG_FILE%
 
 :OAuthComplete
 
@@ -75,51 +63,45 @@ if exist "!CLAUDE_CONFIG!" (
     )
 )
 
-echo 🔧 Claude Desktop設定ファイルを自動更新しますか？ (Y/N)
-set /p CONFIG_CHOICE="選択 (Y/N): "
-if /i "!CONFIG_CHOICE!"=="Y" (
-    echo [%DATE% %TIME%] Claude Desktop設定自動更新開始 >> %LOG_FILE%
-    
-    :: 設定ディレクトリ作成
-    if not exist "%APPDATA%\Claude" mkdir "%APPDATA%\Claude"
-    
-    :: Node.jsパス検出
-    set "NODE_PATH="
-    if exist "C:\Program Files\nodejs\node.exe" (
-        set "NODE_PATH=C:\\Program Files\\nodejs\\node.exe"
-    ) else if exist "C:\Program Files (x86)\nodejs\node.exe" (
-        set "NODE_PATH=C:\\Program Files (x86)\\nodejs\\node.exe"
-    ) else (
-        for /f "delims=" %%i in ('where node 2^>nul') do (
-            set "NODE_PATH=%%i"
-            set "NODE_PATH=!NODE_PATH:\=\\!"
-            goto :NodePathFound
-        )
-    )
-    
-    :NodePathFound
-    set "CURRENT_DIR=%CD%"
-    set "CURRENT_DIR=!CURRENT_DIR:\=\\!"
-    
-    :: 設定ファイル作成
-    (
-        echo {
-        echo   "mcpServers": {
-        echo     "claude-appsscript-pro": {
-        echo       "command": "!NODE_PATH!",
-        echo       "args": ["!CURRENT_DIR!\\server.js"],
-        echo       "cwd": "!CURRENT_DIR!"
-        echo     }
-        echo   }
-        echo }
-    ) > "!CLAUDE_CONFIG!"
-    
-    echo ✅ Claude Desktop設定ファイル更新完了
-    echo 📁 設定場所: !CLAUDE_CONFIG!
+echo 🔧 Claude Desktop設定ファイルを自動更新中...
+echo [%DATE% %TIME%] Claude Desktop設定自動更新開始 >> %LOG_FILE%
+
+:: 設定ディレクトリ作成
+if not exist "%APPDATA%\Claude" mkdir "%APPDATA%\Claude"
+
+:: Node.jsパス検出
+set "NODE_PATH="
+if exist "C:\Program Files\nodejs\node.exe" (
+    set "NODE_PATH=C:\\Program Files\\nodejs\\node.exe"
+) else if exist "C:\Program Files (x86)\nodejs\node.exe" (
+    set "NODE_PATH=C:\\Program Files (x86)\\nodejs\\node.exe"
 ) else (
-    echo ℹ️  Claude Desktop設定をスキップしました
-    echo 💡 手動設定が必要です
+    for /f "delims=" %%i in ('where node 2^>nul') do (
+        set "NODE_PATH=%%i"
+        set "NODE_PATH=!NODE_PATH:\=\\!"
+        goto :NodePathFound
+    )
 )
+
+:NodePathFound
+set "CURRENT_DIR=%CD%"
+set "CURRENT_DIR=!CURRENT_DIR:\=\\!"
+
+:: 設定ファイル作成
+(
+    echo {
+    echo   "mcpServers": {
+    echo     "claude-appsscript-pro": {
+    echo       "command": "!NODE_PATH!",
+    echo       "args": ["!CURRENT_DIR!\\server.js"],
+    echo       "cwd": "!CURRENT_DIR!"
+    echo     }
+    echo   }
+    echo }
+) > "!CLAUDE_CONFIG!"
+
+echo ✅ Claude Desktop設定ファイル更新完了
+echo 📁 設定場所: !CLAUDE_CONFIG!
 
 :ConfigComplete
 
@@ -147,8 +129,9 @@ echo ⏱️  完了時刻: %TIME%
 echo 📄 ログファイル: %LOG_FILE%
 echo.
 echo 🚀 次のステップ:
-echo    1. Claude Desktop を再起動
-echo    2. Claude で claude-appsscript-pro ツールが利用可能になります
+echo    1. OAuth設定: npm run oauth-setup
+echo    2. Claude Desktop を再起動
+echo    3. Claude で claude-appsscript-pro ツールが利用可能になります
 echo.
 echo 💡 問題が発生した場合:
 echo    - ログファイル %LOG_FILE% を確認
@@ -156,18 +139,15 @@ echo    - TROUBLESHOOTING.md を参照
 echo    - GitHub Issues に報告
 echo.
 
-:: 自動でClaude Desktop再起動を提案
-echo 🔄 Claude Desktop を自動再起動しますか？ (Y/N)
-set /p RESTART_CHOICE="選択 (Y/N): "
-if /i "!RESTART_CHOICE!"=="Y" (
-    echo Claude Desktop を再起動中...
-    taskkill /F /IM "Claude.exe" >nul 2>&1
-    timeout /t 3 >nul
-    start "" "%LOCALAPPDATA%\AnthropicClaude\Claude.exe" >nul 2>&1
-    echo ✅ Claude Desktop 再起動完了
-)
+:: 自動でClaude Desktop再起動
+echo 🔄 Claude Desktop を自動再起動中...
+taskkill /F /IM "Claude.exe" >nul 2>&1
+timeout /t 3 >nul
+start "" "%LOCALAPPDATA%\AnthropicClaude\Claude.exe" >nul 2>&1
+echo ✅ Claude Desktop 再起動完了
 
 echo [%DATE% %TIME%] 完全自動インストール完了 >> %LOG_FILE%
 echo.
-echo 🎊 セットアップが完了しました！Claude でお楽しみください！
+echo 🎊 基本セットアップが完了しました！
+echo ⚠️  OAuth設定を忘れずに実行してください: npm run oauth-setup
 echo.
