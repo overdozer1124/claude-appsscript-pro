@@ -83,6 +83,27 @@ if /i "!OAUTH_CHOICE!"=="Y" (
     echo.
     echo ⚠️  npm run oauth-setup の実行が完了しました
     echo.
+    
+    :: 🚀 新機能: OAuth成功の自動検証（重複実行防止）
+    echo 🔍 REFRESH_TOKEN取得状況を自動確認中...
+    if exist .env (
+        findstr /C:"GOOGLE_APP_SCRIPT_API_REFRESH_TOKEN=" .env | findstr /V /C:"GOOGLE_APP_SCRIPT_API_REFRESH_TOKEN=$" >nul 2>&1
+        if !ERRORLEVEL! EQU 0 (
+            echo ✅ OAuth認証完了を自動検出 - REFRESH_TOKEN取得済み
+            echo 📋 認証は正常に完了しました
+            echo [%DATE% %TIME%] OAuth設定完了（自動検証） >> %LOG_FILE%
+            goto :OAuthVerificationComplete
+        ) else (
+            echo ⚠️  REFRESH_TOKENが未取得です
+            echo 💡 ユーザー確認が必要です
+        )
+    ) else (
+        echo ⚠️  .envファイルが見つかりません
+        echo 💡 OAuth設定が失敗した可能性があります
+    )
+
+    :: 自動検証失敗時のみユーザー確認
+    echo.
     echo 🔍 認証状況を確認します...
     echo    - ブラウザでGoogle認証を完了しましたか？
     echo    - .envファイルにREFRESH_TOKENが保存されましたか？
@@ -94,17 +115,7 @@ if /i "!OAUTH_CHOICE!"=="Y" (
     if /i "!OAUTH_COMPLETE!"=="Y" (
         echo ✅ OAuth設定完了を確認しました
         echo [%DATE% %TIME%] OAuth設定完了（ユーザー確認） >> %LOG_FILE%
-        
-        :: REFRESH_TOKENの存在を再確認
-        if exist .env (
-            findstr /C:"GOOGLE_APP_SCRIPT_API_REFRESH_TOKEN=" .env | findstr /V /C:"GOOGLE_APP_SCRIPT_API_REFRESH_TOKEN=$" >nul 2>&1
-            if !ERRORLEVEL! EQU 0 (
-                echo ✅ .envファイルでREFRESH_TOKEN確認済み
-            ) else (
-                echo ⚠️  .envにREFRESH_TOKENが見つかりません
-                echo 💡 OAuth設定が不完全の可能性があります
-            )
-        )
+        goto :OAuthVerificationComplete
     ) else (
         echo ⚠️  OAuth認証が未完了です
         echo.
@@ -115,29 +126,58 @@ if /i "!OAUTH_CHOICE!"=="Y" (
         echo.
         echo [%DATE% %TIME%] OAuth設定未完了（ユーザー選択） >> %LOG_FILE%
         echo 📋 続行するには、まずOAuth設定を完了してください
+        
+        :: 🔧 修正: 再試行前にREFRESH_TOKEN再確認（重複実行防止）
+        echo 🔍 最終確認: REFRESH_TOKEN状況を再チェック中...
+        if exist .env (
+            findstr /C:"GOOGLE_APP_SCRIPT_API_REFRESH_TOKEN=" .env | findstr /V /C:"GOOGLE_APP_SCRIPT_API_REFRESH_TOKEN=$" >nul 2>&1
+            if !ERRORLEVEL! EQU 0 (
+                echo ✅ 実際にはREFRESH_TOKENが取得されています
+                echo 💡 OAuth設定は完了済みです - 次に進みます
+                echo [%DATE% %TIME%] OAuth設定完了（再確認で検出） >> %LOG_FILE%
+                goto :OAuthVerificationComplete
+            )
+        )
+        
         echo 🔄 今すぐOAuth設定を再試行しますか？ (Y/N)
         set /p RETRY_OAUTH="選択 (Y/N): "
         if /i "!RETRY_OAUTH!"=="Y" (
             echo 🔄 OAuth設定を再試行中...
             echo [%DATE% %TIME%] OAuth設定再試行開始 >> %LOG_FILE%
             npm run oauth-setup
+            
+            :: 🚀 再試行後も自動検証（重複実行防止）
             echo.
-            echo 📋 OAuth認証の再試行が完了しました
-            echo 🔑 認証が成功した場合はY、失敗した場合はNを選択してください
-            set /p RETRY_COMPLETE="OAuth再試行は成功しましたか？ (Y/N): "
-            if /i "!RETRY_COMPLETE!"=="Y" (
-                echo ✅ OAuth設定が完了しました
-                echo [%DATE% %TIME%] OAuth設定完了（再試行成功） >> %LOG_FILE%
-            ) else (
-                echo ⚠️  OAuth設定が失敗しました
-                echo 💡 手動で後から設定してください: npm run oauth-setup
-                echo [%DATE% %TIME%] OAuth設定失敗（再試行後） >> %LOG_FILE%
+            echo 🔍 再試行結果を自動確認中...
+            if exist .env (
+                findstr /C:"GOOGLE_APP_SCRIPT_API_REFRESH_TOKEN=" .env | findstr /V /C:"GOOGLE_APP_SCRIPT_API_REFRESH_TOKEN=$" >nul 2>&1
+                if !ERRORLEVEL! EQU 0 (
+                    echo ✅ OAuth設定が完了しました（自動検証）
+                    echo [%DATE% %TIME%] OAuth設定完了（再試行成功・自動検証） >> %LOG_FILE%
+                    goto :OAuthVerificationComplete
+                ) else (
+                    echo ⚠️  OAuth設定が失敗しました
+                    echo 💡 手動で後から設定してください: npm run oauth-setup
+                    echo [%DATE% %TIME%] OAuth設定失敗（再試行後） >> %LOG_FILE%
+                )
             )
         ) else (
             echo ⚠️  OAuth設定をスキップしました
             echo 💡 インストールは続行しますが、ツールは使用できません
             echo [%DATE% %TIME%] OAuth設定スキップ（ユーザー選択） >> %LOG_FILE%
             pause
+        )
+    )
+
+    :OAuthVerificationComplete
+    :: REFRESH_TOKENの最終確認
+    if exist .env (
+        findstr /C:"GOOGLE_APP_SCRIPT_API_REFRESH_TOKEN=" .env | findstr /V /C:"GOOGLE_APP_SCRIPT_API_REFRESH_TOKEN=$" >nul 2>&1
+        if !ERRORLEVEL! EQU 0 (
+            echo ✅ .envファイルでREFRESH_TOKEN確認済み
+        ) else (
+            echo ⚠️  .envにREFRESH_TOKENが見つかりません
+            echo 💡 OAuth設定が不完全の可能性があります
         )
     )
 ) else (
