@@ -132,3 +132,6 @@ manual-token-exchange.cjs
 *.gserviceaccount.json
 *_secret_*.json
 *credentials*.json
+bfg-1.14.0.jar
+..bfg-report/
+oauth-config.json
