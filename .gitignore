@@ -124,7 +124,12 @@ claude_desktop_config*.json
 # Additional security exclusions
 !claude_desktop_config.example.json
 client_secret_*.json
-*.bat
+
+# Exclude specific unnecessary .bat files
+oauth-run-improved.bat
+oauth-run.bat  
+oauth-test.bat
+
 *.backup*
 manual-token-exchange.cjs
 
