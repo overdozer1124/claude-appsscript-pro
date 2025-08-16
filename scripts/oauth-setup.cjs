@@ -387,7 +387,13 @@ function setupWebServer(PORT) {
 // メイン処理
 async function main() {
   try {
-    const PORT = 3001;
+    // .envファイル読み込み（共通）
+    const { envPath, envContent, envVars } = readEnvFile();
+    const REDIRECT_URI = envVars.GOOGLE_APP_SCRIPT_API_REDIRECT_URI || 'http://localhost:3001/oauth/callback';
+    
+    // HTTPサーバー用ポート設定（REDIRECT_URIから動的取得）
+    const redirectURL = new URL(REDIRECT_URI);
+    const PORT = parseInt(redirectURL.port) || 3001;
     
     if (isWebMode) {
       // 🌐 Web版: 革命的JSONアップロード機能
@@ -424,13 +430,10 @@ async function main() {
     
     // 🖥️ ターミナル版: 既存の対話的設定
     
-    // .envファイル読み込み
-    const { envPath, envContent, envVars } = readEnvFile();
     console.log(`📄 .envファイル: ${envPath}\n`);
     
     let CLIENT_ID = envVars.GOOGLE_APP_SCRIPT_API_CLIENT_ID;
     let CLIENT_SECRET = envVars.GOOGLE_APP_SCRIPT_API_CLIENT_SECRET;
-    const REDIRECT_URI = envVars.GOOGLE_APP_SCRIPT_API_REDIRECT_URI || 'http://localhost:3001/oauth/callback';
     
     // 既存の認証情報確認
     console.log('🔑 現在の認証情報:');
@@ -502,9 +505,7 @@ async function main() {
     console.log(authUrl.toString());
     console.log('=====================================\n');
 
-    // HTTPサーバー起動
-    const redirectURL = new URL(REDIRECT_URI);
-    const PORT = parseInt(redirectURL.port) || 3001;
+    // HTTPサーバー起動（既に上で設定済みのPORTを使用）
 
     const server = http.createServer(async (req, res) => {
       const url = new URL(req.url, `http://localhost:${PORT}`);
