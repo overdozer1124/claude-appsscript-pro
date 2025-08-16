@@ -232,8 +232,8 @@ goto :EOF
 echo 🚀 OAuth設定を開始します...
 echo.
 echo ⚠️  重要: 以下の手順で進めます
-echo    1. npm run oauth-setup を実行
-echo    2. ブラウザで Google 認証を完了
+echo    1. Webサーバーを起動します
+echo    2. ブラウザで Google 認証を完了してください
 echo    3. 認証完了後、自動で次に進みます
 echo.
 if "%POWERSHELL_MODE%"=="false" (
@@ -243,9 +243,20 @@ if "%POWERSHELL_MODE%"=="false" (
 
 echo [%DATE% %TIME%] OAuth設定開始 >> %LOG_FILE%
 echo 🔄 OAuth設定プロセスを開始中...
+echo.
 
-node scripts/oauth-setup.cjs --web >> %LOG_FILE% 2>&1
-echo ✅ OAuth設定プロセス完了
+:: 🔧 修正: OAuth設定はユーザーに見える形で実行（ログリダイレクトなし）
+node scripts/oauth-setup.cjs --web
+set OAUTH_RESULT=%ERRORLEVEL%
+
+echo.
+echo [%DATE% %TIME%] OAuth設定完了（終了コード: %OAUTH_RESULT%） >> %LOG_FILE%
+if %OAUTH_RESULT% EQU 0 (
+    echo ✅ OAuth設定プロセス完了
+) else (
+    echo ⚠️  OAuth設定でエラーが発生しました（終了コード: %OAUTH_RESULT%）
+    echo 💡 手動で再試行してください: npm run oauth-setup
+)
 goto :EOF
 
 :CheckClaudeConfig
