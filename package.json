@@ -1,4 +1,4 @@
-﻿{
+{
     "name": "claude-appsscript-pro",
     "version": "3.0.1",
     "description": "Claude Apps Script Pro v3.0.1 - Google Apps Script + Sheets + WebApp Integrated Development Suite with 2-Minute Quick Setup",
@@ -19,16 +19,16 @@
         "setup-win": "C:\\\\Program Files\\\\nodejs\\\\npm.exe install && echo Setup complete! Please run install-auto.bat which will guide you through Web-based OAuth setup.",
         "check": "node --check server.js",
         "check-win": "C:\\Program Files\\nodejs\\node.exe --check server.js",
-        "oauth-setup": "node scripts/oauth-setup.cjs",
-        "oauth-setup-win": "C:\\Program Files\\nodejs\\node.exe scripts/oauth-setup.cjs",
-        "auth": "node scripts/oauth-setup.cjs",
-        "auth-win": "C:\\Program Files\\nodejs\\node.exe scripts/oauth-setup.cjs",
+        "oauth-setup": "node scripts/oauth-setup-automated.cjs",
+        "oauth-setup-win": "C:\\Program Files\\nodejs\\node.exe scripts/oauth-setup-automated.cjs",
+        "auth": "node scripts/oauth-setup-automated.cjs",
+        "auth-win": "C:\\Program Files\\nodejs\\node.exe scripts/oauth-setup-automated.cjs",
         "quick-install": "node install.js",
         "quick-install-win": "install-windows.bat",
         "auto-install": "install-auto.bat",
         "full-auto": "install-auto.bat",
         "install-auto": "install-auto.bat",
-        "postinstall": "node -e \"console.log('\\n脂 繧､繝ｳ繧ｹ繝医・繝ｫ螳御ｺ・ｼ―\n\\n谺｡縺ｮ繧ｹ繝・ャ繝・ npm run auto-install (螳悟・閾ｪ蜍・ 縺ｾ縺溘・ npm run quick-install\\n')\""
+        "postinstall": "echo \"\\n✅ Installation completed!\\n\\nNext steps: npm run auto-install (fully automated) or npm run quick-install\\n\""
     },
     "dependencies": {
         "@modelcontextprotocol/sdk": "^1.13.1",
@@ -67,6 +67,10 @@
         "url": "https://github.com/overdozer1124/claude-appsscript-pro/issues"
     },
     "homepage": "https://github.com/overdozer1124/claude-appsscript-pro#readme",
+    "funding": {
+        "type": "github",
+        "url": "https://github.com/sponsors/overdozer1124"
+    },
     "os": [
         "win32",
         "darwin",
