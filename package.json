@@ -1,7 +1,7 @@
 {
     "name": "claude-appsscript-pro",
-    "version": "3.0.1",
-    "description": "Claude Apps Script Pro v3.0.1 - Google Apps Script + Sheets + WebApp Integrated Development Suite with 2-Minute Quick Setup",
+    "version": "3.1.0",
+    "description": "Claude Apps Script Pro v3.1.0 Phase 2完成版 - 61ツール統合・AI自律開発・クロスプラットフォーム完全対応・OAuth重複実行防止・WebアプリOAuth設定・5分完全セットアップの革命的Google Apps Script開発環境",
     "main": "server.js",
     "type": "module",
     "engines": {
@@ -28,7 +28,11 @@
         "auto-install": "install-auto.bat",
         "full-auto": "install-auto.bat",
         "install-auto": "install-auto.bat",
-        "postinstall": "echo \"\\n✅ Installation completed!\\n\\nNext steps: npm run auto-install (fully automated) or npm run quick-install\\n\""
+        "install-complete": "node install-complete.js",
+        "install-complete-unix": "chmod +x install-complete.sh && ./install-complete.sh",
+        "oauth-cross": "node scripts/oauth-setup-cross.cjs",
+        "oauth-cross-win": "C:\\\\Program Files\\\\nodejs\\\\node.exe scripts/oauth-setup-cross.cjs",
+        "postinstall": "echo \"\\n🔥 Phase 2完成版セットアップ完了!\\n\\n推奨コマンド:\\n- Windows: npm run auto-install (完全自動化)\\n- macOS/Linux: npm run install-complete (統合版)\\n- 全OS対応: npm run install-complete\\n\""
     },
     "dependencies": {
         "@modelcontextprotocol/sdk": "^1.13.1",
@@ -55,7 +59,17 @@
         "output-reduction",
         "all-in-one-suite",
         "61-tools-integrated",
-        "oauth-automation"
+        "oauth-automation",
+        "cross-platform",
+        "oauth-duplicate-prevention",
+        "webapp-oauth-setup",
+        "mcp-safe-update",
+        "error-auto-recovery",
+        "phase-2-complete",
+        "ai-autonomous-workflow",
+        "realtime-debugging",
+        "json-upload-oauth",
+        "revolutionary-development"
     ],
     "author": "Claude Apps Script Pro Team",
     "license": "MIT",
