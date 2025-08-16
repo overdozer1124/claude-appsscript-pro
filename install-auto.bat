@@ -283,26 +283,33 @@ if not exist "!CONFIG_DIR!" (
     echo 📁 Claude設定ディレクトリを作成しました
 )
 
-:: Node.jsパス取得
+:: Node.jsパス取得とエスケープ処理
 for /f "tokens=*" %%i in ('where node 2^>nul') do set "NODE_PATH=%%i"
 if "!NODE_PATH!"=="" (
-    set "NODE_PATH=C:\Program Files\nodejs\node.exe"
+    set "NODE_PATH=C:\\Program Files\\nodejs\\node.exe"
     echo ⚠️  Nodeパスを標準パスに設定: !NODE_PATH!
 ) else (
     echo ✅ Nodeパス検出: !NODE_PATH!
+    :: JSON用にバックスラッシュをエスケープ
+    set "NODE_PATH=!NODE_PATH:\=\\!"
 )
 
-:: 設定ファイル作成
+:: 現在のディレクトリパスをJSON用にエスケープ
+set "CURRENT_DIR=%CD%"
+set "CURRENT_DIR=!CURRENT_DIR:\=\\!"
+
+:: 設定ファイル作成（JSONエスケープ対応）
 echo { > "!CLAUDE_CONFIG!"
 echo   "mcpServers": { >> "!CLAUDE_CONFIG!"
 echo     "claude-appsscript-pro": { >> "!CLAUDE_CONFIG!"
 echo       "command": "!NODE_PATH!", >> "!CLAUDE_CONFIG!"
-echo       "args": ["%CD%\server.js"], >> "!CLAUDE_CONFIG!"
-echo       "cwd": "%CD%" >> "!CLAUDE_CONFIG!"
+echo       "args": ["!CURRENT_DIR!\\server.js"], >> "!CLAUDE_CONFIG!"
+echo       "cwd": "!CURRENT_DIR!" >> "!CLAUDE_CONFIG!"
 echo     } >> "!CLAUDE_CONFIG!"
 echo   } >> "!CLAUDE_CONFIG!"
 echo } >> "!CLAUDE_CONFIG!"
 
 echo ✅ Claude Desktop設定ファイルを更新しました
+echo 📄 設定ファイル場所: !CLAUDE_CONFIG!
 echo [%DATE% %TIME%] Claude Desktop設定完了 >> %LOG_FILE%
 goto :EOF
