@@ -3,20 +3,35 @@ setlocal EnableDelayedExpansion
 chcp 65001 >nul 2>&1
 
 :: Claude-AppsScript-Pro 完全自動インストーラー
-:: バージョン: 2.0.0 - 完全自動化版
+:: バージョン: 2.1.0 - PowerShell対応・OAuth完全自動化版
+
+:: 🔧 PowerShell実行検出（非対話的実行モード）
+set "POWERSHELL_MODE=false"
+set "AUTOMATED_MODE=false"
+echo %CMDCMDLINE% | find /i "powershell" >nul && set "POWERSHELL_MODE=true"
+echo %CMDCMDLINE% | find /i "powershell" >nul && set "AUTOMATED_MODE=true"
+
+:: 🚀 完全自動モード（環境変数での制御）
+if "%AUTO_INSTALL_MODE%"=="true" set "POWERSHELL_MODE=true"
+if "%AUTO_INSTALL_MODE%"=="true" set "AUTOMATED_MODE=true"
 
 title Claude-AppsScript-Pro 完全自動インストーラー
 
 echo.
 echo ╔══════════════════════════════════════════════════════════════╗
 echo ║                                                              ║
-echo ║   Claude-AppsScript-Pro 完全自動インストーラー v2.0.0       ║
-echo ║               🚀 ワンクリック自動セットアップ                ║
+echo ║   Claude-AppsScript-Pro 完全自動インストーラー v2.1.0       ║
+echo ║               🚀 PowerShell対応・完全自動化版                ║
 echo ║                                                              ║
 echo ╚══════════════════════════════════════════════════════════════╝
 echo.
 echo ⏱️  開始時刻: %TIME%
 echo 📁 作業ディレクトリ: %CD%
+if "%POWERSHELL_MODE%"=="true" (
+    echo 🤖 実行モード: PowerShell完全自動モード
+) else (
+    echo 👤 実行モード: 対話型インストールモード
+)
 echo.
 
 :: インストールログ作成
@@ -53,6 +68,24 @@ if exist .env (
 )
 
 echo ⚠️  OAuth設定が必要です
+
+:: 🚀 PowerShellモード時は自動実行
+if "%POWERSHELL_MODE%"=="true" (
+    echo 🤖 PowerShell自動モード: OAuth設定を自動実行します
+    echo.
+    echo 📋 注意: OAuth設定には手動でのGoogle認証が必要です
+    echo    1. ブラウザが自動的に開きます
+    echo    2. Google認証を完了してください
+    echo    3. 認証後、バッチファイルが自動継続します
+    echo.
+    echo 🚀 OAuth設定を開始中...
+    echo [%DATE% %TIME%] OAuth設定開始（PowerShell自動モード） >> %LOG_FILE%
+    
+    call :AutoOAuthSetup
+    goto :OAuthComplete
+)
+
+:: 対話型モードでは従来通りユーザー確認
 echo.
 echo 📋 Google Cloud Console で OAuth クライアント ID を作成する必要があります:
 echo    1. https://console.cloud.google.com/apis/credentials
@@ -63,7 +96,18 @@ echo.
 echo 🔑 OAuth設定を開始しますか？ (Y/N)
 set /p OAUTH_CHOICE="選択 (Y/N): "
 if /i "!OAUTH_CHOICE!"=="Y" (
+    call :AutoOAuthSetup
+) else (
+    echo ℹ️  OAuth設定をスキップしました
+    echo 💡 後で手動実行してください: npm run oauth-setup
+    echo ⚠️  OAuth設定なしではツールは使用できません
     echo.
+    echo 💭 今すぐOAuth設定を行うことを強く推奨します
+    echo 🔄 スキップして続行する場合はEnterキーを押してください
+    echo [%DATE% %TIME%] OAuth設定スキップ（初回選択） >> %LOG_FILE%
+    pause >nul
+)
+
     echo 🚀 OAuth設定を開始します...
     echo.
     echo ⚠️  重要: 以下の手順で進めます
@@ -77,7 +121,7 @@ if /i "!OAUTH_CHOICE!"=="Y" (
     echo [%DATE% %TIME%] OAuth設定開始 >> %LOG_FILE%
     echo 🔄 OAuth設定プロセスを開始中...
     
-    npm run oauth-setup
+    node scripts/oauth-setup.cjs --web
     set OAUTH_ERRORLEVEL=!ERRORLEVEL!
     
     echo.
@@ -144,7 +188,7 @@ if /i "!OAUTH_CHOICE!"=="Y" (
         if /i "!RETRY_OAUTH!"=="Y" (
             echo 🔄 OAuth設定を再試行中...
             echo [%DATE% %TIME%] OAuth設定再試行開始 >> %LOG_FILE%
-            npm run oauth-setup
+            node scripts/oauth-setup.cjs --web
             
             :: 🚀 再試行後も自動検証（重複実行防止）
             echo.
@@ -165,7 +209,7 @@ if /i "!OAUTH_CHOICE!"=="Y" (
             echo ⚠️  OAuth設定をスキップしました
             echo 💡 インストールは続行しますが、ツールは使用できません
             echo [%DATE% %TIME%] OAuth設定スキップ（ユーザー選択） >> %LOG_FILE%
-            pause
+            if "%POWERSHELL_MODE%"=="false" pause
         )
     )
 
@@ -188,7 +232,7 @@ if /i "!OAUTH_CHOICE!"=="Y" (
     echo 💭 今すぐOAuth設定を行うことを強く推奨します
     echo 🔄 スキップして続行する場合はEnterキーを押してください
     echo [%DATE% %TIME%] OAuth設定スキップ（初回選択） >> %LOG_FILE%
-    pause >nul
+    if "%POWERSHELL_MODE%"=="false" pause >nul
 )
 
 goto :OAuthComplete
@@ -206,57 +250,19 @@ if exist "!CLAUDE_CONFIG!" (
     )
 )
 
+:: 🚀 PowerShellモード時は自動実行
+if "%POWERSHELL_MODE%"=="true" (
+    echo 🤖 PowerShell自動モード: Claude Desktop設定を自動更新します
+    call :AutoClaudeConfig
+    goto :ConfigComplete
+)
+
+:: 対話型モードでは従来通りユーザー確認
 echo 🔧 Claude Desktop設定ファイルを更新しますか？ (Y/N)
 echo    既存の設定ファイルがある場合は上書きされます
 set /p CONFIG_CHOICE="選択 (Y/N): "
 if /i "!CONFIG_CHOICE!"=="Y" (
-    echo.
-    echo 🔧 Claude Desktop設定ファイルを更新中...
-    echo [%DATE% %TIME%] Claude Desktop設定自動更新開始 >> %LOG_FILE%
-    
-    :: 設定ディレクトリ作成
-    if not exist "%APPDATA%\Claude" mkdir "%APPDATA%\Claude"
-    
-    :: Node.jsパス検出
-    set "NODE_PATH="
-    if exist "C:\Program Files\nodejs\node.exe" (
-        set "NODE_PATH=C:\\Program Files\\nodejs\\node.exe"
-    ) else if exist "C:\Program Files (x86)\nodejs\node.exe" (
-        set "NODE_PATH=C:\\Program Files (x86)\\nodejs\\node.exe"
-    ) else (
-        for /f "delims=" %%i in ('where node 2^>nul') do (
-            set "NODE_PATH=%%i"
-            set "NODE_PATH=!NODE_PATH:\=\\!"
-            goto :NodePathFound
-        )
-    )
-    
-    :NodePathFound
-    if "!NODE_PATH!"=="" (
-        echo ❌ Node.jsが見つかりません
-        echo 💡 Node.jsをインストールしてから再実行してください
-        pause
-        exit /b 1
-    )
-    
-    set "CURRENT_DIR=%CD%"
-    set "CURRENT_DIR=!CURRENT_DIR:\=\\!"
-    
-    :: 設定ファイル作成
-    (
-        echo {
-        echo   "mcpServers": {
-        echo     "claude-appsscript-pro": {
-        echo       "command": "!NODE_PATH!",
-        echo       "args": ["!CURRENT_DIR!\\server.js"],
-        echo       "cwd": "!CURRENT_DIR!"
-        echo     }
-        echo   }
-        echo }
-    ) > "!CLAUDE_CONFIG!"
-    
-    echo ✅ Claude Desktop設定ファイル更新完了
-    echo 📁 設定場所: !CLAUDE_CONFIG!
+    call :AutoClaudeConfig
 ) else (
     echo ℹ️  Claude Desktop設定をスキップしました
     echo 💡 手動設定が必要です（後で設定可能）
@@ -391,12 +397,6 @@ if "!OAUTH_READY!"=="true" (
     echo    3. claude-appsscript-pro ツールが利用可能になります
 )
 
-<<<<<<< HEAD
-echo.
-echo 💡 重要: Claude Desktop の再起動は手動で行ってください
-echo    - 自動起動は行いません
-echo    - ユーザーのタイミングで安全に再起動できます
-
 echo.
 echo 💡 重要: Claude Desktop の再起動は手動で行ってください
 echo    - 自動起動は行いません
@@ -405,4 +405,133 @@ echo    - ユーザーのタイミングで安全に再起動できます
 echo [%DATE% %TIME%] インストール完了 >> %LOG_FILE%
 echo.
 echo 🎊 セットアップが完了しました！
+
 echo.
+echo 💡 おつかれさまでした！
+echo    Claude-AppsScript-Pro v3.0.1 のセットアップが完了しました
+echo.
+
+:: PowerShell実行時のpause回避
+if "%AUTOMATED_MODE%"=="true" (
+    echo ✅ 自動モード: pauseをスキップ
+    exit /b 0
+) else (
+    pause
+)
+
+:: === 関数セクション ===
+
+:: Claude Desktop設定自動化関数
+:AutoClaudeConfig
+echo 🖥️ Claude Desktop設定を自動更新中...
+set "CLAUDE_CONFIG=%APPDATA%\Claude\claude_desktop_config.json"
+
+:: Node.jsパス検出
+for /f "delims=" %%i in ('where node 2^>nul') do set "NODE_PATH=%%i"
+if "%NODE_PATH%"=="" (
+    echo ❌ Node.jsパスが見つかりません
+    echo 💡 手動設定が必要です
+    goto :eof
+)
+
+:: 現在のディレクトリを取得
+set "CURRENT_DIR=%CD%"
+
+:: JSON設定生成（PowerShell使用）
+powershell -Command "& {
+    $configPath = '%CLAUDE_CONFIG%'
+    $nodeExe = '%NODE_PATH%'
+    $projectDir = '%CURRENT_DIR%'
+    $serverPath = Join-Path $projectDir 'server.js'
+    
+    # ディレクトリが存在しない場合は作成
+    $configDir = Split-Path $configPath -Parent
+    if (!(Test-Path $configDir)) {
+        New-Item -ItemType Directory -Path $configDir -Force | Out-Null
+    }
+    
+    # 既存設定を読み込み（存在する場合）
+    if (Test-Path $configPath) {
+        try {
+            $config = Get-Content $configPath -Raw | ConvertFrom-Json
+        } catch {
+            $config = @{}
+        }
+    } else {
+        $config = @{}
+    }
+    
+    # mcpServers セクションが存在しない場合は作成
+    if (!$config.mcpServers) {
+        $config | Add-Member -Type NoteProperty -Name 'mcpServers' -Value @{}
+    }
+    
+    # claude-appsscript-pro 設定を追加/更新
+    $serverConfig = @{
+        command = $nodeExe
+        args = @($serverPath)
+        cwd = $projectDir
+        env = @{
+            NODE_ENV = 'production'
+        }
+    }
+    
+    $config.mcpServers | Add-Member -Type NoteProperty -Name 'claude-appsscript-pro' -Value $serverConfig -Force
+    
+    # JSON形式で保存
+    $config | ConvertTo-Json -Depth 10 | Set-Content $configPath -Encoding UTF8
+    
+    Write-Host '✅ Claude Desktop設定ファイルを更新しました'
+}" 2>nul
+
+if %ERRORLEVEL% EQU 0 (
+    echo ✅ Claude Desktop設定ファイル更新完了
+    echo 📍 設定ファイル: %CLAUDE_CONFIG%
+    echo 🔧 Node.js パス: %NODE_PATH%
+) else (
+    echo ❌ Claude Desktop設定更新でエラーが発生
+    echo 💡 手動設定が必要な場合があります
+)
+goto :eof
+
+:: OAuth設定完全自動実行関数
+:AutoOAuthSetup
+echo 🔐 OAuth設定の自動実行を開始...
+
+:: .envファイルの存在確認
+if not exist .env (
+    echo ❌ .envファイルが見つかりません
+    echo 💡 手動で実行: npm run oauth-setup
+    goto :eof
+)
+
+:: REFRESH_TOKEN確認
+findstr "GOOGLE_APP_SCRIPT_API_REFRESH_TOKEN=1//" .env >nul 2>&1
+if %ERRORLEVEL% EQU 0 (
+    echo ✅ OAuth設定は既に完了しています
+    set OAUTH_READY=true
+    goto :eof
+)
+
+:: CLIENT_ID確認
+findstr /C:"GOOGLE_APP_SCRIPT_API_CLIENT_ID=" .env | findstr /V /C:"GOOGLE_APP_SCRIPT_API_CLIENT_ID=$" >nul 2>&1
+if %ERRORLEVEL% NEQ 0 (
+    echo ⚠️  CLIENT_IDが設定されていません
+    echo 💡 手動で実行: npm run oauth-setup
+    goto :eof
+)
+
+echo 🤖 OAuth設定を自動実行中...
+call npm run oauth-setup
+
+:: 実行結果の検証
+if %ERRORLEVEL% EQU 0 (
+    echo ✅ OAuth設定が完了しました
+    set OAUTH_READY=true
+) else (
+    echo ❌ OAuth設定でエラーが発生しました
+    echo 💡 手動で再実行: npm run oauth-setup
+    set OAUTH_READY=false
+)
+goto :eof
+pause
