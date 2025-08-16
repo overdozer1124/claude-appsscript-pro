@@ -272,44 +272,23 @@ if exist "!CLAUDE_CONFIG!" (
 goto :EOF
 
 :AutoClaudeConfig
-:: Claude Desktop設定自動更新
+:: Claude Desktop設定安全更新（既存設定保護）
 echo 🔧 Claude Desktop設定を更新中...
-set "CLAUDE_CONFIG=%APPDATA%\Claude\claude_desktop_config.json"
-set "CONFIG_DIR=%APPDATA%\Claude"
+echo 🛡️  既存のMCPサーバー設定を保護します
 
-:: ディレクトリ作成
-if not exist "!CONFIG_DIR!" (
-    mkdir "!CONFIG_DIR!" >> %LOG_FILE% 2>&1
-    echo 📁 Claude設定ディレクトリを作成しました
-)
+:: 安全な設定更新スクリプトを実行
+echo 🔄 安全な設定更新スクリプトを実行中...
+node scripts/update-claude-config.cjs
+set CONFIG_RESULT=%ERRORLEVEL%
 
-:: Node.jsパス取得とエスケープ処理
-for /f "tokens=*" %%i in ('where node 2^>nul') do set "NODE_PATH=%%i"
-if "!NODE_PATH!"=="" (
-    set "NODE_PATH=C:\\Program Files\\nodejs\\node.exe"
-    echo ⚠️  Nodeパスを標準パスに設定: !NODE_PATH!
+echo.
+echo [%DATE% %TIME%] Claude Desktop設定更新（安全モード・終了コード: %CONFIG_RESULT%） >> %LOG_FILE%
+if %CONFIG_RESULT% EQU 0 (
+    echo ✅ Claude Desktop設定を安全に更新しました
+    echo 💡 既存のMCPサーバー設定は保護されています
 ) else (
-    echo ✅ Nodeパス検出: !NODE_PATH!
-    :: JSON用にバックスラッシュをエスケープ
-    set "NODE_PATH=!NODE_PATH:\=\\!"
+    echo ⚠️  Claude Desktop設定の更新でエラーが発生しました（終了コード: %CONFIG_RESULT%）
+    echo 💡 手動で設定ファイルを確認してください
+    echo 📄 設定ファイル場所: %APPDATA%\Claude\claude_desktop_config.json
 )
-
-:: 現在のディレクトリパスをJSON用にエスケープ
-set "CURRENT_DIR=%CD%"
-set "CURRENT_DIR=!CURRENT_DIR:\=\\!"
-
-:: 設定ファイル作成（JSONエスケープ対応）
-echo { > "!CLAUDE_CONFIG!"
-echo   "mcpServers": { >> "!CLAUDE_CONFIG!"
-echo     "claude-appsscript-pro": { >> "!CLAUDE_CONFIG!"
-echo       "command": "!NODE_PATH!", >> "!CLAUDE_CONFIG!"
-echo       "args": ["!CURRENT_DIR!\\server.js"], >> "!CLAUDE_CONFIG!"
-echo       "cwd": "!CURRENT_DIR!" >> "!CLAUDE_CONFIG!"
-echo     } >> "!CLAUDE_CONFIG!"
-echo   } >> "!CLAUDE_CONFIG!"
-echo } >> "!CLAUDE_CONFIG!"
-
-echo ✅ Claude Desktop設定ファイルを更新しました
-echo 📄 設定ファイル場所: !CLAUDE_CONFIG!
-echo [%DATE% %TIME%] Claude Desktop設定完了 >> %LOG_FILE%
 goto :EOF
