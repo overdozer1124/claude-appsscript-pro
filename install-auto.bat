@@ -40,9 +40,9 @@ echo ✅ 基本インストール完了
 :: ステップ2: OAuth設定確認
 echo [2/4] OAuth設定を確認中...
 if exist .env (
-    findstr /C:"GOOGLE_APP_SCRIPT_API_CLIENT_ID=" .env | findstr /V /C:"GOOGLE_APP_SCRIPT_API_CLIENT_ID=$" >nul 2>&1
+    findstr "GOOGLE_APP_SCRIPT_API_CLIENT_ID=" .env | findstr /V "GOOGLE_APP_SCRIPT_API_CLIENT_ID=$" >nul 2>&1
     if !ERRORLEVEL! EQU 0 (
-        findstr /C:"GOOGLE_APP_SCRIPT_API_REFRESH_TOKEN=" .env | findstr /V /C:"GOOGLE_APP_SCRIPT_API_REFRESH_TOKEN=$" >nul 2>&1
+        findstr "GOOGLE_APP_SCRIPT_API_REFRESH_TOKEN=1//" .env >nul 2>&1
         if !ERRORLEVEL! EQU 0 (
             echo ✅ OAuth設定済みを検出（CLIENT_ID + REFRESH_TOKEN）
             goto :OAuthComplete
@@ -87,7 +87,7 @@ if /i "!OAUTH_CHOICE!"=="Y" (
     :: 🚀 新機能: OAuth成功の自動検証（重複実行防止）
     echo 🔍 REFRESH_TOKEN取得状況を自動確認中...
     if exist .env (
-        findstr /C:"GOOGLE_APP_SCRIPT_API_REFRESH_TOKEN=" .env | findstr /V /C:"GOOGLE_APP_SCRIPT_API_REFRESH_TOKEN=$" >nul 2>&1
+        findstr "GOOGLE_APP_SCRIPT_API_REFRESH_TOKEN=1//" .env >nul 2>&1
         if !ERRORLEVEL! EQU 0 (
             echo ✅ OAuth認証完了を自動検出 - REFRESH_TOKEN取得済み
             echo 📋 認証は正常に完了しました
@@ -130,7 +130,7 @@ if /i "!OAUTH_CHOICE!"=="Y" (
         :: 🔧 修正: 再試行前にREFRESH_TOKEN再確認（重複実行防止）
         echo 🔍 最終確認: REFRESH_TOKEN状況を再チェック中...
         if exist .env (
-            findstr /C:"GOOGLE_APP_SCRIPT_API_REFRESH_TOKEN=" .env | findstr /V /C:"GOOGLE_APP_SCRIPT_API_REFRESH_TOKEN=$" >nul 2>&1
+            findstr "GOOGLE_APP_SCRIPT_API_REFRESH_TOKEN=1//" .env >nul 2>&1
             if !ERRORLEVEL! EQU 0 (
                 echo ✅ 実際にはREFRESH_TOKENが取得されています
                 echo 💡 OAuth設定は完了済みです - 次に進みます
@@ -150,7 +150,7 @@ if /i "!OAUTH_CHOICE!"=="Y" (
             echo.
             echo 🔍 再試行結果を自動確認中...
             if exist .env (
-                findstr /C:"GOOGLE_APP_SCRIPT_API_REFRESH_TOKEN=" .env | findstr /V /C:"GOOGLE_APP_SCRIPT_API_REFRESH_TOKEN=$" >nul 2>&1
+                findstr "GOOGLE_APP_SCRIPT_API_REFRESH_TOKEN=1//" .env >nul 2>&1
                 if !ERRORLEVEL! EQU 0 (
                     echo ✅ OAuth設定が完了しました（自動検証）
                     echo [%DATE% %TIME%] OAuth設定完了（再試行成功・自動検証） >> %LOG_FILE%
@@ -172,7 +172,7 @@ if /i "!OAUTH_CHOICE!"=="Y" (
     :OAuthVerificationComplete
     :: REFRESH_TOKENの最終確認
     if exist .env (
-        findstr /C:"GOOGLE_APP_SCRIPT_API_REFRESH_TOKEN=" .env | findstr /V /C:"GOOGLE_APP_SCRIPT_API_REFRESH_TOKEN=$" >nul 2>&1
+        findstr "GOOGLE_APP_SCRIPT_API_REFRESH_TOKEN=1//" .env >nul 2>&1
         if !ERRORLEVEL! EQU 0 (
             echo ✅ .envファイルでREFRESH_TOKEN確認済み
         ) else (
@@ -313,7 +313,7 @@ echo 🔍 OAuth設定状況を最終確認中...
 if exist .env (
     findstr /C:"GOOGLE_APP_SCRIPT_API_CLIENT_ID=" .env | findstr /V /C:"GOOGLE_APP_SCRIPT_API_CLIENT_ID=$" >nul 2>&1
     if !ERRORLEVEL! EQU 0 (
-        findstr /C:"GOOGLE_APP_SCRIPT_API_REFRESH_TOKEN=" .env | findstr /V /C:"GOOGLE_APP_SCRIPT_API_REFRESH_TOKEN=$" >nul 2>&1
+        findstr "GOOGLE_APP_SCRIPT_API_REFRESH_TOKEN=1//" .env >nul 2>&1
         if !ERRORLEVEL! EQU 0 (
             echo ✅ OAuth設定完全完了 - すべて準備完了！
             echo    - CLIENT_ID: 設定済み
