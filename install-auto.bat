@@ -3,7 +3,7 @@ setlocal EnableDelayedExpansion
 chcp 65001 >nul 2>&1
 
 :: Claude-AppsScript-Pro 完全自動インストーラー
-:: バージョン: 2.1.0 - PowerShell対応・OAuth完全自動化版
+:: バージョン: 2.1.1 - PowerShell対応・OAuth完全自動化版（トークンテスト）
 
 :: 🔧 PowerShell実行検出（非対話的実行モード）
 set "POWERSHELL_MODE=false"
