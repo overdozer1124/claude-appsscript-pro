@@ -1,0 +1,23 @@
+[?1049h[22;0;0t[>4;2m[?1h=[?2004h[?1004h[1;24r[?12h[?12l[22;2t[22;1t[27m[23m[29m[m[H[2J[?25l[24;1H<Data/Roaming/Claude/MCP/claude-appsscript-pro/.git/COMMIT_EDITMSG"<ude/MCP/claude-appsscript-pro/.git/COMMIT_EDITMSG" [unix] 30L, 879B[1;1H[38;5;130mfix: PowerShell構文エラー修正・処理順序改善 v2.1.3[m
+
+[34m# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+#
+# [m[35mAuthor:[m[34m    overdozer1124 <overdozer1124@example.com>
+#
+# interactive rebase in progress; onto e979ca1
+# [m[35mLast command done (1 command done):[m
+[34m#    pick f7022d9 fix: PowerShell構文エラー修正・処理順序改善 v2.1.3
+# No commands remaining.
+# You are currently rebasing branch 'main' on 'e979ca1'.
+#
+# [m[35mChanges to be committed:[m
+[34m#       [m[32mnew file[m[34m:   [m[31minstall-auto-fixed.bat[m
+[34m#       [m[32mmodified[m[34m:   [m[31minstall-auto.bat[m
+[34m#
+# [m[35mUntracked files:[m
+[34m#       [m[31mcurrent-status.txt[m
+[34m#       [m[31mgit-add-error.txt[m
+[34m#       [m[31mgit-add.txt[m
+[34m#       [m[31mgit-rebase-continue-error.txt[m
+[1m[7m.git/COMMIT_EDITMSG [unix] (17:11 16/08/2025)                            1,1 Top[1;1H[?25h[?4m

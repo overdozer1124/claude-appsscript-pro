@@ -1,4 +1,4 @@
-{
+﻿{
     "name": "claude-appsscript-pro",
     "version": "3.0.1",
     "description": "Claude Apps Script Pro v3.0.1 - Google Apps Script + Sheets + WebApp Integrated Development Suite with 2-Minute Quick Setup",
@@ -16,7 +16,7 @@
         "install-deps": "npm install --no-optional --no-fund",
         "install-deps-win": "C:\\Program Files\\nodejs\\npm.exe install --no-optional --no-fund",
         "setup": "npm install && echo \"Setup complete! Run 'npm run oauth-setup' to configure authentication.\"",
-        "setup-win": "C:\\Program Files\\nodejs\\npm.exe install && echo Setup complete! Run 'npm run oauth-setup' to configure authentication.",
+        "setup-win": "C:\\\\Program Files\\\\nodejs\\\\npm.exe install && echo Setup complete! Please run install-auto.bat which will guide you through Web-based OAuth setup.",
         "check": "node --check server.js",
         "check-win": "C:\\Program Files\\nodejs\\node.exe --check server.js",
         "oauth-setup": "node scripts/oauth-setup.cjs",
@@ -28,7 +28,7 @@
         "auto-install": "install-auto.bat",
         "full-auto": "install-auto.bat",
         "install-auto": "install-auto.bat",
-        "postinstall": "node -e \"console.log('\\n🎉 インストール完了！\\n\\n次のステップ: npm run auto-install (完全自動) または npm run quick-install\\n')\""
+        "postinstall": "node -e \"console.log('\\n脂 繧､繝ｳ繧ｹ繝医・繝ｫ螳御ｺ・ｼ―\n\\n谺｡縺ｮ繧ｹ繝・ャ繝・ npm run auto-install (螳悟・閾ｪ蜍・ 縺ｾ縺溘・ npm run quick-install\\n')\""
     },
     "dependencies": {
         "@modelcontextprotocol/sdk": "^1.13.1",
