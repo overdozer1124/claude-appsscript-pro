@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claude-AppsScript-Pro OAuth設定</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #333;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 40px;
+            max-width: 600px;
+            width: 90%;
+            text-align: center;
+        }
+        
+        .logo {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .title {
+            font-size: 1.8em;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        
+        .subtitle {
+            color: #7f8c8d;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+        
+        .upload-area {
+            border: 3px dashed #bdc3c7;
+            border-radius: 15px;
+            padding: 40px;
+            margin: 30px 0;
+            background: #f8f9fa;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .upload-area:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+        
+        .upload-area.dragover {
+            border-color: #667eea;
+            background: #e3f2fd;
+            transform: scale(1.02);
+        }
+        
+        .upload-icon {
+            font-size: 4em;
+            color: #bdc3c7;
+            margin-bottom: 20px;
+        }
+        
+        .upload-text {
+            font-size: 1.2em;
+            color: #34495e;
+            margin-bottom: 10px;
+        }
+        
+        .upload-hint {
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+        
+        .file-input {
+            display: none;
+        }
+        
+        .btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .status {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+        
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        .file-info {
+            background: #e3f2fd;
+            border: 1px solid #bbdefb;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: left;
+        }
+        
+        .file-info h3 {
+            color: #1976d2;
+            margin-bottom: 10px;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #ecf0f1;
+            border-radius: 5px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 10px auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">🚀</div>
+        <h1 class="title">Claude-AppsScript-Pro</h1>
+        <p class="subtitle">OAuth設定 - JSONファイルアップロード方式</p>
+        
+        <div id="step1">
+            <div class="upload-area" onclick="document.getElementById('jsonFile').click()">
+                <div class="upload-icon">📄</div>
+                <div class="upload-text">Google Cloud Console JSON設定ファイル</div>
+                <div class="upload-hint">クリックまたはドラッグ&ドロップでファイルを選択</div>
+            </div>
+            <input type="file" id="jsonFile" class="file-input" accept=".json,application/json">
+            
+            <div class="status info">
+                <strong>手順:</strong><br>
+                1. Google Cloud Console → APIs & Services → Credentials<br>
+                2. 「CREATE CREDENTIALS」→ 「OAuth 2.0 Client IDs」<br>
+                3. Application type: 「Web application」<br>
+                4. Authorized redirect URIs: http://localhost:3001/oauth/callback<br>
+                5. ダウンロードしたJSONファイルをここにアップロード
+            </div>
+        </div>
+        
+        <div id="step2" style="display: none;">
+            <div class="file-info">
+                <h3>✅ 設定ファイル確認</h3>
+                <p><strong>Client ID:</strong> <span id="clientId"></span></p>
+                <p><strong>Client Secret:</strong> <span id="clientSecret"></span></p>
+                <p><strong>Redirect URI:</strong> <span id="redirectUri"></span></p>
+            </div>
+            
+            <button class="btn" onclick="startOAuth()">Google認証を開始</button>
+            <button class="btn" onclick="resetUpload()">ファイル再選択</button>
+        </div>
+        
+        <div id="step3" style="display: none;">
+            <div class="spinner"></div>
+            <div class="status info">
+                <strong>OAuth認証進行中...</strong><br>
+                ブラウザでGoogle認証を完了してください
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+        </div>
+        
+        <div id="step4" style="display: none;">
+            <div class="status success">
+                <strong>🎉 OAuth設定完了！</strong><br>
+                Claude-AppsScript-Proが使用可能になりました
+            </div>
+            <button class="btn" onclick="window.close()">ウィンドウを閉じる</button>
+        </div>
+        
+        <div id="errorDiv" class="status error" style="display: none;"></div>
+    </div>
+
+    <script>
+        let uploadedConfig = null;
+        
+        // ドラッグ&ドロップ機能
+        const uploadArea = document.querySelector('.upload-area');
+        const fileInput = document.getElementById('jsonFile');
+        
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFileUpload(files[0]);
+            }
+        });
+        
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFileUpload(e.target.files[0]);
+            }
+        });
+        
+        function handleFileUpload(file) {
+            hideError();
+            
+            if (!file.name.endsWith('.json')) {
+                showError('JSONファイルを選択してください');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const config = JSON.parse(e.target.result);
+                    validateAndProcessConfig(config);
+                } catch (error) {
+                    showError('無効なJSONファイルです: ' + error.message);
+                }
+            };
+            reader.readAsText(file);
+        }
+        
+        function validateAndProcessConfig(config) {
+            try {
+                // Google Cloud Console JSONの検証
+                if (!config.web) {
+                    throw new Error('無効な設定ファイルです。「web」セクションが見つかりません。');
+                }
+                
+                const clientId = config.web.client_id;
+                const clientSecret = config.web.client_secret;
+                const redirectUris = config.web.redirect_uris;
+                
+                if (!clientId || !clientId.includes('.apps.googleusercontent.com')) {
+                    throw new Error('無効なclient_idです。.apps.googleusercontent.comで終わる形式である必要があります。');
+                }
+                
+                if (!clientSecret || clientSecret.length < 20) {
+                    throw new Error('無効なclient_secretです。20文字以上である必要があります。');
+                }
+                
+                if (!redirectUris || !redirectUris.includes('http://localhost:3001/oauth/callback')) {
+                    throw new Error('リダイレクトURIに http://localhost:3001/oauth/callback が設定されていません。');
+                }
+                
+                // 設定成功
+                uploadedConfig = {
+                    clientId: clientId,
+                    clientSecret: clientSecret,
+                    redirectUri: 'http://localhost:3001/oauth/callback'
+                };
+                
+                // UI更新
+                document.getElementById('clientId').textContent = clientId;
+                document.getElementById('clientSecret').textContent = '●'.repeat(clientSecret.length);
+                document.getElementById('redirectUri').textContent = uploadedConfig.redirectUri;
+                
+                showStep(2);
+                
+            } catch (error) {
+                showError(error.message);
+            }
+        }
+        
+        async function startOAuth() {
+            if (!uploadedConfig) {
+                showError('設定ファイルが選択されていません');
+                return;
+            }
+            
+            showStep(3);
+            
+            try {
+                // サーバーに設定を送信
+                const response = await fetch('/upload-config', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(uploadedConfig)
+                });
+                
+                if (!response.ok) {
+                    throw new Error('サーバーエラー: ' + response.statusText);
+                }
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // OAuth認証URLにリダイレクト
+                    updateProgress(50);
+                    window.location.href = result.authUrl;
+                } else {
+                    throw new Error(result.error || '設定の保存に失敗しました');
+                }
+                
+            } catch (error) {
+                showError('OAuth開始エラー: ' + error.message);
+                showStep(2);
+            }
+        }
+        
+        function resetUpload() {
+            uploadedConfig = null;
+            fileInput.value = '';
+            showStep(1);
+            hideError();
+        }
+        
+        function showStep(stepNumber) {
+            document.getElementById('step1').style.display = stepNumber === 1 ? 'block' : 'none';
+            document.getElementById('step2').style.display = stepNumber === 2 ? 'block' : 'none';
+            document.getElementById('step3').style.display = stepNumber === 3 ? 'block' : 'none';
+            document.getElementById('step4').style.display = stepNumber === 4 ? 'block' : 'none';
+        }
+        
+        function showError(message) {
+            const errorDiv = document.getElementById('errorDiv');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+        }
+        
+        function hideError() {
+            document.getElementById('errorDiv').style.display = 'none';
+        }
+        
+        function updateProgress(percentage) {
+            document.getElementById('progressFill').style.width = percentage + '%';
+        }
+        
+        // ページロード時にURL確認（OAuth完了チェック）
+        window.addEventListener('load', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('success') === 'true') {
+                showStep(4);
+                updateProgress(100);
+            }
+        });
+    </script>
+</body>
+</html>

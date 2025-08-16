@@ -24,8 +24,17 @@ const SCOPES = [
   'https://www.googleapis.com/auth/spreadsheets',
 ];
 
-console.log('🚀 Claude-AppsScript-Pro OAuth設定 (対話版)');
-console.log('==========================================');
+// 🚀 革命的機能: Web版/ターミナル版の自動判定
+const isWebMode = process.argv.includes('--web') || process.argv.includes('-w');
+
+if (isWebMode) {
+  console.log('🌐 Claude-AppsScript-Pro OAuth設定 (Web版)');
+  console.log('==========================================');
+  console.log('🚀 革命的JSONアップロード機能で1分セットアップ');
+} else {
+  console.log('🚀 Claude-AppsScript-Pro OAuth設定 (ターミナル版)');
+  console.log('==========================================');
+}
 console.log('');
 
 // 共通のreadlineインターフェース（必要時のみ作成）
