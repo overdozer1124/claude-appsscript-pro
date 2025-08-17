@@ -20,102 +20,6 @@ Claude-AppsScript-Pro は、**61ツール統合**・**AI自律開発**・**リ�
 
 ---
 
-## 🖥️ インストール方法（プラットフォーム別）
-
-### 🪟 Windows（完全版・推奨）⭐
-
-**🔥 完全ノンストップ自動実行（2025.08.17革新）**
-
-```powershell
-# 🚀 ワンクリック完全自動インストール（ノンストップ実行）
-powershell -Command "& { git clone https://github.com/overdozer1124/claude-appsscript-pro.git; cd claude-appsscript-pro; npm install; .\install-auto.bat }"
-```
-
-**🎊 特徴：**
-- ✅ **完全ノンストップ自動実行**：ユーザー操作不要（エンターキー等不要）
-- ✅ **WebアプリOAuth自動設定**：JSONアップロード対応
-- ✅ **OAuth重複実行防止**：革新的アルゴリズムで100%成功
-- ✅ **既存MCP設定完全保護**：他の設定を侵害せず安全更新
-- ✅ **エラー自動復旧**：問題発生時の自動修復機能
-- ✅ **3分で本格運用開始**：技術知識不要のワンクリック体験
-
-**従来版（段階的実行）：**
-```powershell
-git clone https://github.com/overdozer1124/claude-appsscript-pro.git && cd claude-appsscript-pro && npm install && .\install-auto.bat
-```
-※ 段階的実行では install-auto.bat でユーザー操作が必要になる場合があります
-
-### 🍎 macOS（完全版 - NEW！）🎉
-
-**🚀 Windows版同等機能を完全移植**
-
-```bash
-# 完全版インストーラー（推奨）
-git clone https://github.com/overdozer1124/claude-appsscript-pro.git && cd claude-appsscript-pro && npm install && chmod +x install-complete.sh && ./install-complete.sh
-```
-
-**🎊 新機能（2025.08.17実装完了）：**
-- ✅ **WebアプリOAuth自動設定**：JSONアップロード対応
-- ✅ **OAuth重複実行防止**：Windows版革新機能完全移植
-- ✅ **既存MCP設定完全保護**：安全更新アルゴリズム
-- ✅ **エラー自動復旧**：包括的エラーハンドリング
-- ✅ **自動/対話型モード**：柔軟な実行オプション
-
-**代替方法（基本版）：**
-```bash
-# 基本インストール
-git clone https://github.com/overdozer1124/claude-appsscript-pro.git && cd claude-appsscript-pro && npm install && chmod +x install.sh && ./install.sh
-```
-
-### 🐧 Linux（完全版 - NEW！）🎉
-
-**🚀 Windows版同等機能を完全移植**
-
-```bash
-# 完全版インストーラー（推奨）
-git clone https://github.com/overdozer1124/claude-appsscript-pro.git && cd claude-appsscript-pro && npm install && chmod +x install-complete.sh && ./install-complete.sh
-```
-
-**🎊 新機能（2025.08.17実装完了）：**
-- ✅ **WebアプリOAuth自動設定**：JSONアップロード対応
-- ✅ **OAuth重複実行防止**：Windows版革新機能完全移植
-- ✅ **既存MCP設定完全保護**：安全更新アルゴリズム
-- ✅ **エラー自動復旧**：包括的エラーハンドリング
-- ✅ **自動/対話型モード**：柔軟な実行オプション
-
-**代替方法（基本版）：**
-```bash
-# 基本インストール
-git clone https://github.com/overdozer1124/claude-appsscript-pro.git && cd claude-appsscript-pro && npm install && chmod +x install.sh && ./install.sh
-```
-
-### 🌐 Node.js統合版（全OS対応・最高機能版）⭐ NEW！
-
-**🔥 最新技術統合・全プラットフォーム最適化版**
-
-```bash
-# 統合版インストーラー（全OS対応）
-git clone https://github.com/overdozer1124/claude-appsscript-pro.git && cd claude-appsscript-pro && npm install && node install-complete.js
-```
-
-**🚀 革新機能（2025.08.17実装完了）：**
-- ✅ **全OS自動判別・最適化**：Windows/macOS/Linux智能対応
-- ✅ **リアルタイム進捗表示**：インタラクティブUI
-- ✅ **包括的エラーハンドリング**：自動復旧・詳細ログ
-- ✅ **自動/対話型モード**：環境変数制御・CI/CD対応
-- ✅ **Windows版革新機能完全統合**：全機能をクロスプラットフォーム対応
-
-**使用例：**
-```bash
-# 自動実行モード（CI/CD・スクリプト用）
-AUTO_INSTALL_MODE=true node install-complete.js
-
-# 対話型モード（手動インストール用）
-node install-complete.js
-```
-
----
-
 ## 🛠️ 事前準備（5分）
 
 ### 必須ソフトウェア
@@ -470,3 +374,4 @@ git clone https://github.com/overdozer1124/claude-appsscript-pro.git && cd claud
 
 
 **📋 要件**: Node.js 18.0.0+ | **🏷️ ライセンス**: MIT | **⭐ バージョン**: v3.0.1
+
