@@ -59,11 +59,9 @@ Claude-AppsScript-Pro は、**61ツール統合**・**AI自律開発**・**リ�
 ### Windows（完全自動・最推奨）🔥
 
 ```powershell
-# 🚀 PowerShell ワンライナー（ノンストップ実行・最推奨）
+# 🚀 PowerShell で実行（ノンストップ実行・最推奨）
 powershell -Command "& { git clone https://github.com/overdozer1124/claude-appsscript-pro.git; cd claude-appsscript-pro; npm install; .\install-auto.bat }"
 
-# 従来版（段階的実行）
-git clone https://github.com/overdozer1124/claude-appsscript-pro.git; cd claude-appsscript-pro; npm install; .\install-auto.bat
 ```
 
 ### macOS
@@ -80,7 +78,7 @@ curl -fsSL https://raw.githubusercontent.com/overdozer1124/claude-appsscript-pro
 curl -fsSL https://raw.githubusercontent.com/overdozer1124/claude-appsscript-pro/main/install.sh | bash
 ```
 
-### Git未インストール（ZIPダウンロード版）
+### Git未インストールの場合（ZIPダウンロード版）
 
 1. **[ZIPダウンロード](https://github.com/overdozer1124/claude-appsscript-pro/archive/refs/heads/main.zip)**
 2. 解凍後、フォルダ内で：
@@ -374,4 +372,5 @@ git clone https://github.com/overdozer1124/claude-appsscript-pro.git && cd claud
 
 
 **📋 要件**: Node.js 18.0.0+ | **🏷️ ライセンス**: MIT | **⭐ バージョン**: v3.0.1
+
 
