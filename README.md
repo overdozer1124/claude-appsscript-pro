@@ -62,19 +62,26 @@ Claude-AppsScript-Pro は、**61ツール統合**・**AI自律開発**・**リ�
 
 ### 🪟 Windows（完全版・推奨）⭐
 
-**🔥 革新機能満載の完全自動化版**
+**🔥 完全ノンストップ自動実行（2025.08.17革新）**
 
 ```powershell
-# ワンクリック完全自動インストール
-git clone https://github.com/overdozer1124/claude-appsscript-pro.git && cd claude-appsscript-pro && npm install && .\install-auto.bat
+# 🚀 ワンクリック完全自動インストール（ノンストップ実行）
+powershell -Command "& { git clone https://github.com/overdozer1124/claude-appsscript-pro.git; cd claude-appsscript-pro; npm install; .\install-auto.bat }"
 ```
 
-**🎊 Windows版特典機能：**
+**🎊 特徴：**
+- ✅ **完全ノンストップ自動実行**：ユーザー操作不要（エンターキー等不要）
 - ✅ **WebアプリOAuth自動設定**：JSONアップロード対応
 - ✅ **OAuth重複実行防止**：革新的アルゴリズムで100%成功
 - ✅ **既存MCP設定完全保護**：他の設定を侵害せず安全更新
 - ✅ **エラー自動復旧**：問題発生時の自動修復機能
 - ✅ **3分で本格運用開始**：技術知識不要のワンクリック体験
+
+**従来版（段階的実行）：**
+```powershell
+git clone https://github.com/overdozer1124/claude-appsscript-pro.git && cd claude-appsscript-pro && npm install && .\install-auto.bat
+```
+※ 段階的実行では install-auto.bat でユーザー操作が必要になる場合があります
 
 ### 🍎 macOS（完全版 - NEW！）🎉
 
@@ -186,7 +193,10 @@ node install-complete.js
 ### Windows（完全自動・最推奨）🔥
 
 ```powershell
-# PowerShellで実行（最も簡単）
+# 🚀 PowerShell ワンライナー（ノンストップ実行・最推奨）
+powershell -Command "& { git clone https://github.com/overdozer1124/claude-appsscript-pro.git; cd claude-appsscript-pro; npm install; .\install-auto.bat }"
+
+# 従来版（段階的実行）
 git clone https://github.com/overdozer1124/claude-appsscript-pro.git; cd claude-appsscript-pro; npm install; .\install-auto.bat
 ```
 
@@ -478,8 +488,8 @@ macOS/Linux版の機能完全化にコミュニティの力をお借りしてい
 ### 🔥 今すぐ始めましょう！
 
 ```powershell
-# Windows（最推奨・完全自動化）
-git clone https://github.com/overdozer1124/claude-appsscript-pro.git && cd claude-appsscript-pro && npm install && .\install-auto.bat
+# Windows（最推奨・完全ノンストップ自動化）
+powershell -Command "& { git clone https://github.com/overdozer1124/claude-appsscript-pro.git; cd claude-appsscript-pro; npm install; .\install-auto.bat }"
 ```
 
 ```bash

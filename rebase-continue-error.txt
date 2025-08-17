@@ -1,2 +1,6 @@
 Vim: Warning: Output is not to a terminal
 Vim: Warning: Input is not from a terminal
+
+error: there was a problem with the editor 'vi'
+Please supply the message using either -m or -F option.
+error: could not commit staged changes.
