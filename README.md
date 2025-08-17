@@ -95,6 +95,59 @@ npm install && chmod +x install.sh && ./install.sh
 
 ---
 
+## 🔐 OAuth認証設定（自動起動）
+
+上記のインストールコマンド実行後、OAuth認証設定が自動的に開始されます。
+
+### Windows版 - WebアプリOAuth設定 🚀
+
+**✨ 革命的JSONアップロード機能**
+
+ワンクリックコマンド実行後、自動的に以下が起動します：
+
+1. **Webブラウザ自動起動**
+   - `http://localhost:3001/setup` が自動で開きます
+   - 美しいUI付きのOAuth設定画面が表示
+
+2. **Google Cloud Console準備**
+   ```
+   📋 事前準備（上記で完了済み）：
+   ✅ GCPプロジェクト作成
+   ✅ 3つのAPI有効化  
+   ✅ OAuth 2.0 クライアント作成（Webアプリケーション）
+   ✅ リダイレクトURI: http://localhost:3001/oauth/callback
+   ```
+
+3. **JSONファイルダウンロード**
+   - Google Cloud Console → APIs & Services → Credentials
+   - 作成したOAuth 2.0 クライアントIDの右端「⬇️」ボタンクリック
+   - JSONファイルダウンロード
+
+4. **JSONファイルアップロード**
+   - ダウンロードしたJSONファイルを画面にドラッグ&ドロップ
+   - または「クリックしてファイル選択」
+   - 自動検証・設定確認
+
+5. **Google認証完了**
+   - 「Google認証を開始」ボタンクリック
+   - ブラウザでGoogle認証完了
+   - 自動的に設定保存・完了
+
+**⚡ 所要時間：2-3分**
+
+### macOS/Linux版 - ターミナルOAuth設定
+
+インストール後、ターミナルで対話的なOAuth設定が開始されます：
+
+1. **Client ID入力**：Google Cloud Consoleからコピペ
+2. **Client Secret入力**：非表示で安全入力
+3. **ブラウザ認証**：自動起動でGoogle認証
+4. **設定完了**：自動的に.envファイル更新
+
+**⚡ 所要時間：5-8分**
+
+---
+
 ## ✅ インストール成功確認
 
 ### 1. Claude Desktop再起動
@@ -176,7 +229,14 @@ nano ~/.config/Claude/claude_desktop_config.json  # Linux
 **解決策：**
 - GCPでOAuthクライアントを**「Webアプリケーション」**として再作成
 - リダイレクトURI：`http://localhost:3001/oauth/callback`
-- Windows版なら**WebアプリOAuth設定**（JSONアップロード）使用推奨
+
+**Windows版：**
+- WebアプリOAuth設定（JSONアップロード）を利用
+- 自動起動しない場合：`node scripts/oauth-setup.cjs --web`
+
+**macOS/Linux版：**
+- ターミナルでの対話的設定
+- 再実行：`npm run oauth-setup`
 
 #### 4. 構文エラー
 **症状：** `SyntaxError: Invalid regular expression flags`
