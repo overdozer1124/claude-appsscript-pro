@@ -5,9 +5,12 @@ chcp 65001 >nul 2>&1
 :: Claude-AppsScript-Pro 完全自動インストーラー v2.1.0 - 論理改善版
 :: 作成日: 2025.08.16 - OAuth重複実行問題・Claude Desktop設定問題を完全解決
 
-:: 🔧 PowerShell実行検出（非対話的実行モード）
+:: 🔧 PowerShell実行検出（安全版・CMDCMDLINE未定義対応）
 set "POWERSHELL_MODE=false"
-echo %CMDCMDLINE% | find /i "powershell" >nul && set "POWERSHELL_MODE=true"
+if defined CMDCMDLINE (
+    echo %CMDCMDLINE% | find /i "powershell" >nul
+    if !ERRORLEVEL! EQU 0 set "POWERSHELL_MODE=true"
+)
 
 :: 🚀 完全自動モード（環境変数での制御）
 if "%AUTO_INSTALL_MODE%"=="true" set "POWERSHELL_MODE=true"
