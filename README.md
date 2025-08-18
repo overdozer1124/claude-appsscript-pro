@@ -154,7 +154,6 @@ npm install && chmod +x install.sh && ./install.sh
 
 1. Claude Desktop を完全終了
 2. Claude Desktop を再起動
-3. 設定 → 開発者 → 「ローカルMCPサーバーを有効化」をオン
 
 ### 2. 接続テスト
 
@@ -432,5 +431,6 @@ git clone https://github.com/overdozer1124/claude-appsscript-pro.git && cd claud
 
 
 **📋 要件**: Node.js 18.0.0+ | **🏷️ ライセンス**: MIT | **⭐ バージョン**: v3.0.1
+
 
 
