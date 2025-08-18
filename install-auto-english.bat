@@ -38,20 +38,23 @@ echo.
 set "LOG_FILE=install-auto.log"
 echo [%DATE% %TIME%] Complete auto installation started (v3.0.1) > %LOG_FILE%
 
-:: Step 1: Basic installation execution
-echo [1/4] Running basic installation...
-call install-windows.bat >> %LOG_FILE% 2>&1
+:: Step 1: Basic environment check
+echo [1/4] Checking basic environment...
+echo [%DATE% %TIME%] Basic environment check started >> %LOG_FILE%
+
+:: Node.js check
+node --version >nul 2>&1
 if %ERRORLEVEL% NEQ 0 (
-    echo ERROR: Basic installation failed
-    echo Log file: %LOG_FILE% - please check for details
+    echo ERROR: Node.js not found
+    echo Please install Node.js: https://nodejs.org/
     echo.
     echo Please resolve the issue and run again
-    echo [%DATE% %TIME%] Basic installation error >> %LOG_FILE%
+    echo [%DATE% %TIME%] Node.js not installed >> %LOG_FILE%
     goto :error_exit
 )
 
-echo [1/4] Basic installation completed
-echo [%DATE% %TIME%] Basic installation completed >> %LOG_FILE%
+echo [1/4] Basic environment check completed
+echo [%DATE% %TIME%] Basic environment check completed >> %LOG_FILE%
 
 :: Step 2: Check and resolve OAuth duplication
 echo [2/4] Checking OAuth configuration...

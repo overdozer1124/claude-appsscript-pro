@@ -13,7 +13,7 @@ set /p choice="選択 (1-3): "
 if "%choice%"=="1" (
     echo.
     echo Windowsインストーラーを起動します...
-    call install-windows.bat
+    call install-auto.bat
 ) else if "%choice%"=="2" (
     echo.
     echo macOS/Linux用のインストールコマンド：

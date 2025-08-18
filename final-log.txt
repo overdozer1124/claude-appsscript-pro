@@ -1,0 +1,3 @@
+0182507 feat: Initial commit with enhanced README and OAuth authentication guide - Claude-AppsScript-Pro v3.0.1 complete setup
+1330170 Update README.md2025/08/17 10:57
+ce5d3bb Update README.md2025/08/17 10:55
