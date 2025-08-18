@@ -18,12 +18,10 @@ if "%AUTO_INSTALL_MODE%"=="true" set "POWERSHELL_MODE=true"
 title Claude-AppsScript-Pro 完全自動インストーラー v2.1.0 - 論理改善版
 
 echo.
-echo ╔══════════════════════════════════════════════════════════════╗
-echo ║                                                              ║
-echo ║   Claude-AppsScript-Pro 完全自動インストーラー v2.1.0       ║
-echo ║            🚀 OAuth重複実行問題・完全解決版                  ║
-echo ║                                                              ║
-echo ╚══════════════════════════════════════════════════════════════╝
+echo ================================================================
+echo  Claude-AppsScript-Pro 完全自動インストーラー v2.1.0
+echo            OAuth重複実行問題・完全解決版
+echo ================================================================
 echo.
 echo ⏱️  開始時刻: %TIME%
 echo 📁 作業ディレクトリ: %CD%
@@ -89,8 +87,8 @@ echo    2. 「認証情報を作成」→「OAuth 2.0 クライアント ID」
 echo    3. アプリケーションの種類: 「ウェブ アプリケーション」
 echo    4. 承認済みリダイレクト URI: http://localhost:3001/oauth/callback
 echo.
-echo 🔑 OAuth設定を開始しますか？ (Y/N)
-set /p OAUTH_CHOICE="選択 (Y/N): "
+echo 🔑 OAuth設定を開始しますか Y または N で答えてください
+set /p OAUTH_CHOICE="OAuth設定を開始しますか Y/N: "
 if /i "!OAUTH_CHOICE!"=="Y" (
     call :AutoOAuth
 ) else (
@@ -135,9 +133,9 @@ if "%CLAUDE_CONFIG_STATUS%"=="COMPLETE" (
 )
 
 :: 対話型モードでの設定確認
-echo 🔧 Claude Desktop設定ファイルを更新しますか？ (Y/N)
+echo 🔧 Claude Desktop設定ファイルを更新しますか Y または N で答えてください
 echo    既存の設定ファイルがある場合は上書きされます
-set /p CONFIG_CHOICE="選択 (Y/N): "
+set /p CONFIG_CHOICE="Claude Desktop設定を更新しますか Y/N: "
 if /i "!CONFIG_CHOICE!"=="Y" (
     call :AutoClaudeConfig
 ) else (
@@ -160,8 +158,8 @@ if %ERRORLEVEL% EQU 0 (
     echo ❌ サーバー構文チェックでエラーが発生しました
     echo [%DATE% %TIME%] 構文チェックエラー >> %LOG_FILE%
     if "%POWERSHELL_MODE%"=="false" (
-        echo 📋 続行しますか？ (Y/N)
-        set /p SYNTAX_CONTINUE="選択 (Y/N): "
+        echo 📋 続行しますか Y または N で答えてください
+        set /p SYNTAX_CONTINUE="続行しますか Y/N: "
         if /i "!SYNTAX_CONTINUE!"=="N" (
             echo ⚠️  インストールを中止しました
             pause
@@ -175,11 +173,9 @@ if %ERRORLEVEL% EQU 0 (
 :: 完了報告
 :: =========================================================================
 echo.
-echo ╔══════════════════════════════════════════════════════════════╗
-echo ║                                                              ║
-echo ║                   🎉 インストール完了！                     ║
-echo ║                                                              ║
-echo ╚══════════════════════════════════════════════════════════════╝
+echo ================================================================
+echo                 🎉 インストール完了！
+echo ================================================================
 echo.
 echo ✅ Claude-AppsScript-Pro v3.0.1 インストール完了
 echo ⏱️  完了時刻: %TIME%
