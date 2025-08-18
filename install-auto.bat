@@ -116,16 +116,18 @@ if "%OAUTH_STATUS%"=="COMPLETE" (
 :: Step 3: Claude Desktop設定
 :: =========================================================================
 echo [3/4] Claude Desktop設定を確認中...
-call :CheckClaudeConfig
-if "%CLAUDE_CONFIG_STATUS%"=="COMPLETE" (
-    echo ✅ Claude Desktop設定済み
-    goto :ConfigComplete
-)
 
-:: PowerShellモード時は自動実行
+:: PowerShellモード時は設定チェックを無視して自動実行（最優先）
 if "%POWERSHELL_MODE%"=="true" (
     echo 🤖 PowerShell自動モード: Claude Desktop設定を自動更新します
     call :AutoClaudeConfig
+    goto :ConfigComplete
+)
+
+:: 対話型モード時のみ既存設定チェック
+call :CheckClaudeConfig
+if "%CLAUDE_CONFIG_STATUS%"=="COMPLETE" (
+    echo ✅ Claude Desktop設定済み
     goto :ConfigComplete
 )
 
