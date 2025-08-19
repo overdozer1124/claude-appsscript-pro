@@ -1,18 +1,26 @@
 @echo off
 setlocal EnableDelayedExpansion
+
+REM Fix encoding issues - Multiple approaches for maximum compatibility
 chcp 65001 >nul 2>&1
+REM Ensure UTF-8 codepage is set before any Japanese text
+for /f "tokens=2 delims=:" %%a in ('chcp') do set "CURRENT_CP=%%a"
+set "CURRENT_CP=%CURRENT_CP: =%"
+if not "%CURRENT_CP%"=="65001" (
+    chcp 65001 >nul 2>&1
+)
 
-:: Claude-AppsScript-Pro 完全自動インストーラー
-:: バージョン: 2.1.0 - PowerShell対応・完全自動化版
+REM Claude-AppsScript-Pro 完全自動インストーラー
+REM バージョン: 2.1.1 - 文字エンコーディング問題修正版
 
-:: PowerShell実行検出
+REM PowerShell実行検出
 set "POWERSHELL_MODE=false"
 echo %CMDCMDLINE% | find /i "powershell" >nul && set "POWERSHELL_MODE=true"
 
-:: 完全自動モード
+REM 完全自動モード
 if "%AUTO_INSTALL_MODE%"=="true" set "POWERSHELL_MODE=true"
 
-title Claude-AppsScript-Pro 完全自動インストーラー
+title Claude-AppsScript-Pro Auto Installer v2.1.1
 
 echo.
 echo =================================================================
@@ -34,7 +42,7 @@ set "LOG_FILE=install-auto.log"
 echo [%DATE% %TIME%] 完全自動インストール開始 > %LOG_FILE%
 
 :: ステップ1: 基本インストール実行
-echo [1/4] 基本インストール実行中...
+echo [1/4] Basic installation running...
 call install-windows.bat >> %LOG_FILE% 2>&1
 if %ERRORLEVEL% NEQ 0 (
     echo エラー: 基本インストールでエラーが発生しました
