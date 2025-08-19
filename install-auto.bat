@@ -57,21 +57,21 @@ if %ERRORLEVEL% EQU 0 (
     if exist "C:\Program Files\nodejs\node.exe" (
         set "NODE_EXE=C:\Program Files\nodejs\node.exe"
         set "NODE_FOUND=true"
-        echo [FOUND] Node.js at: C:\Program Files\nodejs\
+        echo [FOUND] Node.js at: C:\Program Files\nodejs
     )
     
     :: 2. Program Files (x86) (32bit)
     if "!NODE_FOUND!"=="false" if exist "C:\Program Files (x86)\nodejs\node.exe" (
         set "NODE_EXE=C:\Program Files (x86)\nodejs\node.exe"
         set "NODE_FOUND=true"
-        echo [FOUND] Node.js at: C:\Program Files (x86)\nodejs\
+        echo [FOUND] Node.js at: C:\Program Files (x86)\nodejs
     )
     
     :: 3. User Local AppData
     if "!NODE_FOUND!"=="false" if exist "%LOCALAPPDATA%\Programs\nodejs\node.exe" (
         set "NODE_EXE=%LOCALAPPDATA%\Programs\nodejs\node.exe"
         set "NODE_FOUND=true"
-        echo [FOUND] Node.js at: %LOCALAPPDATA%\Programs\nodejs\
+        echo [FOUND] Node.js at: %LOCALAPPDATA%\Programs\nodejs
     )
     
     :: 4. User AppData (nvm-windows)
@@ -80,7 +80,7 @@ if %ERRORLEVEL% EQU 0 (
             if exist "%%i\node.exe" (
                 set "NODE_EXE=%%i\node.exe"
                 set "NODE_FOUND=true"
-                echo [FOUND] Node.js at: %%i\
+                echo [FOUND] Node.js at: %%i
                 goto :NodeSearchComplete
             )
         )
