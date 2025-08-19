@@ -19,15 +19,54 @@ function updateClaudeDesktopConfig() {
             console.log('📁 Claude設定ディレクトリを作成しました');
         }
         
-        // Node.jsパス取得
+        // Node.jsパス取得（堅牢版）
         const { execSync } = require('child_process');
         let nodePath;
+        
         try {
+            // まずPATHからnode.exeを検索
             nodePath = execSync('where node', { encoding: 'utf8' }).trim().split('\n')[0];
-            console.log('✅ Nodeパス検出:', nodePath);
+            console.log('✅ Node.js found in PATH:', nodePath);
         } catch (error) {
-            nodePath = 'C:\\Program Files\\nodejs\\node.exe';
-            console.log('⚠️  Nodeパスを標準パスに設定:', nodePath);
+            console.log('🔍 Searching for Node.js in common locations...');
+            
+            // 一般的なインストール場所を順次確認
+            const commonPaths = [
+                'C:\\Program Files\\nodejs\\node.exe',
+                'C:\\Program Files (x86)\\nodejs\\node.exe',
+                path.join(process.env.LOCALAPPDATA, 'Programs', 'nodejs', 'node.exe')
+            ];
+            
+            // nvm-windowsの場合の特別処理
+            if (fs.existsSync(path.join(process.env.APPDATA, 'nvm'))) {
+                const nvmDir = path.join(process.env.APPDATA, 'nvm');
+                try {
+                    const versions = fs.readdirSync(nvmDir).filter(dir => dir.startsWith('v'));
+                    if (versions.length > 0) {
+                        // 最新バージョンを使用
+                        const latestVersion = versions.sort().pop();
+                        commonPaths.push(path.join(nvmDir, latestVersion, 'node.exe'));
+                    }
+                } catch (nvmError) {
+                    // nvm-windowsディレクトリが読み取れない場合は無視
+                }
+            }
+            
+            // 各パスを確認
+            nodePath = null;
+            for (const testPath of commonPaths) {
+                if (fs.existsSync(testPath)) {
+                    nodePath = testPath;
+                    console.log('✅ Node.js found at:', testPath);
+                    break;
+                }
+            }
+            
+            if (!nodePath) {
+                // 最後の手段として標準パスを設定
+                nodePath = 'C:\\Program Files\\nodejs\\node.exe';
+                console.log('⚠️  Using default path (may not exist):', nodePath);
+            }
         }
         
         // 現在のディレクトリ
