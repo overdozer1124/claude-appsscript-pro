@@ -6,7 +6,7 @@ chcp 65001 >nul 2>&1
 goto :MAIN
 
 :: =============================================================================
-:: サブルーチン群（呼び出された時だけ実行されるよう、必ず :MAIN より後ろに置く想定）
+:: サブルーチン群
 :: =============================================================================
 
 :CheckOAuthVars
@@ -34,9 +34,9 @@ echo [!DATE! !TIME!] OAuth設定開始 >> "!LOG_FILE!"
 echo 🚀 OAuth設定を開始中...
 echo(
 echo 📋 注意: OAuth設定には手動でのGoogle認証が必要です
-echo    1. ブラウザが自動的に開きます
-echo    2. Google認証を完了してください
-echo    3. 認証後、このバッチは自動で続行します
+echo    1^) ブラウザが自動的に開きます
+echo    2^) Google認証を完了してください
+echo    3^) 認証後、このバッチは自動で続行します
 echo(
 
 "%NODE_CMD%" "scripts/oauth-setup.cjs" --web
@@ -90,7 +90,6 @@ if errorlevel 1 (
 :: メインフロー
 :: =============================================================================
 :MAIN
-:: メタ
 set "SCRIPT_VERSION=3.1.0"
 
 :: 実行モード判定
@@ -163,14 +162,14 @@ if "%POWERSHELL_MODE%"=="true" (
 :: 対話型
 echo(
 echo 📋 Google Cloud Console で OAuth クライアント ID を作成（未済なら）
-echo    1) https://console.cloud.google.com/apis/credentials
-echo    2) 認証情報を作成 → OAuth 2.0 クライアント ID
-echo    3) 種類: ウェブアプリケーション
-echo    4) リダイレクトURI: http://localhost:3001/oauth/callback
+echo    1^) https://console.cloud.google.com/apis/credentials
+echo    2^) 認証情報を作成 → OAuth 2.0 クライアント ID
+echo    3^) 種類: ウェブアプリケーション
+echo    4^) リダイレクトURI: http://localhost:3001/oauth/callback
 echo(
-echo 🔑 今すぐ OAuth 設定を実行しますか？ (Y/N)
+echo 🔑 今すぐ OAuth 設定を実行しますか？ ^(Y/N^)
 set "OAUTH_CHOICE="
-set /p OAUTH_CHOICE="選択 (Y/N): "
+set /p OAUTH_CHOICE="選択 ^(Y/N^): "
 if /i "!OAUTH_CHOICE!"=="Y" (
     call :RunOAuthSetup
 ) else (
@@ -185,9 +184,9 @@ if defined HAS_REFRESH_TOKEN (
     echo ✅ .envで REFRESH_TOKEN を確認しました
 ) else (
     echo ⚠️  REFRESH_TOKEN が未取得です
-    echo 🔄 OAuth設定を再試行しますか？ (Y/N)
+    echo 🔄 OAuth設定を再試行しますか？ ^(Y/N^)
     set "RETRY_OAUTH="
-    set /p RETRY_OAUTH="選択 (Y/N): "
+    set /p RETRY_OAUTH="選択 ^(Y/N^): "
     if /i "!RETRY_OAUTH!"=="Y" (
         call :RunOAuthSetup
         call :CheckOAuthVars
@@ -219,10 +218,10 @@ if "%POWERSHELL_MODE%"=="true" (
     goto :ConfigComplete
 )
 
-echo 🔧 Claude Desktop設定ファイルを更新しますか？ (Y/N)
+echo 🔧 Claude Desktop設定ファイルを更新しますか？ ^(Y/N^)
 echo    既存の設定ファイルがある場合は上書き（バックアップ作成）されます
 set "CONFIG_CHOICE="
-set /p CONFIG_CHOICE="選択 (Y/N): "
+set /p CONFIG_CHOICE="選択 ^(Y/N^): "
 if /i "!CONFIG_CHOICE!"=="Y" (
     call :AutoClaudeConfig
 ) else (
@@ -246,11 +245,11 @@ if errorlevel 1 (
     echo 💡 構文エラーを修正してから再実行してください
     if "%POWERSHELL_MODE%"=="false" (
         echo(
-        echo 📋 続行しますか？ (Y/N)
+        echo 📋 続行しますか？ ^(Y/N^)
         echo    Y: 構文エラーを無視して続行（非推奨）
         echo    N: インストールを中止
         set "SYNTAX_CONTINUE="
-        set /p SYNTAX_CONTINUE="選択 (Y/N): "
+        set /p SYNTAX_CONTINUE="選択 ^(Y/N^): "
         if /i "!SYNTAX_CONTINUE!"=="N" (
             echo ⚠️  インストールを中止しました
             pause
