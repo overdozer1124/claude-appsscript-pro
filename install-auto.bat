@@ -1,329 +1,200 @@
 @echo off
-setlocal EnableDelayedExpansion
 chcp 65001 >nul 2>&1
-
-:: Claude-AppsScript-Pro 完全自動インストーラー v2.1.0 - 堅牢版
-:: 作成日: 2025.08.19 - バックアップ実績版ベース完全再構築
-:: OAuth重複実行問題・Claude Desktop設定問題を完全解決
-
-:: 🔧 PowerShell実行検出（非対話的実行モード）
-set "POWERSHELL_MODE=false"
-echo %CMDCMDLINE% | find /i "powershell" >nul && set "POWERSHELL_MODE=true"
-
-:: 🚀 完全自動モード（環境変数での制御）
-if "%AUTO_INSTALL_MODE%"=="true" set "POWERSHELL_MODE=true"
-
-title Claude-AppsScript-Pro 完全自動インストーラー v2.1.0 - 堅牢版
-
+setlocal EnableDelayedExpansion
 echo.
-echo ╔══════════════════════════════════════════════════════════════╗
-echo ║                                                              ║
-echo ║   Claude-AppsScript-Pro 完全自動インストーラー v2.1.0       ║
-echo ║            🚀 バックアップ実績版・完全堅牢版                 ║
-echo ║                                                              ║
-echo ╚══════════════════════════════════════════════════════════════╝
+echo ===============================================================================
+echo Claude-AppsScript-Pro Auto Installer v3.0.2
+echo ===============================================================================
+echo Google Apps Script Development - Revolutionary Efficiency!
+echo The most exciting development experience awaits you!
 echo.
-echo ⏱️  開始時刻: %TIME%
-echo 📁 作業ディレクトリ: %CD%
-if "%POWERSHELL_MODE%"=="true" (
-    echo 🤖 実行モード: PowerShell完全自動モード
-) else (
-    echo 👤 実行モード: 対話型インストールモード
-)
+echo Execution Flow:
+echo  1. OAuth Setup (via attractive Web interface)
+echo  2. Claude Desktop Configuration (safe update)
+echo  3. MCP Server Completion!
 echo.
 
-:: インストールログ作成
+:: Log file setting
 set "LOG_FILE=install-auto.log"
-echo [%DATE% %TIME%] 完全自動インストール開始（堅牢版） > %LOG_FILE%
+echo [%DATE% %TIME%] Auto Installation Started > %LOG_FILE%
 
-:: =========================================================================
-:: Step 1: 基本インストール実行
-:: =========================================================================
-echo [1/4] 基本インストール実行中...
-call install-windows.bat >> %LOG_FILE% 2>&1
-if %ERRORLEVEL% NEQ 0 (
-    echo ❌ 基本インストールでエラーが発生しました
-    echo 📄 ログファイル: %LOG_FILE% を確認してください
-    echo [%DATE% %TIME%] 基本インストールエラー >> %LOG_FILE%
-    if "%POWERSHELL_MODE%"=="false" pause
-    exit /b 1
-)
-echo ✅ 基本インストール完了
-echo [%DATE% %TIME%] 基本インストール完了 >> %LOG_FILE%
+echo Starting OAuth setup...
+echo.
 
-:: =========================================================================
-:: Step 2: OAuth設定確認・実行（重複実行防止）
-:: =========================================================================
-echo [2/4] OAuth設定を確認中...
-
-:: OAuth状況を確認
+:: OAuth status check
 call :CheckOAuthStatus
 if "%OAUTH_STATUS%"=="COMPLETE" (
-    echo ✅ OAuth設定済みを検出（CLIENT_ID + REFRESH_TOKEN）
-    echo [%DATE% %TIME%] OAuth設定確認済み >> %LOG_FILE%
+    echo [SUCCESS] OAuth setup already completed!
+    echo CLIENT_ID + REFRESH_TOKEN are properly configured
+    echo [%DATE% %TIME%] OAuth setup verified >> %LOG_FILE%
     goto :OAuthComplete
 )
 
-echo ⚠️  OAuth設定が必要です
-
-:: PowerShellモード時は自動実行
-if "%POWERSHELL_MODE%"=="true" (
-    echo 🤖 PowerShell自動モード: OAuth設定を自動実行します
-    call :AutoOAuth
-    goto :OAuthVerificationStep
-)
-
-:: 対話型モードでのOAuth設定
+echo Starting attractive OAuth setup Web application...
+echo Beautiful and enjoyable interface prepared for you!
 echo.
-echo 📋 Google Cloud Console で OAuth クライアント ID を作成する必要があります:
-echo    1. https://console.cloud.google.com/apis/credentials
-echo    2. 「認証情報を作成」→「OAuth 2.0 クライアント ID」
-echo    3. アプリケーションの種類: 「ウェブ アプリケーション」
-echo    4. 承認済みリダイレクト URI: http://localhost:3001/oauth/callback
-echo.
-echo 🔑 OAuth設定を開始しますか？ (Y/N)
-set /p OAUTH_CHOICE="選択 (Y/N): "
+
+set /p OAUTH_CHOICE="Start OAuth setup now? (Y/N): "
 if /i "!OAUTH_CHOICE!"=="Y" (
+    echo.
+    echo Starting attractive OAuth setup!
     call :AutoOAuth
 ) else (
-    echo ℹ️  OAuth設定をスキップしました
-    echo ⚠️  OAuth設定なしではツールは使用できません
-    echo [%DATE% %TIME%] OAuth設定スキップ（ユーザー選択） >> %LOG_FILE%
-    goto :OAuthComplete
-)
-
-:OAuthVerificationStep
-:: OAuth設定後の確認
-echo 🔍 OAuth設定結果を確認中...
-call :CheckOAuthStatus
-if "%OAUTH_STATUS%"=="COMPLETE" (
-    echo ✅ OAuth設定が正常に完了しました
-    echo [%DATE% %TIME%] OAuth設定完了 >> %LOG_FILE%
-) else (
-    echo ⚠️  OAuth設定が不完全です
-    echo 💡 手動で設定してください: npm run oauth-setup
-    echo [%DATE% %TIME%] OAuth設定不完全 >> %LOG_FILE%
+    echo.
+    echo For later setup, please run: npm run oauth-setup
+    echo.
+    echo [%DATE% %TIME%] OAuth setup skipped >> %LOG_FILE%
 )
 
 :OAuthComplete
-
-:: =========================================================================
-:: Step 3: Claude Desktop設定（既存設定保護）
-:: =========================================================================
-echo [3/4] Claude Desktop設定を確認中...
-
-call :CheckClaudeConfig
-if "%CLAUDE_CONFIG_STATUS%"=="COMPLETE" (
-    echo ✅ Claude Desktop設定済み
-    echo [%DATE% %TIME%] Claude Desktop設定確認済み >> %LOG_FILE%
-    goto :ConfigComplete
-)
-
-:: PowerShellモード時は自動実行
-if "%POWERSHELL_MODE%"=="true" (
-    echo 🤖 PowerShell自動モード: Claude Desktop設定を安全更新します
-    call :AutoClaudeConfig
-    goto :ConfigComplete
-)
-
-:: 対話型モードでのClaude Desktop設定
-echo 🔧 Claude Desktop設定ファイルを更新しますか？ (Y/N)
-echo    既存のMCPサーバー設定は保護されます
-set /p CONFIG_CHOICE="選択 (Y/N): "
-if /i "!CONFIG_CHOICE!"=="Y" (
-    call :AutoClaudeConfig
+echo.
+echo Updating Claude Desktop configuration automatically...
+node scripts/update-claude-config.cjs >> %LOG_FILE% 2>&1
+if %ERRORLEVEL% EQU 0 (
+    echo [SUCCESS] Claude Desktop configuration updated automatically!
+    echo [%DATE% %TIME%] Claude Desktop config auto-update completed >> %LOG_FILE%
 ) else (
-    echo ℹ️  Claude Desktop設定をスキップしました
-    echo 💡 手動設定が必要です
+    echo [WARNING] Auto-update failed. Manual configuration guide:
+    echo [%DATE% %TIME%] Claude Desktop config auto-update failed >> %LOG_FILE%
+    call :ShowManualConfig
 )
 
-:ConfigComplete
-
-:: =========================================================================
-:: Step 4: 動作確認・最終検証
-:: =========================================================================
-echo [4/4] 動作確認中...
-echo 🧪 サーバー起動テスト実行中...
-
-:: 構文チェック
+echo.
+echo Running server.js syntax check...
 node --check server.js >> %LOG_FILE% 2>&1
 if %ERRORLEVEL% EQU 0 (
-    echo ✅ サーバー構文チェック成功
-    echo [%DATE% %TIME%] 構文チェック成功 >> %LOG_FILE%
+    echo [SUCCESS] Syntax check completed! Everything is normal
+    echo [%DATE% %TIME%] Syntax check success >> %LOG_FILE%
 ) else (
-    echo ❌ サーバー構文チェックでエラーが発生しました
-    echo 📄 詳細なエラー内容:
-    echo.
-    node --check server.js
-    echo.
-    echo [%DATE% %TIME%] サーバー構文チェックエラー >> %LOG_FILE%
-    echo 💡 構文エラーを修正してから再実行してください
-    if "%POWERSHELL_MODE%"=="false" pause
-    exit /b 1
-)
-
-:: =========================================================================
-:: インストール完了・最終確認
-:: =========================================================================
-echo.
-echo ╔══════════════════════════════════════════════════════════════╗
-echo ║                                                              ║
-echo ║                   🎉 インストール完了！                     ║
-echo ║                                                              ║
-echo ╚══════════════════════════════════════════════════════════════╝
-echo.
-echo ✅ Claude-AppsScript-Pro v3.0.1 基本インストール完了
-echo ⏱️  完了時刻: %TIME%
-echo 📄 ログファイル: %LOG_FILE%
-echo.
-
-:: 最終状況確認
-echo 🔍 最終設定状況を確認中...
-call :CheckOAuthStatus
-call :CheckClaudeConfig
-
-echo.
-echo 📊 最終設定状況レポート:
-if "%OAUTH_STATUS%"=="COMPLETE" (
-    echo ✅ OAuth設定: 完了（CLIENT_ID + REFRESH_TOKEN）
-) else (
-    echo ⚠️  OAuth設定: 未完了
-    echo 💡 手動実行: npm run oauth-setup
-)
-
-if "%CLAUDE_CONFIG_STATUS%"=="COMPLETE" (
-    echo ✅ Claude Desktop設定: 完了
-) else (
-    echo ⚠️  Claude Desktop設定: 未完了
-    echo 💡 手動設定が必要です
-)
-
-echo ✅ 構文チェック: 成功
-echo.
-
-:: 次の手順案内
-echo 📋 次の手順（手動操作）:
-echo    1. Claude Desktop を完全終了してください
-echo    2. Claude Desktop を再起動してください
-if "%OAUTH_STATUS%"=="INCOMPLETE" (
-    echo    3. OAuth設定を実行: npm run oauth-setup
-    echo    4. 再度 Claude Desktop を再起動してください
-)
-echo    3. claude-appsscript-pro ツールが利用可能になります
-echo.
-
-echo 🎊 最終確認:
-if "%OAUTH_STATUS%"=="COMPLETE" (
-    if "%CLAUDE_CONFIG_STATUS%"=="COMPLETE" (
-        echo ✅ すべて完了！Claude Desktop を再起動してください
-        echo 💡 動作確認: claude-appsscript-pro:test_connection
-        echo [%DATE% %TIME%] インストール完全成功 >> %LOG_FILE%
-    ) else (
-        echo ⚠️  Claude Desktop設定が未完了です
-        echo [%DATE% %TIME%] インストール部分成功（Claude設定要） >> %LOG_FILE%
-    )
-) else (
-    echo ⚠️  OAuth設定が未完了です
-    echo 📋 OAuth設定後にClaude Desktop を再起動してください
-    echo [%DATE% %TIME%] インストール部分成功（OAuth要） >> %LOG_FILE%
+    echo [WARNING] Syntax errors found...
+    echo [%DATE% %TIME%] Syntax check failed >> %LOG_FILE%
+    echo Details: Please check %LOG_FILE%
 )
 
 echo.
-echo 💡 重要: Claude Desktop の再起動は手動で行ってください
-echo    - 自動起動は行いません
-echo    - ユーザーのタイミングで安全に再起動できます
-
-echo [%DATE% %TIME%] インストール完了 >> %LOG_FILE%
+echo ===============================================================================
+echo                    COMPLETED! Congratulations!
 echo.
-echo 🎊 セットアップが完了しました！
+echo    Claude-AppsScript-Pro v3.0.2 setup completed successfully
+echo.
+echo                  Your amazing development journey begins!
+echo ===============================================================================
+echo.
+
+echo Next Steps:
+echo.
+echo   1. Restart Claude Desktop
+echo      - Required to apply settings
+echo.
+echo   2. Run connection test in Claude
+echo      - claude-appsscript-pro:test_connection
+echo.
+echo   3. Start exciting development!
+echo      - Try: "Create a task management system for Web use"
+echo.
+
+echo Installation Details:
+echo   Tools: 61 powerful tools
+echo   Features: AI autonomous development, real-time debugging, full automation
+echo   Log file: %LOG_FILE%
+echo.
+
+echo IMPORTANT: Please restart Claude Desktop manually
+echo    - Automatic startup is not performed
+echo    - You can safely restart at your timing
+
+echo [%DATE% %TIME%] Installation completed >> %LOG_FILE%
+echo.
+echo Setup completed successfully!
 
 echo.
-echo 💡 おつかれさまでした！
-echo    Claude-AppsScript-Pro v3.0.1 のセットアップが完了しました
+echo Thank you for your hard work!
+echo    Claude-AppsScript-Pro v3.0.2 setup is now complete
 echo.
-if "%POWERSHELL_MODE%"=="false" pause
-goto :EOF
+pause
+goto :eof
 
-:: =========================================================================
-:: サブルーチン定義
-:: =========================================================================
-
+:: =============================================================================
+:: Subroutine: OAuth Status Check
+:: =============================================================================
 :CheckOAuthStatus
-:: OAuth設定状況を確認（重複実行防止の要）
 set "OAUTH_STATUS=INCOMPLETE"
-if exist .env (
-    findstr /C:"GOOGLE_APP_SCRIPT_API_CLIENT_ID=" .env | findstr /V /C:"GOOGLE_APP_SCRIPT_API_CLIENT_ID=$" >nul 2>&1
-    if !ERRORLEVEL! EQU 0 (
-        findstr "GOOGLE_APP_SCRIPT_API_REFRESH_TOKEN=1//" .env >nul 2>&1
-        if !ERRORLEVEL! EQU 0 (
-            set "OAUTH_STATUS=COMPLETE"
-        )
+
+:: Check .env file existence
+if not exist ".env" (
+    set "OAUTH_STATUS=INCOMPLETE"
+    goto :eof
+)
+
+:: Check CLIENT_ID and REFRESH_TOKEN
+findstr /C:"GOOGLE_APP_SCRIPT_API_CLIENT_ID" .env >nul 2>&1
+if %ERRORLEVEL% NEQ 0 (
+    set "OAUTH_STATUS=INCOMPLETE"
+    goto :eof
+)
+
+findstr /C:"GOOGLE_APP_SCRIPT_API_REFRESH_TOKEN" .env >nul 2>&1
+if %ERRORLEVEL% NEQ 0 (
+    set "OAUTH_STATUS=INCOMPLETE"
+    goto :eof
+)
+
+:: Check that CLIENT_ID and REFRESH_TOKEN are not empty
+for /f "tokens=2 delims==" %%i in ('findstr /C:"GOOGLE_APP_SCRIPT_API_CLIENT_ID" .env') do (
+    if "%%i"=="" (
+        set "OAUTH_STATUS=INCOMPLETE"
+        goto :eof
     )
 )
-goto :EOF
 
+for /f "tokens=2 delims==" %%i in ('findstr /C:"GOOGLE_APP_SCRIPT_API_REFRESH_TOKEN" .env') do (
+    if "%%i"=="" (
+        set "OAUTH_STATUS=INCOMPLETE"
+        goto :eof
+    )
+)
+
+set "OAUTH_STATUS=COMPLETE"
+goto :eof
+
+:: =============================================================================
+:: Subroutine: Auto OAuth Setup
+:: =============================================================================
 :AutoOAuth
-:: 自動OAuth設定実行
-echo 🚀 OAuth設定を開始します...
-echo.
-echo ⚠️  重要: 以下の手順で進めます
-echo    1. Webサーバーを起動します
-echo    2. ブラウザで Google 認証を完了してください
-echo    3. 認証完了後、自動で次に進みます
-echo.
-if "%POWERSHELL_MODE%"=="false" (
-    echo 📋 準備ができたらEnterキーを押してください...
-    pause >nul
-)
-
-echo [%DATE% %TIME%] OAuth設定開始 >> %LOG_FILE%
-echo 🔄 OAuth設定プロセスを開始中...
-echo.
-
-:: OAuth設定はユーザーに見える形で実行
-node scripts/oauth-setup.cjs --web
-set OAUTH_RESULT=%ERRORLEVEL%
-
-echo.
-echo [%DATE% %TIME%] OAuth設定完了（終了コード: %OAUTH_RESULT%） >> %LOG_FILE%
-if %OAUTH_RESULT% EQU 0 (
-    echo ✅ OAuth設定プロセス完了
+echo Running OAuth setup script...
+node scripts/oauth-setup.cjs >> %LOG_FILE% 2>&1
+if %ERRORLEVEL% EQU 0 (
+    echo [SUCCESS] OAuth setup completed successfully!
+    echo [%DATE% %TIME%] OAuth setup completed >> %LOG_FILE%
 ) else (
-    echo ⚠️  OAuth設定でエラーが発生しました（終了コード: %OAUTH_RESULT%）
-    echo 💡 手動で再試行してください: npm run oauth-setup
+    echo [WARNING] OAuth setup error occurred...
+    echo [%DATE% %TIME%] OAuth setup error >> %LOG_FILE%
+    echo Details: Please check %LOG_FILE%
+    echo.
+    echo Manual setup method:
+    echo    Run: npm run oauth-setup
 )
-goto :EOF
+goto :eof
 
-:CheckClaudeConfig
-:: Claude Desktop設定確認
-set "CLAUDE_CONFIG_STATUS=INCOMPLETE"
-set "CLAUDE_CONFIG=%APPDATA%\Claude\claude_desktop_config.json"
-if exist "!CLAUDE_CONFIG!" (
-    findstr /C:"claude-appsscript-pro" "!CLAUDE_CONFIG!" >nul 2>&1
-    if !ERRORLEVEL! EQU 0 (
-        set "CLAUDE_CONFIG_STATUS=COMPLETE"
-    )
-)
-goto :EOF
-
-:AutoClaudeConfig
-:: Claude Desktop設定安全更新（既存設定保護）
-echo 🔧 Claude Desktop設定を更新中...
-echo 🛡️  既存のMCPサーバー設定を保護します
-
-:: 安全な設定更新スクリプトを実行
-echo 🔄 安全な設定更新スクリプトを実行中...
-node scripts/update-claude-config.cjs
-set CONFIG_RESULT=%ERRORLEVEL%
-
+:: =============================================================================
+:: Subroutine: Manual Configuration Guide
+:: =============================================================================
+:ShowManualConfig
 echo.
-echo [%DATE% %TIME%] Claude Desktop設定更新（安全モード・終了コード: %CONFIG_RESULT%） >> %LOG_FILE%
-if %CONFIG_RESULT% EQU 0 (
-    echo ✅ Claude Desktop設定を安全に更新しました
-    echo 💡 既存のMCPサーバー設定は保護されています
-) else (
-    echo ⚠️  Claude Desktop設定の更新でエラーが発生しました（終了コード: %CONFIG_RESULT%）
-    echo 💡 手動で設定ファイルを確認してください
-    echo 📄 設定ファイル場所: %APPDATA%\Claude\claude_desktop_config.json
-)
-goto :EOF
+echo Manual configuration guide:
+echo.
+echo Config file location: %APPDATA%\Claude\claude_desktop_config.json
+echo.
+echo Configuration content to add:
+echo.
+echo {
+echo   "mcpServers": {
+echo     "claude-appsscript-pro": {
+echo       "command": "node",
+echo       "args": ["%CD%\server.js"],
+echo       "cwd": "%CD%"
+echo     }
+echo   }
+echo }
+echo.
+goto :eof
