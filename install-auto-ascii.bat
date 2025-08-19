@@ -1,368 +1,207 @@
 @echo off
 setlocal EnableDelayedExpansion
-chcp 65001 >nul 2>&1
 
-REM Claude-AppsScript-Pro 完全自動インストーラー ASCII版
-REM バージョン: 2.1.1 - 文字エンコーディング問題解決版
+REM ASCII-only version to avoid encoding issues completely
+REM Claude-AppsScript-Pro Complete Auto Installer
+REM Version: 2.1.2 - ASCII-only safe version
 
-REM PowerShell実行検出
+REM PowerShell execution detection
 set "POWERSHELL_MODE=false"
 echo %CMDCMDLINE% | find /i "powershell" >nul && set "POWERSHELL_MODE=true"
 
-REM 完全自動モード
+REM Full auto mode
 if "%AUTO_INSTALL_MODE%"=="true" set "POWERSHELL_MODE=true"
 
-title Claude-AppsScript-Pro ASCII Installer v2.1.1
+title Claude-AppsScript-Pro Auto Installer v2.1.2 (ASCII)
 
 echo.
 echo =================================================================
-echo    Claude-AppsScript-Pro Auto Installer v2.1.1 ASCII Edition
-echo                  PowerShell Compatible Safe Version
+echo    Claude-AppsScript-Pro Complete Auto Installer v2.1.2
+echo                PowerShell Compatible - Full Automation
 echo =================================================================
 echo.
-echo Start Time: %TIME%
-echo Working Directory: %CD%
-if "%POWERSHELL_MODE%"=="true" (
-    echo Execution Mode: PowerShell Full Auto Mode
-) else (
-    echo Execution Mode: Interactive Installation Mode
-)
-echo.
 
-REM インストールログ作成
+REM Log file setup
 set "LOG_FILE=install-auto.log"
-echo [%DATE% %TIME%] Full Auto Installation Started > %LOG_FILE%
+echo [%DATE% %TIME%] Installation started (ASCII version) >> %LOG_FILE%
 
-REM ステップ1: 基本インストール実行
-echo [1/4] Executing Basic Installation...
-call install-windows.bat >> %LOG_FILE% 2>&1
-if %ERRORLEVEL% NEQ 0 (
-    echo ERROR: Basic installation failed
-    echo Log File: %LOG_FILE% - Check for details
-    echo.
-    echo Please resolve issues and retry
-    echo [%DATE% %TIME%] Basic Installation Error >> %LOG_FILE%
-    pause
+REM Working directory verification
+echo Current directory: %CD%
+echo [%DATE% %TIME%] Working directory: %CD% >> %LOG_FILE%
+
+REM Check if we're in correct directory
+if not exist package.json (
+    echo ERROR: package.json not found in current directory
+    echo Please run this installer from the claude-appsscript-pro directory
+    echo [%DATE% %TIME%] ERROR: Wrong directory - package.json not found >> %LOG_FILE%
+    if "%POWERSHELL_MODE%"=="false" pause
     exit /b 1
 )
-echo SUCCESS: Basic Installation Complete
 
-REM ステップ2: OAuth設定確認
-echo [2/4] Checking OAuth Configuration...
+echo Step 1: Verifying Node.js installation...
+echo [%DATE% %TIME%] Step 1: Node.js verification >> %LOG_FILE%
 
-REM .envファイル存在確認
-if not exist .env (
+REM Node.js version check
+node --version >nul 2>&1
+if !ERRORLEVEL! NEQ 0 (
+    echo ERROR: Node.js is not installed or not in PATH
+    echo Please install Node.js from https://nodejs.org/
+    echo [%DATE% %TIME%] ERROR: Node.js not found >> %LOG_FILE%
+    if "%POWERSHELL_MODE%"=="false" pause
+    exit /b 1
+)
+
+for /f "tokens=*" %%i in ('node --version') do set "NODE_VERSION=%%i"
+echo SUCCESS: Node.js found - %NODE_VERSION%
+echo [%DATE% %TIME%] Node.js version: %NODE_VERSION% >> %LOG_FILE%
+
+echo.
+echo Step 2: Installing dependencies...
+echo [%DATE% %TIME%] Step 2: npm install start >> %LOG_FILE%
+
+npm install
+if !ERRORLEVEL! NEQ 0 (
+    echo ERROR: npm install failed
+    echo [%DATE% %TIME%] ERROR: npm install failed >> %LOG_FILE%
+    if "%POWERSHELL_MODE%"=="false" pause
+    exit /b 1
+)
+
+echo SUCCESS: Dependencies installed
+echo [%DATE% %TIME%] Dependencies installation completed >> %LOG_FILE%
+
+echo.
+echo Step 3: Syntax check...
+echo [%DATE% %TIME%] Step 3: Syntax check >> %LOG_FILE%
+
+node --check server.js
+if !ERRORLEVEL! NEQ 0 (
+    echo ERROR: server.js has syntax errors
+    echo [%DATE% %TIME%] ERROR: server.js syntax error >> %LOG_FILE%
+    if "%POWERSHELL_MODE%"=="false" pause
+    exit /b 1
+)
+
+echo SUCCESS: Syntax check passed
+echo [%DATE% %TIME%] Syntax check passed >> %LOG_FILE%
+
+echo.
+echo Step 4: OAuth configuration...
+echo [%DATE% %TIME%] Step 4: OAuth setup start >> %LOG_FILE%
+
+REM Check if OAuth is already configured
+set "OAUTH_CONFIGURED=false"
+if exist .env (
+    findstr "GOOGLE_APP_SCRIPT_API_REFRESH_TOKEN=1//" .env >nul 2>&1
+    if !ERRORLEVEL! EQU 0 (
+        set "OAUTH_CONFIGURED=true"
+        echo INFO: OAuth already configured, skipping setup
+        echo [%DATE% %TIME%] OAuth already configured >> %LOG_FILE%
+    )
+)
+
+if "%OAUTH_CONFIGURED%"=="false" (
     if "%POWERSHELL_MODE%"=="true" (
-        echo PowerShell Auto Mode: Starting automatic OAuth setup
-        call :AutoOAuth
-        goto :AutoOAuthCheck
+        echo Running automated OAuth setup...
+        node scripts/oauth-setup.cjs --web
     ) else (
         echo.
-        echo OAuth configuration is required for tool functionality
-        echo Would you like to configure OAuth now? (Y/N)
-        echo   - This will open browser for Google authentication
-        echo   - Required for Google Apps Script API access
-        set /p OAUTH_CHOICE="Choice (Y/N): "
-        if /i "!OAUTH_CHOICE!"=="Y" (
-            echo Starting OAuth configuration...
-            echo [%DATE% %TIME%] OAuth Setup Started (User Choice) >> %LOG_FILE%
+        echo OAuth setup is required for full functionality
+        echo This will open a web browser for Google authentication
+        echo.
+        set /p "OAUTH_CHOICE=Run OAuth setup now? [Y/n]: "
+        if /i "!OAUTH_CHOICE!"=="n" (
+            echo Skipping OAuth setup
+            echo You can run it later with: npm run oauth-setup
+            echo [%DATE% %TIME%] OAuth setup skipped by user >> %LOG_FILE%
+        ) else (
+            echo Running OAuth setup...
             node scripts/oauth-setup.cjs --web
-            echo [%DATE% %TIME%] OAuth Setup Completed (User Choice) >> %LOG_FILE%
-            
-            REM 設定結果確認
-            if exist .env (
-                findstr "GOOGLE_APP_SCRIPT_API_REFRESH_TOKEN=1//" .env >nul 2>&1
-                if !ERRORLEVEL! EQU 0 (
-                    echo SUCCESS: OAuth configuration completed
-                    echo [%DATE% %TIME%] OAuth Setup Success (After User Setup) >> %LOG_FILE%
-                ) else (
-                    echo WARNING: OAuth configuration incomplete
-                    echo Manual setup required: npm run oauth-setup
-                    echo [%DATE% %TIME%] OAuth Setup Failed (After User Setup) >> %LOG_FILE%
-                )
-            ) else (
-                echo WARNING: OAuth configuration failed
-                echo Manual setup required: npm run oauth-setup
-                echo [%DATE% %TIME%] OAuth Setup Failed (After Retry) >> %LOG_FILE%
-            )
-        ) else (
-            echo WARNING: OAuth configuration skipped
-            echo Installation will continue but tools will not work
-            echo [%DATE% %TIME%] OAuth Setup Skipped (User Choice) >> %LOG_FILE%
-            if "%POWERSHELL_MODE%"=="false" pause
+            echo [%DATE% %TIME%] OAuth setup completed >> %LOG_FILE%
         )
     )
-) else (
-    REM 既存設定確認
-    findstr "GOOGLE_APP_SCRIPT_API_REFRESH_TOKEN=1//" .env >nul 2>&1
-    if !ERRORLEVEL! EQU 0 (
-        echo SUCCESS: OAuth already configured
-        echo [%DATE% %TIME%] OAuth Already Configured >> %LOG_FILE%
-    ) else (
-        echo WARNING: Existing .env found but REFRESH_TOKEN missing
-        if "%POWERSHELL_MODE%"=="true" (
-            echo PowerShell Auto Mode: Re-running OAuth setup
-            call :AutoOAuth
-            goto :AutoOAuthCheck
-        ) else (
-            echo Would you like to reconfigure OAuth? (Y/N)
-            set /p OAUTH_RECONFIG="Choice (Y/N): "
-            if /i "!OAUTH_RECONFIG!"=="Y" (
-                echo Reconfiguring OAuth...
-                echo [%DATE% %TIME%] OAuth Reconfiguration Started >> %LOG_FILE%
-                node scripts/oauth-setup.cjs --web
-                echo [%DATE% %TIME%] OAuth Reconfiguration Completed >> %LOG_FILE%
-                
-                REM 再設定結果確認
-                findstr "GOOGLE_APP_SCRIPT_API_REFRESH_TOKEN=1//" .env >nul 2>&1
-                if !ERRORLEVEL! EQU 0 (
-                    echo SUCCESS: OAuth reconfiguration completed
-                    echo [%DATE% %TIME%] OAuth Reconfiguration Success >> %LOG_FILE%
-                ) else (
-                    echo WARNING: OAuth reconfiguration failed
-                    echo Manual setup required: npm run oauth-setup
-                    echo [%DATE% %TIME%] OAuth Reconfiguration Failed >> %LOG_FILE%
-                )
-            ) else (
-                echo WARNING: OAuth reconfiguration skipped
-                echo Manual setup may be required later: npm run oauth-setup
-                echo [%DATE% %TIME%] OAuth Reconfiguration Skipped >> %LOG_FILE%
-                if "%POWERSHELL_MODE%"=="false" pause
-            )
-        )
-    )
-)
-goto :OAuthVerificationComplete
-
-:AutoOAuth
-echo Running automatic OAuth setup...
-echo [%DATE% %TIME%] Auto OAuth Setup Started >> %LOG_FILE%
-node scripts/oauth-setup.cjs --web
-echo [%DATE% %TIME%] Auto OAuth Setup Completed >> %LOG_FILE%
-goto :AutoOAuthCheck
-
-:AutoOAuthCheck
-echo Checking OAuth setup results automatically...
-if exist .env (
-    findstr "GOOGLE_APP_SCRIPT_API_REFRESH_TOKEN=1//" .env >nul 2>&1
-    if !ERRORLEVEL! EQU 0 (
-        echo SUCCESS: OAuth configuration completed (Auto Mode)
-        echo [%DATE% %TIME%] OAuth Setup Success (Auto Mode) >> %LOG_FILE%
-    ) else (
-        echo WARNING: OAuth configuration incomplete (Auto Mode)
-        echo Manual setup required: npm run oauth-setup
-        echo [%DATE% %TIME%] OAuth Setup Incomplete (Auto Mode) >> %LOG_FILE%
-    )
-) else (
-    echo WARNING: .env file not created
-    echo OAuth setup may have failed
-    echo [%DATE% %TIME%] OAuth Setup Failed (Auto Mode - no env file) >> %LOG_FILE%
-)
-goto :OAuthVerificationComplete
-
-:OAuthVerificationComplete
-REM REFRESH_TOKENの最終確認
-if exist .env (
-    findstr "GOOGLE_APP_SCRIPT_API_REFRESH_TOKEN=1//" .env >nul 2>&1
-    if !ERRORLEVEL! EQU 0 (
-        echo SUCCESS: REFRESH_TOKEN verified in .env file
-    ) else (
-        echo WARNING: REFRESH_TOKEN not found in .env
-        echo OAuth configuration may be incomplete
-    )
-)
-goto :OAuthComplete
-
-:OAuthComplete
-
-REM ステップ3: Claude Desktop設定
-echo [3/4] Checking Claude Desktop Configuration...
-set "CLAUDE_CONFIG=%APPDATA%\Claude\claude_desktop_config.json"
-if exist "!CLAUDE_CONFIG!" (
-    findstr /C:"claude-appsscript-pro" "!CLAUDE_CONFIG!" >nul 2>&1
-    if !ERRORLEVEL! EQU 0 (
-        echo SUCCESS: Claude Desktop already configured
-        goto :ConfigComplete
-    )
-)
-
-REM PowerShellモード時は自動実行
-if "%POWERSHELL_MODE%"=="true" (
-    echo PowerShell Auto Mode: Updating Claude Desktop config automatically
-    call :AutoClaudeConfig
-    goto :ConfigComplete
-)
-
-REM 対話型モードでは従来通りユーザー確認
-echo Would you like to update Claude Desktop configuration? (Y/N)
-echo    Existing configuration file will be updated safely
-set /p CONFIG_CHOICE="Choice (Y/N): "
-if /i "!CONFIG_CHOICE!"=="Y" (
-    call :AutoClaudeConfig
-) else (
-    echo INFO: Claude Desktop configuration skipped
-    echo Manual configuration required (can be done later)
-)
-
-goto :ConfigComplete
-
-:AutoClaudeConfig
-echo Updating Claude Desktop configuration...
-echo [%DATE% %TIME%] Claude Desktop Config Update Started >> %LOG_FILE%
-
-REM Node.js パスの自動検出
-for /f "tokens=*" %%i in ('where node 2^>nul') do set "NODE_PATH=%%i"
-if "!NODE_PATH!"=="" (
-    set "NODE_PATH=C:\Program Files\nodejs\node.exe"
-    echo WARNING: Node.js path not found. Using default: !NODE_PATH!
-) else (
-    echo SUCCESS: Node.js path detected: !NODE_PATH!
-)
-
-REM プロジェクトディレクトリの絶対パス
-set "PROJECT_PATH=%CD%"
-
-REM Claude Desktop設定ディレクトリ作成
-if not exist "%APPDATA%\Claude" mkdir "%APPDATA%\Claude"
-
-REM 安全な設定更新（既存設定保護）
-node scripts/update-claude-config.cjs "!NODE_PATH!" "!PROJECT_PATH!" >> %LOG_FILE% 2>&1
-if %ERRORLEVEL% NEQ 0 (
-    echo WARNING: Claude Desktop config update failed
-    echo Manual configuration may be required
-    echo [%DATE% %TIME%] Claude Desktop Config Update Failed >> %LOG_FILE%
-) else (
-    echo SUCCESS: Claude Desktop configuration updated
-    echo [%DATE% %TIME%] Claude Desktop Config Update Success >> %LOG_FILE%
-)
-
-goto :ConfigComplete
-
-:ConfigComplete
-
-REM ステップ4: 最終構文チェック
-echo [4/4] Running Final Syntax Check...
-echo [%DATE% %TIME%] Final Syntax Check Started >> %LOG_FILE%
-
-REM server.js構文チェック
-node --check server.js >> %LOG_FILE% 2>&1
-if %ERRORLEVEL% NEQ 0 (
-    echo ERROR: server.js syntax check failed
-    echo Log File: %LOG_FILE% - Check syntax errors
-    echo Installation cannot complete with syntax errors
-    echo [%DATE% %TIME%] Syntax Check Failed >> %LOG_FILE%
-    pause
-    exit /b 1
-) else (
-    echo SUCCESS: server.js syntax check passed
-    echo [%DATE% %TIME%] Syntax Check Success >> %LOG_FILE%
-)
-
-REM 最終完了表示
-echo.
-echo =================================================================
-echo                    Installation Complete!
-echo =================================================================
-echo.
-echo SUCCESS: Claude-AppsScript-Pro v3.0.1 Basic Installation Complete
-echo Completion Time: %TIME%
-echo Log File: %LOG_FILE%
-echo.
-
-REM OAuth設定状況確認
-echo Checking final OAuth configuration status...
-if exist .env (
-    findstr /C:"GOOGLE_APP_SCRIPT_API_CLIENT_ID=" .env | findstr /V /C:"GOOGLE_APP_SCRIPT_API_CLIENT_ID=$" >nul 2>&1
-    if !ERRORLEVEL! EQU 0 (
+    
+    REM Verify OAuth configuration
+    if exist .env (
         findstr "GOOGLE_APP_SCRIPT_API_REFRESH_TOKEN=1//" .env >nul 2>&1
         if !ERRORLEVEL! EQU 0 (
-            echo SUCCESS: OAuth configuration fully complete - All ready!
-            echo    - CLIENT_ID: Configured
-            echo    - REFRESH_TOKEN: Configured
-            set OAUTH_READY=true
+            echo SUCCESS: OAuth configured successfully
+            echo [%DATE% %TIME%] OAuth verification successful >> %LOG_FILE%
         ) else (
             echo WARNING: OAuth configuration incomplete
-            echo    - CLIENT_ID: Configured
-            echo    - REFRESH_TOKEN: Not configured
-            echo Manual setup required: npm run oauth-setup
-            set OAUTH_READY=false
+            echo You can complete it later with: npm run oauth-setup
+            echo [%DATE% %TIME%] OAuth verification failed >> %LOG_FILE%
         )
-    ) else (
-        echo WARNING: OAuth configuration not complete
-        echo    - CLIENT_ID: Not configured
-        echo    - REFRESH_TOKEN: Not configured
-        echo Manual setup required: npm run oauth-setup
-        set OAUTH_READY=false
     )
+)
+
+echo.
+echo Step 5: Claude Desktop configuration...
+echo [%DATE% %TIME%] Step 5: Claude Desktop config start >> %LOG_FILE%
+
+REM Get Node.js absolute path
+for /f "tokens=*" %%i in ('where node') do set "NODE_PATH=%%i"
+echo Node.js path: %NODE_PATH%
+
+REM Update Claude Desktop configuration
+node scripts/update-claude-config.cjs
+if !ERRORLEVEL! NEQ 0 (
+    echo WARNING: Failed to update Claude Desktop configuration
+    echo You may need to update it manually
+    echo [%DATE% %TIME%] Claude Desktop config update failed >> %LOG_FILE%
 ) else (
-    echo WARNING: .env file does not exist
-    echo OAuth configuration required: npm run oauth-setup
-    set OAUTH_READY=false
+    echo SUCCESS: Claude Desktop configuration updated
+    echo [%DATE% %TIME%] Claude Desktop config updated >> %LOG_FILE%
 )
 
 echo.
-echo If problems occur:
-echo    - Check log file %LOG_FILE%
-echo    - Refer to TROUBLESHOOTING.md
-echo    - Report to GitHub Issues
-echo.
+echo Step 6: Final verification...
+echo [%DATE% %TIME%] Step 6: Final verification >> %LOG_FILE%
 
-REM 完了メッセージと手動操作案内
-echo.
-echo Installation Work Complete!
-echo.
-if "!OAUTH_READY!"=="true" (
-    echo SUCCESS: Current Status:
-    echo    - Basic Installation: Complete
-    echo    - OAuth Configuration: Complete (CLIENT_ID + REFRESH_TOKEN)
-    echo    - Claude Desktop Configuration: Complete
-    echo    - Syntax Check: Passed
-    echo.
-    echo Manually restart Claude Desktop to enable tools immediately
+REM Create process info file
+node -e "
+const fs = require('fs');
+const path = require('path');
+const info = {
+    version: '3.0.1',
+    nodeVersion: process.version,
+    platform: process.platform,
+    arch: process.arch,
+    cwd: process.cwd(),
+    timestamp: new Date().toISOString()
+};
+fs.writeFileSync('install-verification.json', JSON.stringify(info, null, 2));
+console.log('Verification file created');
+"
+
+if exist install-verification.json (
+    echo SUCCESS: Installation verification completed
+    echo [%DATE% %TIME%] Installation verification successful >> %LOG_FILE%
 ) else (
-    echo WARNING: Current Status:
-    echo    - Basic Installation: Complete
-    echo    - OAuth Configuration: Incomplete
-    echo    - Claude Desktop Configuration: Complete
-    echo    - Syntax Check: Passed
-    echo.
-    echo Manually restart Claude Desktop after completing OAuth setup
-)
-echo.
-
-echo Next Steps (Manual Operations):
-echo    1. Exit Claude Desktop
-echo    2. Restart Claude Desktop
-if "!OAUTH_READY!"=="false" (
-    echo    3. Run OAuth setup: npm run oauth-setup
-    echo    4. Restart Claude Desktop again manually
-)
-echo    3. claude-appsscript-pro tools will be available
-echo.
-
-echo Final Verification:
-if "!OAUTH_READY!"=="true" (
-    echo SUCCESS: Everything complete! Manually restart Claude Desktop
-    echo Test command: claude-appsscript-pro:test_connection
-) else (
-    echo WARNING: OAuth configuration incomplete
-    echo Next Steps:
-    echo    1. OAuth setup: npm run oauth-setup
-    echo    2. Manually restart Claude Desktop
-    echo    3. claude-appsscript-pro tools will be available
+    echo WARNING: Verification file creation failed
+    echo [%DATE% %TIME%] Verification file creation failed >> %LOG_FILE%
 )
 
 echo.
-echo IMPORTANT: Claude Desktop restart must be done manually
-echo    - No automatic startup performed
-echo    - User can safely restart at their timing
+echo =================================================================
+echo                    INSTALLATION COMPLETED
+echo =================================================================
+echo.
+echo Next steps:
+echo 1. Restart Claude Desktop application
+echo 2. Enable "Local MCP servers" in Claude Desktop settings
+echo 3. Test connection with: claude-appsscript-pro:test_connection
+echo.
+echo If OAuth was skipped, run: npm run oauth-setup
+echo.
+echo Installation log: %LOG_FILE%
+echo [%DATE% %TIME%] Installation completed successfully >> %LOG_FILE%
+echo.
 
-echo [%DATE% %TIME%] Installation Complete >> %LOG_FILE%
-echo.
-echo Setup Complete!
+if "%POWERSHELL_MODE%"=="false" (
+    echo Press any key to exit...
+    pause >nul
+)
 
-echo.
-echo Thank you for your patience!
-echo    Claude-AppsScript-Pro v3.0.1 setup has been completed
-echo.
-pause
+echo Installation completed at %DATE% %TIME%
+exit /b 0

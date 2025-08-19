@@ -2,58 +2,58 @@
 chcp 65001 >nul
 setlocal enabledelayedexpansion
 
-:: Claude-AppsScript-Pro Windows 基本インストールスクリプト
-:: v1.0.0 - 基本機能版
+:: Claude-AppsScript-Pro Windows Basic Installation Script
+:: v1.0.1 - ASCII-only safe version
 
 echo.
-echo 🚀 Claude-AppsScript-Pro Windows インストール開始
+echo Claude-AppsScript-Pro Windows Installation Starting
 echo ========================================================
 
-:: Node.js 確認
-echo 📋 Step 1: Node.js バージョン確認
+:: Node.js verification
+echo Step 1: Node.js version check
 node --version >nul 2>&1
 if errorlevel 1 (
-    echo ❌ Node.js が見つかりません
-    echo    https://nodejs.org/ からインストールしてください
+    echo ERROR: Node.js not found
+    echo    Please install from https://nodejs.org/
     pause
     exit /b 1
 )
-echo ✅ Node.js 確認完了
+echo SUCCESS: Node.js verification completed
 
-:: 依存関係インストール
+:: Dependencies installation
 echo.
-echo 📋 Step 2: 依存関係インストール
+echo Step 2: Installing dependencies
 npm install
 if errorlevel 1 (
-    echo ❌ npm install 失敗
+    echo ERROR: npm install failed
     pause
     exit /b 1
 )
-echo ✅ 依存関係インストール完了
+echo SUCCESS: Dependencies installation completed
 
-:: 構文チェック
+:: Syntax check
 echo.
-echo 📋 Step 3: 構文チェック
+echo Step 3: Syntax check
 node --check server.js
 if errorlevel 1 (
-    echo ❌ 構文エラーが見つかりました
+    echo ERROR: Syntax errors found
     pause
     exit /b 1
 )
-echo ✅ 構文チェック完了
+echo SUCCESS: Syntax check completed
 
-:: OAuth設定案内
+:: OAuth setup guidance
 echo.
-echo 📋 Step 4: OAuth設定
-echo    手動でOAuth設定を実行してください:
+echo Step 4: OAuth setup
+echo    Please run OAuth setup manually:
 echo    npm run oauth-setup
 echo.
-echo ⚠️  注意: .env ファイルを手動で確認してください
+echo WARNING: Please verify .env file manually
 
-:: Claude Desktop設定案内
+:: Claude Desktop setup guidance
 echo.
-echo 📋 Step 5: Claude Desktop設定
-echo    以下の設定を claude_desktop_config.json に追加してください:
+echo Step 5: Claude Desktop configuration
+echo    Please add the following to claude_desktop_config.json:
 echo.
 echo    "claude-appsscript-pro": {
 echo        "command": "node",
@@ -62,10 +62,10 @@ echo        "cwd": "%cd%"
 echo    }
 
 echo.
-echo 🎊 基本インストール完了！
-echo    次のステップ:
-echo    1. npm run oauth-setup でOAuth設定
-echo    2. Claude Desktop 再起動
-echo    3. MCP接続確認
+echo Basic installation completed!
+echo    Next steps:
+echo    1. Run npm run oauth-setup for OAuth configuration
+echo    2. Restart Claude Desktop
+echo    3. Verify MCP connection
 echo.
 pause

@@ -10,14 +10,14 @@ if not "%CURRENT_CP%"=="65001" (
     chcp 65001 >nul 2>&1
 )
 
-REM Claude-AppsScript-Pro 完全自動インストーラー
-REM バージョン: 2.1.1 - 文字エンコーディング問題修正版
+REM Claude-AppsScript-Pro Complete Auto Installer
+REM Version: 2.1.1 - Character Encoding Issue Fixed
 
-REM PowerShell実行検出
+REM PowerShell execution detection
 set "POWERSHELL_MODE=false"
 echo %CMDCMDLINE% | find /i "powershell" >nul && set "POWERSHELL_MODE=true"
 
-REM 完全自動モード
+REM Full automatic mode
 if "%AUTO_INSTALL_MODE%"=="true" set "POWERSHELL_MODE=true"
 
 title Claude-AppsScript-Pro Auto Installer v2.1.1
