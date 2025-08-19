@@ -105,139 +105,134 @@ if /i "!OAUTH_CHOICE!"=="Y" (
     pause >nul
 )
 
-goto :OAuthComplete
-
-:ManualOAuth
-echo 🚀 OAuth設定を開始します...
-echo.
-echo ⚠️  重要: 以下の手順で進めます
-echo    1. npm run oauth-setup を実行
-echo    2. ブラウザで Google 認証を完了
-echo    3. 認証完了後、手動でEnterキーを押して次に進む
-echo.
-echo 📋 準備ができたらEnterキーを押してください...
-pause >nul
-
-echo [%DATE% %TIME%] OAuth設定開始 >> %LOG_FILE%
-echo 🔄 OAuth設定プロセスを開始中...
-
-node scripts/oauth-setup.cjs --web
-set OAUTH_ERRORLEVEL=!ERRORLEVEL!
-
-echo.
-echo ⚠️  npm run oauth-setup の実行が完了しました
-echo.
-
-:: 🚀 新機能: OAuth成功の自動検証（重複実行防止）
-echo 🔍 REFRESH_TOKEN取得状況を自動確認中...
-if exist .env (
-    findstr "GOOGLE_APP_SCRIPT_API_REFRESH_TOKEN=1//" .env >nul 2>&1
-    if !ERRORLEVEL! EQU 0 (
-        echo ✅ OAuth認証完了を自動検出 - REFRESH_TOKEN取得済み
-        echo 📋 認証は正常に完了しました
-        echo [%DATE% %TIME%] OAuth設定完了（自動検証） >> %LOG_FILE%
-        goto :OAuthVerificationComplete
-    ) else (
-        echo ⚠️  REFRESH_TOKENが未取得です
-        echo 💡 ユーザー確認が必要です
-    )
-) else (
-    echo ⚠️  .envファイルが見つかりません
-    echo 💡 OAuth設定が失敗した可能性があります
-)
-
-:: 自動検証失敗時のみユーザー確認
-echo.
-echo 🔍 認証状況を確認します...
-echo    - ブラウザでGoogle認証を完了しましたか？
-echo    - .envファイルにREFRESH_TOKENが保存されましたか？
-echo.
-echo 📋 OAuth認証が完全に完了した場合のみ Y を選択してください
-echo 🔑 OAuth認証は完了しましたか？ (Y/N)
-set /p OAUTH_COMPLETE="選択 (Y/N): "
-
-if /i "!OAUTH_COMPLETE!"=="Y" (
-    echo ✅ OAuth設定完了を確認しました
-    echo [%DATE% %TIME%] OAuth設定完了（ユーザー確認） >> %LOG_FILE%
-    goto :OAuthVerificationComplete
-) else (
-    echo ⚠️  OAuth認証が未完了です
+    echo 🚀 OAuth設定を開始します...
     echo.
-    echo 💡 以下の方法で後から設定できます:
-    echo    1. npm run oauth-setup を再実行
-    echo    2. ブラウザでGoogle認証を完了
-    echo    3. .envファイルの設定を確認
+    echo ⚠️  重要: 以下の手順で進めます
+    echo    1. npm run oauth-setup を実行
+    echo    2. ブラウザで Google 認証を完了
+    echo    3. 認証完了後、手動でEnterキーを押して次に進む
     echo.
-    echo [%DATE% %TIME%] OAuth設定未完了（ユーザー選択） >> %LOG_FILE%
-    echo 📋 続行するには、まずOAuth設定を完了してください
+    echo 📋 準備ができたらEnterキーを押してください...
+    pause >nul
     
-    :: 🔧 修正: 再試行前にREFRESH_TOKEN再確認（重複実行防止）
-    echo 🔍 最終確認: REFRESH_TOKEN状況を再チェック中...
+    echo [%DATE% %TIME%] OAuth設定開始 >> %LOG_FILE%
+    echo 🔄 OAuth設定プロセスを開始中...
+    
+    node scripts/oauth-setup.cjs --web
+    set OAUTH_ERRORLEVEL=!ERRORLEVEL!
+    
+    echo.
+    echo ⚠️  npm run oauth-setup の実行が完了しました
+    echo.
+    
+    :: 🚀 新機能: OAuth成功の自動検証（重複実行防止）
+    echo 🔍 REFRESH_TOKEN取得状況を自動確認中...
     if exist .env (
         findstr "GOOGLE_APP_SCRIPT_API_REFRESH_TOKEN=1//" .env >nul 2>&1
         if !ERRORLEVEL! EQU 0 (
-            echo ✅ 実際にはREFRESH_TOKENが取得されています
-            echo 💡 OAuth設定は完了済みです - 次に進みます
-            echo [%DATE% %TIME%] OAuth設定完了（再確認で検出） >> %LOG_FILE%
+            echo ✅ OAuth認証完了を自動検出 - REFRESH_TOKEN取得済み
+            echo 📋 認証は正常に完了しました
+            echo [%DATE% %TIME%] OAuth設定完了（自動検証） >> %LOG_FILE%
             goto :OAuthVerificationComplete
+        ) else (
+            echo ⚠️  REFRESH_TOKENが未取得です
+            echo 💡 ユーザー確認が必要です
         )
+    ) else (
+        echo ⚠️  .envファイルが見つかりません
+        echo 💡 OAuth設定が失敗した可能性があります
     )
+
+    :: 自動検証失敗時のみユーザー確認
+    echo.
+    echo 🔍 認証状況を確認します...
+    echo    - ブラウザでGoogle認証を完了しましたか？
+    echo    - .envファイルにREFRESH_TOKENが保存されましたか？
+    echo.
+    echo 📋 OAuth認証が完全に完了した場合のみ Y を選択してください
+    echo 🔑 OAuth認証は完了しましたか？ (Y/N)
+    set /p OAUTH_COMPLETE="選択 (Y/N): "
     
-    echo 🔄 今すぐOAuth設定を再試行しますか？ (Y/N)
-    set /p RETRY_OAUTH="選択 (Y/N): "
-    if /i "!RETRY_OAUTH!"=="Y" (
-        echo 🔄 OAuth設定を再試行中...
-        echo [%DATE% %TIME%] OAuth設定再試行開始 >> %LOG_FILE%
-        node scripts/oauth-setup.cjs --web
-        
-        :: 🚀 再試行後も自動検証（重複実行防止）
+    if /i "!OAUTH_COMPLETE!"=="Y" (
+        echo ✅ OAuth設定完了を確認しました
+        echo [%DATE% %TIME%] OAuth設定完了（ユーザー確認） >> %LOG_FILE%
+        goto :OAuthVerificationComplete
+    ) else (
+        echo ⚠️  OAuth認証が未完了です
         echo.
-        echo 🔍 再試行結果を自動確認中...
+        echo 💡 以下の方法で後から設定できます:
+        echo    1. npm run oauth-setup を再実行
+        echo    2. ブラウザでGoogle認証を完了
+        echo    3. .envファイルの設定を確認
+        echo.
+        echo [%DATE% %TIME%] OAuth設定未完了（ユーザー選択） >> %LOG_FILE%
+        echo 📋 続行するには、まずOAuth設定を完了してください
+        
+        :: 🔧 修正: 再試行前にREFRESH_TOKEN再確認（重複実行防止）
+        echo 🔍 最終確認: REFRESH_TOKEN状況を再チェック中...
         if exist .env (
             findstr "GOOGLE_APP_SCRIPT_API_REFRESH_TOKEN=1//" .env >nul 2>&1
             if !ERRORLEVEL! EQU 0 (
-                echo ✅ OAuth設定が完了しました（自動検証）
-                echo [%DATE% %TIME%] OAuth設定完了（再試行成功・自動検証） >> %LOG_FILE%
+                echo ✅ 実際にはREFRESH_TOKENが取得されています
+                echo 💡 OAuth設定は完了済みです - 次に進みます
+                echo [%DATE% %TIME%] OAuth設定完了（再確認で検出） >> %LOG_FILE%
                 goto :OAuthVerificationComplete
-            ) else (
-                echo ⚠️  OAuth設定が失敗しました
-                echo 💡 手動で後から設定してください: npm run oauth-setup
-                echo [%DATE% %TIME%] OAuth設定失敗（再試行後） >> %LOG_FILE%
             )
         )
-    ) else (
-        echo ⚠️  OAuth設定をスキップしました
-        echo 💡 インストールは続行しますが、ツールは使用できません
-        echo [%DATE% %TIME%] OAuth設定スキップ（ユーザー選択） >> %LOG_FILE%
-        if "%POWERSHELL_MODE%"=="false" pause
+        
+        echo 🔄 今すぐOAuth設定を再試行しますか？ (Y/N)
+        set /p RETRY_OAUTH="選択 (Y/N): "
+        if /i "!RETRY_OAUTH!"=="Y" (
+            echo 🔄 OAuth設定を再試行中...
+            echo [%DATE% %TIME%] OAuth設定再試行開始 >> %LOG_FILE%
+            node scripts/oauth-setup.cjs --web
+            
+            :: 🚀 再試行後も自動検証（重複実行防止）
+            echo.
+            echo 🔍 再試行結果を自動確認中...
+            if exist .env (
+                findstr "GOOGLE_APP_SCRIPT_API_REFRESH_TOKEN=1//" .env >nul 2>&1
+                if !ERRORLEVEL! EQU 0 (
+                    echo ✅ OAuth設定が完了しました（自動検証）
+                    echo [%DATE% %TIME%] OAuth設定完了（再試行成功・自動検証） >> %LOG_FILE%
+                    goto :OAuthVerificationComplete
+                ) else (
+                    echo ⚠️  OAuth設定が失敗しました
+                    echo 💡 手動で後から設定してください: npm run oauth-setup
+                    echo [%DATE% %TIME%] OAuth設定失敗（再試行後） >> %LOG_FILE%
+                )
+            )
+        ) else (
+            echo ⚠️  OAuth設定をスキップしました
+            echo 💡 インストールは続行しますが、ツールは使用できません
+            echo [%DATE% %TIME%] OAuth設定スキップ（ユーザー選択） >> %LOG_FILE%
+            if "%POWERSHELL_MODE%"=="false" pause
+        )
     )
-)
 
-:OAuthVerificationComplete
-:: REFRESH_TOKENの最終確認
-if exist .env (
-    findstr "GOOGLE_APP_SCRIPT_API_REFRESH_TOKEN=1//" .env >nul 2>&1
-    if !ERRORLEVEL! EQU 0 (
-        echo ✅ .envファイルでREFRESH_TOKEN確認済み
-    ) else (
-        echo ⚠️  .envにREFRESH_TOKENが見つかりません
-        echo 💡 OAuth設定が不完全の可能性があります
+    :OAuthVerificationComplete
+    :: REFRESH_TOKENの最終確認
+    if exist .env (
+        findstr "GOOGLE_APP_SCRIPT_API_REFRESH_TOKEN=1//" .env >nul 2>&1
+        if !ERRORLEVEL! EQU 0 (
+            echo ✅ .envファイルでREFRESH_TOKEN確認済み
+        ) else (
+            echo ⚠️  .envにREFRESH_TOKENが見つかりません
+            echo 💡 OAuth設定が不完全の可能性があります
+        )
     )
-)
-goto :eof
-
-:AutoOAuth
-echo 🚀 OAuth設定を自動実行中...
-node scripts/oauth-setup.cjs --web >> %LOG_FILE% 2>&1
-if %ERRORLEVEL% EQU 0 (
-    echo ✅ OAuth設定が完了しました
-    echo [%DATE% %TIME%] OAuth設定完了（自動実行） >> %LOG_FILE%
 ) else (
-    echo ⚠️  OAuth設定でエラーが発生しました
-    echo 💡 手動で後から設定してください: npm run oauth-setup
-    echo [%DATE% %TIME%] OAuth設定エラー（自動実行） >> %LOG_FILE%
+    echo ℹ️  OAuth設定をスキップしました
+    echo 💡 後で手動実行してください: npm run oauth-setup
+    echo ⚠️  OAuth設定なしではツールは使用できません
+    echo.
+    echo 💭 今すぐOAuth設定を行うことを強く推奨します
+    echo 🔄 スキップして続行する場合はEnterキーを押してください
+    echo [%DATE% %TIME%] OAuth設定スキップ（初回選択） >> %LOG_FILE%
+    if "%POWERSHELL_MODE%"=="false" pause >nul
 )
-goto :eof
+
+goto :OAuthComplete
 
 :OAuthComplete
 
@@ -413,64 +408,3 @@ echo 💡 おつかれさまでした！
 echo    Claude-AppsScript-Pro v3.0.1 のセットアップが完了しました
 echo.
 pause
-goto :eof
-
-:: =============================================================================
-:: サブルーチン: Claude Desktop自動設定
-:: =============================================================================
-:AutoClaudeConfig
-echo 🔧 Claude Desktop設定を自動更新中...
-
-:: Node.jsの絶対パス検出
-for /f "tokens=*" %%i in ('where node 2^>nul') do set "NODE_PATH=%%i"
-if "!NODE_PATH!"=="" (
-    set "NODE_PATH=node"
-    echo ⚠️  Node.jsの絶対パスが検出できませんでした
-    echo 💡 相対パス 'node' を使用します
-) else (
-    echo 📍 Node.js検出: !NODE_PATH!
-)
-
-:: scripts/update-claude-config.cjs を使用
-if exist "scripts\update-claude-config.cjs" (
-    node scripts\update-claude-config.cjs >> %LOG_FILE% 2>&1
-    if !ERRORLEVEL! EQU 0 (
-        echo ✅ Claude Desktop設定が自動更新されました
-        echo [%DATE% %TIME%] Claude Desktop設定自動更新完了 >> %LOG_FILE%
-    ) else (
-        echo ⚠️  自動更新スクリプトでエラーが発生しました
-        echo 💡 手動設定が必要な可能性があります
-        echo [%DATE% %TIME%] Claude Desktop設定自動更新エラー >> %LOG_FILE%
-        call :ShowManualConfig
-    )
-) else (
-    echo ⚠️  自動更新スクリプトが見つかりません
-    echo 💡 手動設定を実行します
-    call :ShowManualConfig
-)
-goto :eof
-
-:: =============================================================================
-:: サブルーチン: 手動設定ガイド表示
-:: =============================================================================
-:ShowManualConfig
-echo.
-echo 📋 手動設定ガイド:
-echo.
-echo 設定ファイル場所: %APPDATA%\Claude\claude_desktop_config.json
-echo.
-echo 追加すべき設定内容:
-echo.
-echo {
-echo   "mcpServers": {
-echo     "claude-appsscript-pro": {
-echo       "command": "!NODE_PATH!",
-echo       "args": ["%CD%\server.js"],
-echo       "cwd": "%CD%"
-echo     }
-echo   }
-echo }
-echo.
-echo 💡 既存の設定がある場合は、mcpServers セクションに追加してください
-echo.
-goto :eof
