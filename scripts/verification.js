@@ -5,8 +5,8 @@
 
 console.log('🚀 Starting verification script...');
 
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
 
 console.log('📁 Working directory:', process.cwd());
 console.log('🎯 Node.js version:', process.version);
