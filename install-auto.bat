@@ -59,16 +59,32 @@ echo.
 echo Step 2: Installing dependencies...
 echo [%DATE% %TIME%] Step 2: npm install start >> %LOG_FILE%
 
-npm install
+REM Check if node_modules already exists to avoid redundant installation
+if exist "node_modules" (
+    echo INFO: Dependencies already installed, skipping npm install
+    echo [%DATE% %TIME%] Dependencies already present, skipped >> %LOG_FILE%
+    goto :syntax_check
+)
+
+REM Run npm install with timeout and error handling
+echo Running npm install...
+timeout /t 2 >nul 2>&1
+npm install --silent --no-progress >nul 2>&1
 if !ERRORLEVEL! NEQ 0 (
-    echo ERROR: npm install failed
-    echo [%DATE% %TIME%] ERROR: npm install failed >> %LOG_FILE%
-    if "%POWERSHELL_MODE%"=="false" pause
-    exit /b 1
+    echo WARNING: Silent install failed, trying verbose mode...
+    npm install
+    if !ERRORLEVEL! NEQ 0 (
+        echo ERROR: npm install failed
+        echo [%DATE% %TIME%] ERROR: npm install failed >> %LOG_FILE%
+        if "%POWERSHELL_MODE%"=="false" pause
+        exit /b 1
+    )
 )
 
 echo SUCCESS: Dependencies installed
 echo [%DATE% %TIME%] Dependencies installation completed >> %LOG_FILE%
+
+:syntax_check
 
 echo.
 echo Step 3: Syntax check...
