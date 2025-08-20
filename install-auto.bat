@@ -3,7 +3,7 @@ setlocal EnableDelayedExpansion
 
 REM ASCII-only version to avoid encoding issues completely
 REM Claude-AppsScript-Pro Complete Auto Installer
-REM Version: 2.1.2 - ASCII-only safe version
+REM Version: 3.0.1 - Fixed verification version
 
 REM PowerShell execution detection
 set "POWERSHELL_MODE=false"
@@ -12,18 +12,18 @@ echo %CMDCMDLINE% | find /i "powershell" >nul && set "POWERSHELL_MODE=true"
 REM Full auto mode
 if "%AUTO_INSTALL_MODE%"=="true" set "POWERSHELL_MODE=true"
 
-title Claude-AppsScript-Pro Auto Installer v2.1.2 (ASCII)
+title Claude-AppsScript-Pro Auto Installer v3.0.1 (Fixed)
 
 echo.
 echo =================================================================
-echo    Claude-AppsScript-Pro Complete Auto Installer v2.1.2
+echo    Claude-AppsScript-Pro Complete Auto Installer v3.0.1
 echo                PowerShell Compatible - Full Automation
 echo =================================================================
 echo.
 
 REM Log file setup
 set "LOG_FILE=install-auto.log"
-echo [%DATE% %TIME%] Installation started (ASCII version) >> %LOG_FILE%
+echo [%DATE% %TIME%] Installation started (Fixed version) >> %LOG_FILE%
 
 REM Working directory verification
 echo Current directory: %CD%
@@ -174,28 +174,23 @@ echo.
 echo Step 6: Final verification...
 echo [%DATE% %TIME%] Step 6: Final verification >> %LOG_FILE%
 
-REM Create process info file
-node -e "
-const fs = require('fs');
-const path = require('path');
-const info = {
-    version: '3.0.1',
-    nodeVersion: process.version,
-    platform: process.platform,
-    arch: process.arch,
-    cwd: process.cwd(),
-    timestamp: new Date().toISOString()
-};
-fs.writeFileSync('install-verification.json', JSON.stringify(info, null, 2));
-console.log('Verification file created');
-"
-
-if exist install-verification.json (
-    echo SUCCESS: Installation verification completed
-    echo [%DATE% %TIME%] Installation verification successful >> %LOG_FILE%
+REM Run verification script (FIXED - using external JS file)
+node scripts/verification.js
+if !ERRORLEVEL! EQU 0 (
+    echo SUCCESS: Verification script completed
+    echo [%DATE% %TIME%] Verification script successful >> %LOG_FILE%
 ) else (
-    echo WARNING: Verification file creation failed
-    echo [%DATE% %TIME%] Verification file creation failed >> %LOG_FILE%
+    echo WARNING: Verification script failed
+    echo [%DATE% %TIME%] Verification script failed >> %LOG_FILE%
+)
+
+REM Check if verification file was created
+if exist install-verification.json (
+    echo SUCCESS: Verification file created
+    echo [%DATE% %TIME%] Verification file found >> %LOG_FILE%
+) else (
+    echo WARNING: Verification file not found
+    echo [%DATE% %TIME%] Verification file missing >> %LOG_FILE%
 )
 
 echo.
