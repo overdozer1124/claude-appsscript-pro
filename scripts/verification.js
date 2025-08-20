@@ -39,4 +39,4 @@ try {
     console.error('🔍 Error details:', error);
     process.exit(1);
 }
-# Verification update 2025-08-20 11:10:43
+// Verification update 2025-08-20 11:10:43
