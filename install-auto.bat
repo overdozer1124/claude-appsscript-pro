@@ -2,7 +2,7 @@
 setlocal EnableDelayedExpansion
 
 REM Enhanced Auto Installer with ASCII Progress Bar
-REM Claude-AppsScript-Pro Complete Auto Installer v4.1.0
+REM Claude-AppsScript-Pro Complete Auto Installer v4.1.0 FIXED
 REM Features: Windows PowerShell compatible ASCII progress bar, enhanced error handling, step tracking
 
 REM UTF-8 Encoding Setup
@@ -15,7 +15,7 @@ echo %CMDCMDLINE% | find /i "powershell" >nul && set "POWERSHELL_MODE=true"
 REM Full auto mode
 if "%AUTO_INSTALL_MODE%"=="true" set "POWERSHELL_MODE=true"
 
-title Claude-AppsScript-Pro Auto Installer v4.1.0
+title Claude-AppsScript-Pro Auto Installer v4.1.0 FIXED
 
 REM Progress tracking variables
 set "TOTAL_STEPS=6"
@@ -23,21 +23,21 @@ set "CURRENT_STEP=0"
 
 REM Progress bar function
 :show_progress
-set /a PROGRESS_PERCENT=(%CURRENT_STEP% * 100) / %TOTAL_STEPS%
+set /a PROGRESS_PERCENT=(!CURRENT_STEP! * 100) / !TOTAL_STEPS!
 set "PROGRESS_BAR="
 set "PROGRESS_EMPTY="
 
 REM Create progress bar (20 characters width)
-set /a FILLED_CHARS=(%PROGRESS_PERCENT% * 20) / 100
-set /a EMPTY_CHARS=20 - %FILLED_CHARS%
+set /a FILLED_CHARS=(!PROGRESS_PERCENT! * 20) / 100
+set /a EMPTY_CHARS=20 - !FILLED_CHARS!
 
-for /L %%i in (1,1,%FILLED_CHARS%) do set "PROGRESS_BAR=!PROGRESS_BAR!#"
-for /L %%i in (1,1,%EMPTY_CHARS%) do set "PROGRESS_EMPTY=!PROGRESS_EMPTY!."
+for /L %%i in (1,1,!FILLED_CHARS!) do set "PROGRESS_BAR=!PROGRESS_BAR!#"
+for /L %%i in (1,1,!EMPTY_CHARS!) do set "PROGRESS_EMPTY=!PROGRESS_EMPTY!."
 
 echo.
 echo +==================================================================+
-echo |         Claude-AppsScript-Pro Auto Installer v4.1.0            |
-echo |           Windows PowerShell Compatible ASCII Edition           |
+echo ^|         Claude-AppsScript-Pro Auto Installer v4.1.0            ^|
+echo ^|           Windows PowerShell Compatible ASCII Edition           ^|
 echo +==================================================================+
 echo ^| Progress: [!PROGRESS_BAR!!PROGRESS_EMPTY!] !PROGRESS_PERCENT!%% ^(!CURRENT_STEP!/!TOTAL_STEPS!^) ^|
 echo +==================================================================+
@@ -49,7 +49,7 @@ call :show_progress
 
 REM Log file setup
 set "LOG_FILE=install-auto.log"
-echo [%DATE% %TIME%] Installation started (v4.1.0 with ASCII progress bar) >> %LOG_FILE%
+echo [%DATE% %TIME%] Installation started (v4.1.0 FIXED with ASCII progress bar) >> %LOG_FILE%
 
 REM Working directory verification
 echo [i] Current directory: %CD%
@@ -70,8 +70,8 @@ REM =================================================================
 set /a CURRENT_STEP=1
 call :show_progress
 
-echo [?] Step %CURRENT_STEP%: Verifying Node.js installation...
-echo [%DATE% %TIME%] Step %CURRENT_STEP%: Node.js verification >> %LOG_FILE%
+echo [?] Step !CURRENT_STEP!: Verifying Node.js installation...
+echo [%DATE% %TIME%] Step !CURRENT_STEP!: Node.js verification >> %LOG_FILE%
 
 node --version >nul 2>&1
 if !ERRORLEVEL! NEQ 0 (
@@ -83,8 +83,8 @@ if !ERRORLEVEL! NEQ 0 (
 )
 
 for /f "tokens=*" %%i in ('node --version') do set "NODE_VERSION=%%i"
-echo [OK] SUCCESS: Node.js found - %NODE_VERSION%
-echo [%DATE% %TIME%] Node.js version: %NODE_VERSION% >> %LOG_FILE%
+echo [OK] SUCCESS: Node.js found - !NODE_VERSION!
+echo [%DATE% %TIME%] Node.js version: !NODE_VERSION! >> %LOG_FILE%
 
 timeout /t 1 >nul 2>&1
 
@@ -94,8 +94,8 @@ REM =================================================================
 set /a CURRENT_STEP=2
 call :show_progress
 
-echo [PKG] Step %CURRENT_STEP%: Installing dependencies...
-echo [%DATE% %TIME%] Step %CURRENT_STEP%: npm install start >> %LOG_FILE%
+echo [PKG] Step !CURRENT_STEP!: Installing dependencies...
+echo [%DATE% %TIME%] Step !CURRENT_STEP!: npm install start >> %LOG_FILE%
 
 REM Check if node_modules already exists
 if exist "node_modules" (
@@ -104,14 +104,14 @@ if exist "node_modules" (
     goto :syntax_check
 )
 
-echo [>] Installing dependencies with silent output...
+echo [GT] Installing dependencies with silent output...
 set "RETRY_COUNT=0"
 set "MAX_RETRIES=3"
 
 :npm_install_retry
 set /a RETRY_COUNT+=1
-echo [DL] Attempt %RETRY_COUNT% of %MAX_RETRIES%...
-echo [%DATE% %TIME%] npm install attempt %RETRY_COUNT% >> %LOG_FILE%
+echo [DL] Attempt !RETRY_COUNT! of !MAX_RETRIES!...
+echo [%DATE% %TIME%] npm install attempt !RETRY_COUNT! >> %LOG_FILE%
 
 REM Configure npm
 call npm config set registry https://registry.npmjs.org/ >nul 2>&1
@@ -120,7 +120,7 @@ call npm config set fetch-retry-mintimeout 10000 >nul 2>&1
 call npm config set fetch-retry-maxtimeout 60000 >nul 2>&1
 
 REM Clear cache on retry
-if %RETRY_COUNT% GTR 1 (
+if !RETRY_COUNT! GTR 1 (
     echo [CLN] Clearing npm cache...
     call npm cache clean --force >nul 2>&1
     echo [%DATE% %TIME%] npm cache cleared >> %LOG_FILE%
@@ -133,11 +133,11 @@ set "NPM_EXIT_CODE=!ERRORLEVEL!"
 
 if !NPM_EXIT_CODE! EQU 0 (
     echo [OK] SUCCESS: Dependencies installed successfully
-    echo [%DATE% %TIME%] Dependencies installation completed on attempt %RETRY_COUNT% >> %LOG_FILE%
+    echo [%DATE% %TIME%] Dependencies installation completed on attempt !RETRY_COUNT! >> %LOG_FILE%
     goto :npm_install_complete
 ) else (
     echo [!]  WARNING: npm install failed with exit code !NPM_EXIT_CODE!
-    echo [%DATE% %TIME%] npm install failed on attempt %RETRY_COUNT% with exit code !NPM_EXIT_CODE! >> %LOG_FILE%
+    echo [%DATE% %TIME%] npm install failed on attempt !RETRY_COUNT! with exit code !NPM_EXIT_CODE! >> %LOG_FILE%
     
     if !RETRY_COUNT! LSS !MAX_RETRIES! (
         echo [WAIT] Retrying in 3 seconds...
@@ -175,8 +175,8 @@ REM =================================================================
 set /a CURRENT_STEP=3
 call :show_progress
 
-echo [?] Step %CURRENT_STEP%: Syntax verification...
-echo [%DATE% %TIME%] Step %CURRENT_STEP%: Syntax check >> %LOG_FILE%
+echo [?] Step !CURRENT_STEP!: Syntax verification...
+echo [%DATE% %TIME%] Step !CURRENT_STEP!: Syntax check >> %LOG_FILE%
 
 call node --check server.js >nul 2>&1
 if !ERRORLEVEL! NEQ 0 (
@@ -196,8 +196,8 @@ REM =================================================================
 set /a CURRENT_STEP=4
 call :show_progress
 
-echo [AUTH] Step %CURRENT_STEP%: OAuth configuration...
-echo [%DATE% %TIME%] Step %CURRENT_STEP%: OAuth setup start >> %LOG_FILE%
+echo [AUTH] Step !CURRENT_STEP!: OAuth configuration...
+echo [%DATE% %TIME%] Step !CURRENT_STEP!: OAuth setup start >> %LOG_FILE%
 
 REM Check if OAuth is already configured
 set "OAUTH_CONFIGURED=false"
@@ -210,7 +210,7 @@ if exist .env (
     )
 )
 
-if "%OAUTH_CONFIGURED%"=="false" (
+if "!OAUTH_CONFIGURED!"=="false" (
     if "%POWERSHELL_MODE%"=="true" (
         echo [WEB] Running automated OAuth setup...
         call node scripts/oauth-setup.cjs --web
@@ -253,12 +253,12 @@ REM =================================================================
 set /a CURRENT_STEP=5
 call :show_progress
 
-echo [CFG]  Step %CURRENT_STEP%: Claude Desktop configuration...
-echo [%DATE% %TIME%] Step %CURRENT_STEP%: Claude Desktop config start >> %LOG_FILE%
+echo [CFG]  Step !CURRENT_STEP!: Claude Desktop configuration...
+echo [%DATE% %TIME%] Step !CURRENT_STEP!: Claude Desktop config start >> %LOG_FILE%
 
 REM Get Node.js absolute path
 for /f "tokens=*" %%i in ('where node') do set "NODE_PATH=%%i"
-echo [PATH] Node.js path: %NODE_PATH%
+echo [PATH] Node.js path: !NODE_PATH!
 
 REM Update Claude Desktop configuration
 call node scripts/update-claude-config.cjs >nul 2>&1
@@ -279,8 +279,8 @@ REM =================================================================
 set /a CURRENT_STEP=6
 call :show_progress
 
-echo [?] Step %CURRENT_STEP%: Final verification...
-echo [%DATE% %TIME%] Step %CURRENT_STEP%: Final verification >> %LOG_FILE%
+echo [?] Step !CURRENT_STEP!: Final verification...
+echo [%DATE% %TIME%] Step !CURRENT_STEP!: Final verification >> %LOG_FILE%
 
 REM Run verification script
 call node scripts/verification.js >nul 2>&1
@@ -310,7 +310,7 @@ call :show_progress
 
 echo.
 echo +==================================================================+
-echo |                   INSTALLATION COMPLETED!                       |
+echo ^|                   INSTALLATION COMPLETED!                       ^|
 echo +==================================================================+
 echo.
 echo [ ] Next steps:
