@@ -3,7 +3,7 @@ setlocal EnableDelayedExpansion
 
 REM ASCII-only version to avoid encoding issues completely
 REM Claude-AppsScript-Pro Complete Auto Installer
-REM Version: 3.0.2 - Enhanced npm retry for virtual environments
+REM Version: 3.1.0 - Improved npm logging and compatibility
 
 REM PowerShell execution detection
 set "POWERSHELL_MODE=false"
@@ -12,18 +12,18 @@ echo %CMDCMDLINE% | find /i "powershell" >nul && set "POWERSHELL_MODE=true"
 REM Full auto mode
 if "%AUTO_INSTALL_MODE%"=="true" set "POWERSHELL_MODE=true"
 
-title Claude-AppsScript-Pro Auto Installer v3.0.2 (Enhanced)
+title Claude-AppsScript-Pro Auto Installer v3.1.0 (Improved)
 
 echo.
 echo =================================================================
-echo    Claude-AppsScript-Pro Complete Auto Installer v3.0.2
-echo           Enhanced npm retry for virtual environments
+echo    Claude-AppsScript-Pro Complete Auto Installer v3.1.0
+echo          Improved npm logging and compatibility
 echo =================================================================
 echo.
 
 REM Log file setup
 set "LOG_FILE=install-auto.log"
-echo [%DATE% %TIME%] Installation started (Enhanced version 3.0.2) >> %LOG_FILE%
+echo [%DATE% %TIME%] Installation started (Improved version 3.1.0) >> %LOG_FILE%
 
 REM Working directory verification
 echo Current directory: %CD%
@@ -78,10 +78,10 @@ echo [%DATE% %TIME%] npm install attempt %RETRY_COUNT% >> %LOG_FILE%
 
 REM Configure npm for better virtual environment compatibility
 call npm config set registry https://registry.npmjs.org/
-call npm config set timeout 300000
 call npm config set fetch-retries 5
 call npm config set fetch-retry-mintimeout 10000
 call npm config set fetch-retry-maxtimeout 60000
+call npm config set network-timeout 300000
 
 REM Clear npm cache to avoid partial downloads
 if %RETRY_COUNT% GTR 1 (
@@ -90,9 +90,9 @@ if %RETRY_COUNT% GTR 1 (
     echo [%DATE% %TIME%] npm cache cleared >> %LOG_FILE%
 )
 
-REM Run npm install with progress for better visibility
+REM Run npm install with minimal logging for clean output
 echo Installing dependencies (this may take a few minutes)...
-call npm install --loglevel=info --progress=true
+call npm install --loglevel=warn --no-progress --no-audit
 set "NPM_EXIT_CODE=!ERRORLEVEL!"
 
 if !NPM_EXIT_CODE! EQU 0 (
