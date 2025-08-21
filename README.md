@@ -1,5 +1,4 @@
 # 🚀 Claude-AppsScript-Pro v3.1.0
-# 🚀 Claude-AppsScript-Pro v3.1.0
 ## Google Apps Script開発を革命的に効率化するMCPサーバー
 
 Claude-AppsScript-Pro は、**61ツール統合**・**AI自律開発**・**リアルタイムブラウザデバッグ**により、Google Apps Script開発の**99%出力削減**と**10倍デバッグ効率向上**を実現する革命的プラットフォームです。
@@ -55,15 +54,58 @@ Claude-AppsScript-Pro は、**61ツール統合**・**AI自律開発**・**リ�
 
 ---
 
+## ⚠️ 重要：事前準備必須確認
+
+**ワンクリックインストール実行前に必ず確認してください：**
+
+### 📋 必須ソフトウェア確認
+```powershell
+# PowerShellで以下を実行し、全て正常に表示されることを確認
+git --version
+node --version
+npm --version
+```
+
+**エラーが出る場合：**
+- ❌ `'git' が認識されません` → [Git](https://git-scm.com/) をインストール・PC再起動
+- ❌ `'node' が認識されません` → [Node.js](https://nodejs.org/) をインストール・PC再起動
+
+### 🎯 代替手順（Git未インストールの場合）
+Gitをインストールしたくない場合：
+1. **[ZIPダウンロード](https://github.com/overdozer1124/claude-appsscript-pro/archive/refs/heads/main.zip)**
+2. Node.jsのみインストール
+3. 解凍後：`npm install` → `.\install-auto.bat`
+
+---
+
 ## ⚡ ワンクリックインストール
 
 ### Windows（完全自動・最推奨）🔥
 
 ```powershell
-# 🚀 PowerShell で実行（ノンストップ実行・最推奨）
-powershell -Command "& { git clone https://github.com/overdozer1124/claude-appsscript-pro.git; cd claude-appsscript-pro; npm install; .\install-auto.bat }"
-
+# 🚀 PowerShell完全自動セットアップ（PATH問題解決版・最推奨）
+powershell -ExecutionPolicy RemoteSigned -Command "if(!(Test-Path ~\AppData\Roaming\Claude\MCP)){mkdir ~\AppData\Roaming\Claude\MCP -Force}; cd ~\AppData\Roaming\Claude\MCP; if(Test-Path claude-appsscript-pro){cd claude-appsscript-pro; git pull; cd ..} else {git clone https://github.com/overdozer1124/claude-appsscript-pro.git}; cd claude-appsscript-pro; .\install-auto.bat"
 ```
+
+**特徴:**
+✅ PowerShell実行ポリシー自動修正
+✅ WebアプリOAuth自動設定  
+✅ 既存MCP設定完全保護
+✅ エラー自動復旧
+✅ 3分完全セットアップ
+
+#### npm installエラー時の代替手順（Windows）
+
+```powershell
+# npm installエラーが発生した場合の手動解決手順
+cd ~\AppData\Roaming\Claude\MCP\claude-appsscript-pro
+$env:NODE_PATH = ""
+$env:NPM_CONFIG_PREFIX = ""
+npm install
+.\install-auto.bat
+```
+
+**使用タイミング**: install-auto.bat実行中にnpm installエラーが発生した場合
 
 ### macOS
 
@@ -392,7 +434,6 @@ macOS/Linux版の機能完全化にコミュニティの力をお借りしてい
 ## 🎊 まとめ
 
 **Claude-AppsScript-Pro v3.1.0** は、Google Apps Script開発の新時代を切り開く革命的プラットフォームです。
-**Claude-AppsScript-Pro v3.1.0** は、Google Apps Script開発の新時代を切り開く革命的プラットフォームです。
 
 ### ✨ 実現する価値
 
@@ -414,8 +455,8 @@ macOS/Linux版の機能完全化にコミュニティの力をお借りしてい
 ### 🔥 今すぐ始めましょう！
 
 ```powershell
-# Windows（最推奨・完全ノンストップ自動化）
-powershell -Command "& { git clone https://github.com/overdozer1124/claude-appsscript-pro.git; cd claude-appsscript-pro; npm install; .\install-auto.bat }"
+# Windows（最推奨・PowerShell実行ポリシー自動修正付き）
+powershell -Command "& { Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force; git clone https://github.com/overdozer1124/claude-appsscript-pro.git; cd claude-appsscript-pro; npm install; .\install-auto.bat }"
 ```
 
 ```bash
@@ -434,3 +475,4 @@ git clone https://github.com/overdozer1124/claude-appsscript-pro.git && cd claud
 
 
 **📋 要件**: Node.js 18.0.0+ | **🏷️ ライセンス**: MIT | **⭐ バージョン**: v3.1.0
+
