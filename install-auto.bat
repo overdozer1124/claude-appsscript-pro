@@ -77,22 +77,22 @@ echo Attempt %RETRY_COUNT% of %MAX_RETRIES%...
 echo [%DATE% %TIME%] npm install attempt %RETRY_COUNT% >> %LOG_FILE%
 
 REM Configure npm for better virtual environment compatibility
-npm config set registry https://registry.npmjs.org/
-npm config set timeout 300000
-npm config set fetch-retries 5
-npm config set fetch-retry-mintimeout 10000
-npm config set fetch-retry-maxtimeout 60000
+call npm config set registry https://registry.npmjs.org/
+call npm config set timeout 300000
+call npm config set fetch-retries 5
+call npm config set fetch-retry-mintimeout 10000
+call npm config set fetch-retry-maxtimeout 60000
 
 REM Clear npm cache to avoid partial downloads
 if %RETRY_COUNT% GTR 1 (
     echo Clearing npm cache...
-    npm cache clean --force >nul 2>&1
+    call npm cache clean --force >nul 2>&1
     echo [%DATE% %TIME%] npm cache cleared >> %LOG_FILE%
 )
 
 REM Run npm install with progress for better visibility
 echo Installing dependencies (this may take a few minutes)...
-npm install --loglevel=info --progress=true
+call npm install --loglevel=info --progress=true
 set "NPM_EXIT_CODE=!ERRORLEVEL!"
 
 if !NPM_EXIT_CODE! EQU 0 (
@@ -131,7 +131,7 @@ echo.
 echo Step 3: Syntax check...
 echo [%DATE% %TIME%] Step 3: Syntax check >> %LOG_FILE%
 
-node --check server.js
+call node --check server.js
 if !ERRORLEVEL! NEQ 0 (
     echo ERROR: server.js has syntax errors
     echo [%DATE% %TIME%] ERROR: server.js syntax error >> %LOG_FILE%
@@ -160,7 +160,7 @@ if exist .env (
 if "%OAUTH_CONFIGURED%"=="false" (
     if "%POWERSHELL_MODE%"=="true" (
         echo Running automated OAuth setup...
-        node scripts/oauth-setup.cjs --web
+        call node scripts/oauth-setup.cjs --web
     ) else (
         echo.
         echo OAuth setup is required for full functionality
@@ -173,7 +173,7 @@ if "%OAUTH_CONFIGURED%"=="false" (
             echo [%DATE% %TIME%] OAuth setup skipped by user >> %LOG_FILE%
         ) else (
             echo Running OAuth setup...
-            node scripts/oauth-setup.cjs --web
+            call node scripts/oauth-setup.cjs --web
             echo [%DATE% %TIME%] OAuth setup completed >> %LOG_FILE%
         )
     )
@@ -201,7 +201,7 @@ for /f "tokens=*" %%i in ('where node') do set "NODE_PATH=%%i"
 echo Node.js path: %NODE_PATH%
 
 REM Update Claude Desktop configuration
-node scripts/update-claude-config.cjs
+call node scripts/update-claude-config.cjs
 if !ERRORLEVEL! NEQ 0 (
     echo WARNING: Failed to update Claude Desktop configuration
     echo You may need to update it manually
@@ -216,7 +216,7 @@ echo Step 6: Final verification...
 echo [%DATE% %TIME%] Step 6: Final verification >> %LOG_FILE%
 
 REM Run verification script (FIXED - using external JS file)
-node scripts/verification.js
+call node scripts/verification.js
 if !ERRORLEVEL! EQU 0 (
     echo SUCCESS: Verification script completed
     echo [%DATE% %TIME%] Verification script successful >> %LOG_FILE%
