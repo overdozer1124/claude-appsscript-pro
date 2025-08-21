@@ -3,7 +3,7 @@ setlocal EnableDelayedExpansion
 
 REM ASCII-only version to avoid encoding issues completely
 REM Claude-AppsScript-Pro Complete Auto Installer
-REM Version: 3.0.1 - Fixed verification version
+REM Version: 3.0.2 - Enhanced npm retry for virtual environments
 
 REM PowerShell execution detection
 set "POWERSHELL_MODE=false"
@@ -12,18 +12,18 @@ echo %CMDCMDLINE% | find /i "powershell" >nul && set "POWERSHELL_MODE=true"
 REM Full auto mode
 if "%AUTO_INSTALL_MODE%"=="true" set "POWERSHELL_MODE=true"
 
-title Claude-AppsScript-Pro Auto Installer v3.0.1 (Fixed)
+title Claude-AppsScript-Pro Auto Installer v3.0.2 (Enhanced)
 
 echo.
 echo =================================================================
-echo    Claude-AppsScript-Pro Complete Auto Installer v3.0.1
-echo                PowerShell Compatible - Full Automation
+echo    Claude-AppsScript-Pro Complete Auto Installer v3.0.2
+echo           Enhanced npm retry for virtual environments
 echo =================================================================
 echo.
 
 REM Log file setup
 set "LOG_FILE=install-auto.log"
-echo [%DATE% %TIME%] Installation started (Fixed version) >> %LOG_FILE%
+echo [%DATE% %TIME%] Installation started (Enhanced version 3.0.2) >> %LOG_FILE%
 
 REM Working directory verification
 echo Current directory: %CD%
@@ -66,23 +66,64 @@ if exist "node_modules" (
     goto :syntax_check
 )
 
-REM Run npm install with timeout and error handling
-echo Running npm install...
-timeout /t 2 >nul 2>&1
-npm install --silent --no-progress >nul 2>&1
-if !ERRORLEVEL! NEQ 0 (
-    echo WARNING: Silent install failed, trying verbose mode...
-    npm install
-    if !ERRORLEVEL! NEQ 0 (
-        echo ERROR: npm install failed
-        echo [%DATE% %TIME%] ERROR: npm install failed >> %LOG_FILE%
+REM Enhanced npm install with retry mechanism for virtual environments
+echo Running npm install with retry support...
+set "RETRY_COUNT=0"
+set "MAX_RETRIES=3"
+
+:npm_install_retry
+set /a RETRY_COUNT+=1
+echo Attempt %RETRY_COUNT% of %MAX_RETRIES%...
+echo [%DATE% %TIME%] npm install attempt %RETRY_COUNT% >> %LOG_FILE%
+
+REM Configure npm for better virtual environment compatibility
+npm config set registry https://registry.npmjs.org/
+npm config set timeout 300000
+npm config set fetch-retries 5
+npm config set fetch-retry-mintimeout 10000
+npm config set fetch-retry-maxtimeout 60000
+
+REM Clear npm cache to avoid partial downloads
+if %RETRY_COUNT% GTR 1 (
+    echo Clearing npm cache...
+    npm cache clean --force >nul 2>&1
+    echo [%DATE% %TIME%] npm cache cleared >> %LOG_FILE%
+)
+
+REM Run npm install with progress for better visibility
+echo Installing dependencies (this may take a few minutes)...
+npm install --loglevel=info --progress=true
+set "NPM_EXIT_CODE=!ERRORLEVEL!"
+
+if !NPM_EXIT_CODE! EQU 0 (
+    echo SUCCESS: Dependencies installed successfully
+    echo [%DATE% %TIME%] Dependencies installation completed on attempt %RETRY_COUNT% >> %LOG_FILE%
+    goto :npm_install_complete
+) else (
+    echo WARNING: npm install failed with exit code !NPM_EXIT_CODE!
+    echo [%DATE% %TIME%] npm install failed on attempt %RETRY_COUNT% with exit code !NPM_EXIT_CODE! >> %LOG_FILE%
+    
+    if !RETRY_COUNT! LSS !MAX_RETRIES! (
+        echo Retrying in 5 seconds...
+        timeout /t 5 >nul 2>&1
+        goto :npm_install_retry
+    ) else (
+        echo ERROR: All npm install attempts failed
+        echo This may be due to network issues or virtual environment limitations
+        echo.
+        echo Troubleshooting suggestions:
+        echo 1. Check internet connection
+        echo 2. Try running: npm install --verbose
+        echo 3. Clear npm cache: npm cache clean --force
+        echo 4. Restart and try again
+        echo.
+        echo [%DATE% %TIME%] ERROR: All npm install attempts exhausted >> %LOG_FILE%
         if "%POWERSHELL_MODE%"=="false" pause
         exit /b 1
     )
 )
 
-echo SUCCESS: Dependencies installed
-echo [%DATE% %TIME%] Dependencies installation completed >> %LOG_FILE%
+:npm_install_complete
 
 :syntax_check
 
