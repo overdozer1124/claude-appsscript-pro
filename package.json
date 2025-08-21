@@ -32,7 +32,7 @@
         "install-complete-unix": "chmod +x install-complete.sh && ./install-complete.sh",
         "oauth-cross": "node scripts/oauth-setup-cross.cjs",
         "oauth-cross-win": "C:\\\\Program Files\\\\nodejs\\\\node.exe scripts/oauth-setup-cross.cjs",
-        "postinstall": "echo \"\\n🔥 Phase 2完成版セットアップ完了!\\n\\n推奨コマンド:\\n- Windows: npm run auto-install (完全自動化)\\n- macOS/Linux: npm run install-complete (統合版)\\n- 全OS対応: npm run install-complete\\n\""
+        "postinstall": "echo \"Dependencies installed successfully. Run 'npm run auto-install' to complete setup.\""
     },
     "dependencies": {
         "@modelcontextprotocol/sdk": "^1.13.1",
