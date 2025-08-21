@@ -3,7 +3,7 @@ setlocal EnableDelayedExpansion
 
 REM ASCII-only version to avoid encoding issues completely
 REM Claude-AppsScript-Pro Complete Auto Installer
-REM Version: 3.0.2 - Enhanced npm retry for virtual environments
+REM Version: 3.0.3 - Virtual environments optimized with silent output
 
 REM PowerShell execution detection
 set "POWERSHELL_MODE=false"
@@ -12,18 +12,18 @@ echo %CMDCMDLINE% | find /i "powershell" >nul && set "POWERSHELL_MODE=true"
 REM Full auto mode
 if "%AUTO_INSTALL_MODE%"=="true" set "POWERSHELL_MODE=true"
 
-title Claude-AppsScript-Pro Auto Installer v3.0.2 (Enhanced)
+title Claude-AppsScript-Pro Auto Installer v3.0.3 (Silent)
 
 echo.
 echo =================================================================
-echo    Claude-AppsScript-Pro Complete Auto Installer v3.0.2
-echo           Enhanced npm retry for virtual environments
+echo    Claude-AppsScript-Pro Complete Auto Installer v3.0.3
+echo            Silent output optimized for virtual environments
 echo =================================================================
 echo.
 
 REM Log file setup
 set "LOG_FILE=install-auto.log"
-echo [%DATE% %TIME%] Installation started (Enhanced version 3.0.2) >> %LOG_FILE%
+echo [%DATE% %TIME%] Installation started (Silent version 3.0.3) >> %LOG_FILE%
 
 REM Working directory verification
 echo Current directory: %CD%
@@ -67,7 +67,7 @@ if exist "node_modules" (
 )
 
 REM Enhanced npm install with retry mechanism for virtual environments
-echo Running npm install with retry support...
+echo Running npm install with silent output (this may take a few minutes)...
 set "RETRY_COUNT=0"
 set "MAX_RETRIES=3"
 
@@ -77,11 +77,10 @@ echo Attempt %RETRY_COUNT% of %MAX_RETRIES%...
 echo [%DATE% %TIME%] npm install attempt %RETRY_COUNT% >> %LOG_FILE%
 
 REM Configure npm for better virtual environment compatibility
-call npm config set registry https://registry.npmjs.org/
-call npm config set timeout 300000
-call npm config set fetch-retries 5
-call npm config set fetch-retry-mintimeout 10000
-call npm config set fetch-retry-maxtimeout 60000
+call npm config set registry https://registry.npmjs.org/ >nul 2>&1
+call npm config set fetch-retries 5 >nul 2>&1
+call npm config set fetch-retry-mintimeout 10000 >nul 2>&1
+call npm config set fetch-retry-maxtimeout 60000 >nul 2>&1
 
 REM Clear npm cache to avoid partial downloads
 if %RETRY_COUNT% GTR 1 (
@@ -90,9 +89,9 @@ if %RETRY_COUNT% GTR 1 (
     echo [%DATE% %TIME%] npm cache cleared >> %LOG_FILE%
 )
 
-REM Run npm install with progress for better visibility
-echo Installing dependencies (this may take a few minutes)...
-call npm install --loglevel=info --progress=true
+REM Run npm install with silent output for cleaner experience
+echo Installing dependencies (silent mode for cleaner output)...
+call npm install --silent --no-progress --no-fund 2>nul
 set "NPM_EXIT_CODE=!ERRORLEVEL!"
 
 if !NPM_EXIT_CODE! EQU 0 (
@@ -104,22 +103,33 @@ if !NPM_EXIT_CODE! EQU 0 (
     echo [%DATE% %TIME%] npm install failed on attempt %RETRY_COUNT% with exit code !NPM_EXIT_CODE! >> %LOG_FILE%
     
     if !RETRY_COUNT! LSS !MAX_RETRIES! (
-        echo Retrying in 5 seconds...
+        echo Retrying in 5 seconds... (will show detailed output if all attempts fail)
         timeout /t 5 >nul 2>&1
         goto :npm_install_retry
     ) else (
-        echo ERROR: All npm install attempts failed
-        echo This may be due to network issues or virtual environment limitations
+        echo ERROR: All silent install attempts failed, trying with verbose output...
+        echo This will show detailed output for troubleshooting:
         echo.
-        echo Troubleshooting suggestions:
-        echo 1. Check internet connection
-        echo 2. Try running: npm install --verbose
-        echo 3. Clear npm cache: npm cache clean --force
-        echo 4. Restart and try again
-        echo.
-        echo [%DATE% %TIME%] ERROR: All npm install attempts exhausted >> %LOG_FILE%
-        if "%POWERSHELL_MODE%"=="false" pause
-        exit /b 1
+        call npm install --verbose
+        set "VERBOSE_EXIT_CODE=!ERRORLEVEL!"
+        
+        if !VERBOSE_EXIT_CODE! NEQ 0 (
+            echo.
+            echo ERROR: Installation failed even with verbose output
+            echo.
+            echo Troubleshooting suggestions:
+            echo 1. Check internet connection
+            echo 2. Try running: npm cache clean --force
+            echo 3. Restart and try again
+            echo 4. Check if antivirus is blocking npm
+            echo.
+            echo [%DATE% %TIME%] ERROR: All npm install attempts exhausted >> %LOG_FILE%
+            if "%POWERSHELL_MODE%"=="false" pause
+            exit /b 1
+        ) else (
+            echo SUCCESS: Installation completed with verbose output
+            echo [%DATE% %TIME%] Dependencies installation completed with verbose fallback >> %LOG_FILE%
+        )
     )
 )
 
@@ -131,7 +141,7 @@ echo.
 echo Step 3: Syntax check...
 echo [%DATE% %TIME%] Step 3: Syntax check >> %LOG_FILE%
 
-call node --check server.js
+call node --check server.js >nul 2>&1
 if !ERRORLEVEL! NEQ 0 (
     echo ERROR: server.js has syntax errors
     echo [%DATE% %TIME%] ERROR: server.js syntax error >> %LOG_FILE%
@@ -201,7 +211,7 @@ for /f "tokens=*" %%i in ('where node') do set "NODE_PATH=%%i"
 echo Node.js path: %NODE_PATH%
 
 REM Update Claude Desktop configuration
-call node scripts/update-claude-config.cjs
+call node scripts/update-claude-config.cjs >nul 2>&1
 if !ERRORLEVEL! NEQ 0 (
     echo WARNING: Failed to update Claude Desktop configuration
     echo You may need to update it manually
@@ -216,7 +226,7 @@ echo Step 6: Final verification...
 echo [%DATE% %TIME%] Step 6: Final verification >> %LOG_FILE%
 
 REM Run verification script (FIXED - using external JS file)
-call node scripts/verification.js
+call node scripts/verification.js >nul 2>&1
 if !ERRORLEVEL! EQU 0 (
     echo SUCCESS: Verification script completed
     echo [%DATE% %TIME%] Verification script successful >> %LOG_FILE%
