@@ -39,7 +39,7 @@ echo +==================================================================+
 echo |         Claude-AppsScript-Pro Auto Installer v4.1.0            |
 echo |           Windows PowerShell Compatible ASCII Edition           |
 echo +==================================================================+
-echo | Progress: [!PROGRESS_BAR!!PROGRESS_EMPTY!] %PROGRESS_PERCENT%%% ^(%CURRENT_STEP%/%TOTAL_STEPS%^) |
+echo ^| Progress: [!PROGRESS_BAR!!PROGRESS_EMPTY!] !PROGRESS_PERCENT!%% ^(!CURRENT_STEP!/!TOTAL_STEPS!^) ^|
 echo +==================================================================+
 echo.
 goto :eof
