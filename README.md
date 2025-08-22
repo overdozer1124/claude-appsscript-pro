@@ -44,6 +44,28 @@ Claude-AppsScript-Pro は、**61ツール統合**・**AI自律開発**・**リ�
    - タイプ：**「Webアプリケーション」**（重要）
    - リダイレクトURI：`http://localhost:3001/oauth/callback`
 
+### 🔐 必須OAuth スコープ設定
+
+Claude-AppsScript-Pro の61ツール機能を実現するため、以下の**4つの必須スコープ**が自動設定されます：
+
+| スコープURL | 機能説明 | 対応ツール例 |
+|-------------|----------|--------------|
+| `https://www.googleapis.com/auth/script.projects` | **Apps Script プロジェクト作成・更新** | システム構築・デプロイ・管理 |
+| `https://www.googleapis.com/auth/script.deployments` | **Apps Script デプロイ作成・更新** | WebApp公開・バージョン管理 |
+| `https://www.googleapis.com/auth/drive` | **Google Drive ファイル操作** | スプレッドシート作成・管理 |
+| `https://www.googleapis.com/auth/spreadsheets` | **スプレッドシート操作** | データ読み書き・分析・最適化 |
+
+**📋 Google Cloud Console での設定：**
+- これらのスコープは**自動的にOAuth認証時に設定**されます
+- 手動設定は不要ですが、OAuth クライアント作成時に「**Webアプリケーション**」を選択することが重要
+- 企業環境では管理者による事前承認が必要な場合があります
+
+**⚠️ 追加機能利用時の拡張スコープ：**
+将来的に以下の高度機能を利用する場合、追加スコープが必要になる可能性があります：
+- `https://www.googleapis.com/auth/script.triggers` - トリガー管理
+- `https://www.googleapis.com/auth/script.processes` - プロセス監視
+- `https://www.googleapis.com/auth/script.external_request` - 外部API連携
+
 ### チェックリスト
 
 - [ ] Node.js インストール確認：`node --version`
@@ -51,6 +73,7 @@ Claude-AppsScript-Pro は、**61ツール統合**・**AI自律開発**・**リ�
 - [ ] Claude Desktop インストール完了
 - [ ] GCPプロジェクト作成完了
 - [ ] OAuth クライアントID・シークレット取得完了
+- [ ] **OAuth スコープ理解完了**（自動設定されることを確認）
 
 ---
 
