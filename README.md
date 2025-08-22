@@ -43,6 +43,7 @@ Claude-AppsScript-Pro は、**61ツール統合**・**AI自律開発**・**リ�
 4. **OAuth 2.0 クライアント作成**：
    - タイプ：**「Webアプリケーション」**（重要）
    - リダイレクトURI：`http://localhost:3001/oauth/callback`
+
 5.**クライアント設定のjsonファイルを必ずダウンロードしておいてください。**
 
 ### 🔐 必須OAuth スコープ設定
