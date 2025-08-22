@@ -3,7 +3,7 @@ setlocal EnableDelayedExpansion
 
 REM ASCII-only version to avoid encoding issues completely
 REM Claude-AppsScript-Pro Complete Auto Installer
-REM Version: 3.1.0 - Improved npm logging and compatibility
+REM Version: 3.1.1 - Improved npm logging and compatibility
 
 REM PowerShell execution detection
 set "POWERSHELL_MODE=false"
@@ -12,7 +12,7 @@ echo %CMDCMDLINE% | find /i "powershell" >nul && set "POWERSHELL_MODE=true"
 REM Full auto mode
 if "%AUTO_INSTALL_MODE%"=="true" set "POWERSHELL_MODE=true"
 
-title Claude-AppsScript-Pro Auto Installer v3.1.0 (Improved)
+title Claude-AppsScript-Pro Auto Installer v3.1.1 (Improved)
 
 echo.
 echo =================================================================
@@ -23,7 +23,7 @@ echo.
 
 REM Log file setup
 set "LOG_FILE=install-auto.log"
-echo [%DATE% %TIME%] Installation started (Improved version 3.1.0) >> %LOG_FILE%
+echo [%DATE% %TIME%] Installation started (Improved version 3.1.1) >> %LOG_FILE%
 
 REM Working directory verification
 echo Current directory: %CD%
@@ -81,7 +81,7 @@ call npm config set registry https://registry.npmjs.org/
 call npm config set fetch-retries 5
 call npm config set fetch-retry-mintimeout 10000
 call npm config set fetch-retry-maxtimeout 60000
-call npm config set network-timeout 300000
+call npm config set timeout 300000
 
 REM Clear npm cache to avoid partial downloads
 if %RETRY_COUNT% GTR 1 (
