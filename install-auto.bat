@@ -1,4 +1,4 @@
-@echo off
+﻿@echo off
 setlocal EnableDelayedExpansion
 
 REM ASCII-only version to avoid encoding issues completely
@@ -77,11 +77,12 @@ echo Attempt %RETRY_COUNT% of %MAX_RETRIES%...
 echo [%DATE% %TIME%] npm install attempt %RETRY_COUNT% >> %LOG_FILE%
 
 REM Configure npm for better virtual environment compatibility
-call npm config set registry https://registry.npmjs.org/
-call npm config set fetch-retries 5
-call npm config set fetch-retry-mintimeout 10000
-call npm config set fetch-retry-maxtimeout 60000
-call npm config set timeout 300000
+  echo Configuring npm settings for stability...
+  call npm config set registry https://registry.npmjs.org/ 2>nul || echo Warning: npm config setting failed, continuing...
+  call npm config set fetch-retries 5 2>nul || echo Warning: npm config setting failed, continuing...
+  call npm config set fetch-retry-mintimeout 10000 2>nul || echo Warning: npm config setting failed, continuing...
+  call npm config set fetch-retry-maxtimeout 60000 2>nul || echo Warning: npm config setting failed, continuing...
+  call npm config set fetch-timeout 300000 2>nul || echo Warning: npm config setting failed, continuing...
 
 REM Clear npm cache to avoid partial downloads
 if %RETRY_COUNT% GTR 1 (
