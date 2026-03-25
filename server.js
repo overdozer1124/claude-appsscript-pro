@@ -166,81 +166,129 @@ class MCPServer {
         ...intelligentWorkflowTools
       ];
 
+      // エイリアスツール定義（旧名称でもClaudeが発見できるように）
+      const aliasToolDefs = [
+        { name: 'execute_function',      description: '🎯 Apps Script関数実行（execute_script_functionのエイリアス）', inputSchema: { type: 'object', properties: { script_id: { type: 'string' }, function_name: { type: 'string' }, parameters: { type: 'array', items: { type: 'string' } } }, required: ['script_id', 'function_name'] } },
+        { name: 'get_sheet_data',        description: 'スプレッドシートデータ取得（read_sheet_dataのエイリアス）',        inputSchema: { type: 'object', properties: { spreadsheet_id: { type: 'string' }, range: { type: 'string' } }, required: ['spreadsheet_id'] } },
+        { name: 'update_sheet_data',     description: 'スプレッドシートデータ更新（write_sheet_dataのエイリアス）',        inputSchema: { type: 'object', properties: { spreadsheet_id: { type: 'string' }, range: { type: 'string' }, values: { type: 'array' } }, required: ['spreadsheet_id', 'range', 'values'] } },
+        { name: 'get_sheet_info',        description: 'スプレッドシートメタ情報取得（get_spreadsheet_metadataのエイリアス）', inputSchema: { type: 'object', properties: { spreadsheet_id: { type: 'string' } }, required: ['spreadsheet_id'] } },
+        { name: 'clear_sheet_data',      description: 'シートデータクリア（update_sheet_rangeのエイリアス）',               inputSchema: { type: 'object', properties: { spreadsheet_id: { type: 'string' }, range: { type: 'string' } }, required: ['spreadsheet_id', 'range'] } },
+        { name: 'batch_update_sheet',    description: 'シート一括更新（update_sheet_rangeのエイリアス）',                  inputSchema: { type: 'object', properties: { spreadsheet_id: { type: 'string' }, range: { type: 'string' }, values: { type: 'array' } }, required: ['spreadsheet_id'] } },
+        { name: 'apply_patch',           description: 'コードパッチ適用（apply_code_patchのエイリアス）',                  inputSchema: { type: 'object', properties: { script_id: { type: 'string' }, file_name: { type: 'string' }, patch_content: { type: 'string' } }, required: ['script_id', 'file_name', 'patch_content'] } },
+        { name: 'apply_anchor_patch',    description: 'アンカーベースパッチ（apply_enhanced_patchのエイリアス）',            inputSchema: { type: 'object', properties: { script_id: { type: 'string' }, file_name: { type: 'string' }, anchored_patches: { type: 'array' } }, required: ['script_id', 'file_name', 'anchored_patches'] } },
+        { name: 'smart_patch',           description: 'スマートパッチ（smart_fix_scriptのエイリアス）',                    inputSchema: { type: 'object', properties: { script_id: { type: 'string' }, issue_description: { type: 'string' } }, required: ['script_id', 'issue_description'] } },
+        { name: 'multi_patch',           description: '複数パッチ適用（apply_html_patchのエイリアス）',                    inputSchema: { type: 'object', properties: { script_id: { type: 'string' }, file_name: { type: 'string' } }, required: ['script_id', 'file_name'] } },
+        { name: 'get_deployments',       description: 'デプロイ一覧取得（list_webapp_deploymentsのエイリアス）',            inputSchema: { type: 'object', properties: { script_id: { type: 'string' } }, required: ['script_id'] } },
+        { name: 'update_deployment',     description: 'デプロイ更新（update_webapp_deploymentのエイリアス）',              inputSchema: { type: 'object', properties: { script_id: { type: 'string' }, deployment_id: { type: 'string' } }, required: ['script_id', 'deployment_id'] } },
+        { name: 'list_script_files',     description: 'スクリプトファイル一覧（get_script_infoのエイリアス）',              inputSchema: { type: 'object', properties: { script_id: { type: 'string' } }, required: ['script_id'] } },
+      ];
+
+
       return {
-        tools: allTools
+        tools: [...allTools, ...aliasToolDefs]
       };
     });
 
     this.server.setRequestHandler(CallToolRequestSchema, async (request) => {
       const { name, arguments: args } = request.params;
       
+      // ===== ツール名エイリアスマッピング（後方互換性保持） =====
+      const TOOL_ALIAS_MAP = {
+        // Execution tools
+        'execute_function':          'execute_script_function',
+        // Sheet tools
+        'get_sheet_data':            'read_sheet_data',
+        'update_sheet_data':         'write_sheet_data',
+        'get_sheet_info':            'get_spreadsheet_metadata',
+        'clear_sheet_data':          'update_sheet_range',
+        'batch_update_sheet':        'update_sheet_range',
+        // Patch tools
+        'apply_patch':               'apply_code_patch',
+        'apply_anchor_patch':        'apply_enhanced_patch',
+        'smart_patch':               'smart_fix_script',
+        'multi_patch':               'apply_html_patch',
+        // Deployment tools
+        'get_deployments':           'list_webapp_deployments',
+        'update_deployment':         'update_webapp_deployment',
+        'deploy_webapp_version':     'deploy_webapp',
+        // Sheet management
+        'list_script_files':         'get_script_info',
+        'rename_script_file':        'update_script_file',
+        'delete_script_file_alias':  'delete_script_file',
+        // Script info
+        'get_script_info_alias':     'get_script_info',
+      };
+      const resolvedName = TOOL_ALIAS_MAP[name] || name;
+      // ===== エイリアスマッピング終了 =====
+
+      
       try {
         // Basic tools
-        if (['test_connection', 'diagnostic_info', 'test_apis', 'get_process_info'].includes(name)) {
-          return await this.basicTools.handleTool(name, args || {});
+        if (['test_connection', 'diagnostic_info', 'test_apis', 'get_process_info'].includes(resolvedName)) {
+          return await this.basicTools.handleTool(resolvedName, args || {});
         }
         
         // System tools
-        if (this.systemTools.canHandle(name)) {
-          return await this.systemTools.handleTool(name, args || {});
+        if (this.systemTools.canHandle(resolvedName)) {
+          return await this.systemTools.handleTool(resolvedName, args || {});
         }
         
         // Development tools
-        if (this.developmentTools.canHandle(name)) {
-          return await this.developmentTools.handleTool(name, args || {});
+        if (this.developmentTools.canHandle(resolvedName)) {
+          return await this.developmentTools.handleTool(resolvedName, args || {});
         }
         
         // Patch tools
-        if (this.patchTools.canHandle(name)) {
-          return await this.patchTools.handleTool(name, args || {});
+        if (this.patchTools.canHandle(resolvedName)) {
+          return await this.patchTools.handleTool(resolvedName, args || {});
         }
         
         // Enhanced Patch tools (🚀 革命的パッチシステム)
-        if (this.enhancedPatchTools.canHandle(name)) {
-          return await this.enhancedPatchTools.handleTool(name, args || {});
+        if (this.enhancedPatchTools.canHandle(resolvedName)) {
+          return await this.enhancedPatchTools.handleTool(resolvedName, args || {});
         }
         
         // Function tools
-        if (this.functionTools.canHandle(name)) {
-          return await this.functionTools.handleTool(name, args || {});
+        if (this.functionTools.canHandle(resolvedName)) {
+          return await this.functionTools.handleTool(resolvedName, args || {});
         }
         
         // Formula tools
-        if (this.formulaTools.canHandle(name)) {
-          return await this.formulaTools.handleTool(name, args || {});
+        if (this.formulaTools.canHandle(resolvedName)) {
+          return await this.formulaTools.handleTool(resolvedName, args || {});
         }
 
         // WebApp deployment tools
-        if (this.webappDeploymentTools.canHandle(name)) {
-          return await this.webappDeploymentTools.handleTool(name, args || {});
+        if (this.webappDeploymentTools.canHandle(resolvedName)) {
+          return await this.webappDeploymentTools.handleTool(resolvedName, args || {});
         }
 
         // Browser debug tools
-        if (this.browserDebugTools.canHandle(name)) {
-          return await this.browserDebugTools.handleTool(name, args || {});
+        if (this.browserDebugTools.canHandle(resolvedName)) {
+          return await this.browserDebugTools.handleTool(resolvedName, args || {});
         }
 
         // Sheet tools
-        if (this.sheetTools.canHandle(name)) {
-          return await this.sheetTools.handleTool(name, args || {});
+        if (this.sheetTools.canHandle(resolvedName)) {
+          return await this.sheetTools.handleTool(resolvedName, args || {});
         }
 
         // Sheet management tools
-        if (this.sheetManagement.canHandle(name)) {
-          return await this.sheetManagement.handleTool(name, args || {});
+        if (this.sheetManagement.canHandle(resolvedName)) {
+          return await this.sheetManagement.handleTool(resolvedName, args || {});
         }
 
         // Execution tools
-        if (this.executionTools.canHandle(name)) {
-          return await this.executionTools.handleTool(name, args || {});
+        if (this.executionTools.canHandle(resolvedName)) {
+          return await this.executionTools.handleTool(resolvedName, args || {});
         }
 
         // Intelligent Workflow tools
-        if (this.intelligentWorkflow.canHandle(name)) {
-          return await this.intelligentWorkflow.handleToolCall(name, args || {});
+        if (this.intelligentWorkflow.canHandle(resolvedName)) {
+          return await this.intelligentWorkflow.handleToolCall(resolvedName, args || {});
         }
         
-        throw new Error(`Unknown tool: ${name}`);
+        throw new Error(`Unknown tool: ${resolvedName}`);
         
       } catch (error) {
         this.logger.error(`Tool execution error for ${name}:`, error);
