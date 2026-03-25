@@ -65,6 +65,7 @@ class MCPServer {
     // Initialize all components (オールインワン版)
     this.googleManager = new GoogleAPIsManager();
     this.logger = new DiagnosticLogger();
+    this._initializationPromise = null;  // API初期化Promise（競合防止）
     
     // Initialize handlers - All-in-One Suite (61ツール構成)
     this.basicTools = new BasicToolsHandler(this.googleManager, this.logger, this);
@@ -81,8 +82,8 @@ class MCPServer {
     this.executionTools = new ExecutionToolsHandler(this.googleManager, this.logger);
     this.intelligentWorkflow = new IntelligentWorkflowHandler(this.googleManager, this.logger, this);
 
-    // Initialize Google APIs
-    this.initializeAPIs();
+    // Initialize Google APIs（Promiseを保存して後から待機可能にする）
+    this._initializationPromise = this.initializeAPIs();
 
     // Log process info
     this.logProcessInfo();
@@ -221,7 +222,11 @@ class MCPServer {
       const resolvedName = TOOL_ALIAS_MAP[name] || name;
       // ===== エイリアスマッピング終了 =====
 
-      
+      // Google APIs初期化完了を待機（競合防止）
+      if (this._initializationPromise) {
+        try { await this._initializationPromise; } catch(e) { /* 初期化エラーは各ツールで処理 */ }
+      }
+
       try {
         // Basic tools
         if (['test_connection', 'diagnostic_info', 'test_apis', 'get_process_info'].includes(resolvedName)) {
